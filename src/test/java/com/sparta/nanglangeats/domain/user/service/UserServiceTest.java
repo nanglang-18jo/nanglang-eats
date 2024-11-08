@@ -17,6 +17,7 @@ import com.sparta.nanglangeats.domain.user.controller.dto.request.UserSignupRequ
 import com.sparta.nanglangeats.domain.user.entity.User;
 import com.sparta.nanglangeats.domain.user.enums.UserRole;
 import com.sparta.nanglangeats.domain.user.repository.UserRepository;
+import com.sparta.nanglangeats.global.common.exception.CustomException;
 import com.sparta.nanglangeats.global.common.exception.CustomFieldError;
 import com.sparta.nanglangeats.global.common.exception.ParameterException;
 
@@ -164,6 +165,43 @@ class UserServiceTest {
 				tuple(duplicatedEmail, DUPLICATED_EMAIL.getMessage())
 			);
 	}
+
+	@Test
+	@DisplayName("getUserByUsername(유저네임): 유저네임을 받아 사용자를 조회한다.")
+	void getUserByUsername_success() {
+		// given
+		final String username = "testerId";
+		final String nickname = "tester";
+		final String email = "tester@gmail.com";
+		saveUser(username, nickname, email);
+
+		// when
+		User result = userService.getUserByUsername(username);
+
+		// then
+		assertThat(result).isNotNull();
+		assertThat(result.getUsername()).isEqualTo(username);
+		assertThat(result.getNickname()).isEqualTo(nickname);
+		assertThat(result.getEmail()).isEqualTo(email);
+	}
+
+	@Test
+	@DisplayName("getUserByUsername(유저네임): 유저네임이 존재하지 않는 경우 조회에 실패한다.")
+	void getUserByUsername_does_not_exist_username_fail() {
+		// given
+		final String username = "testerId";
+		final String nickname = "tester";
+		final String email = "tester@gmail.com";
+		saveUser(username, nickname, email);
+
+		final String newUsername = "newUsername";
+
+		// expected
+		assertThatThrownBy(() -> userService.getUserByUsername(newUsername))
+			.isInstanceOf(CustomException.class)
+			.hasMessage(USER_NOT_FOUND.getMessage());
+	}
+
 	
 	private User saveUser(String username, String nickname, String email) {
 		return userRepository.save(User.builder()

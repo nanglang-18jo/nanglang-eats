@@ -13,6 +13,7 @@ import com.sparta.nanglangeats.domain.user.controller.dto.request.UserSignupRequ
 import com.sparta.nanglangeats.domain.user.entity.User;
 import com.sparta.nanglangeats.domain.user.enums.UserRole;
 import com.sparta.nanglangeats.domain.user.repository.UserRepository;
+import com.sparta.nanglangeats.global.common.exception.CustomException;
 import com.sparta.nanglangeats.global.common.exception.CustomFieldError;
 import com.sparta.nanglangeats.global.common.exception.ParameterException;
 
@@ -30,15 +31,20 @@ public class UserService {
 		validateUserInfo(request);
 
 		return userRepository.save(User.builder()
-			.username(request.getUsername())
-			.password(passwordEncoder.encode(request.getPassword()))
-			.nickname(request.getNickname())
-			.email(request.getEmail())
-			.role(role)
-			.build())
+				.username(request.getUsername())
+				.password(passwordEncoder.encode(request.getPassword()))
+				.nickname(request.getNickname())
+				.email(request.getEmail())
+				.role(role)
+				.build())
 			.getId();
 	}
 
+	@Transactional(readOnly = true)
+	public User getUserByUsername(String username) {
+		return userRepository.findByUsername(username)
+			.orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+	}
 
 	private void validateUserInfo(UserSignupRequest request) {
 		List<CustomFieldError> customFieldErrors = new ArrayList<>();
