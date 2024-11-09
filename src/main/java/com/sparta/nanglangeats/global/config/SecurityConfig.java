@@ -9,6 +9,9 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 
+import com.sparta.nanglangeats.global.config.security.handler.CustomAuthenticationFailureHandler;
+import com.sparta.nanglangeats.global.config.security.handler.CustomAuthenticationSuccessHandler;
+
 import lombok.RequiredArgsConstructor;
 
 @Configuration
@@ -17,6 +20,9 @@ import lombok.RequiredArgsConstructor;
 public class SecurityConfig {
 
 	private final AuthenticationProvider authenticationProvider;
+
+	private final CustomAuthenticationSuccessHandler successHandler;
+	private final CustomAuthenticationFailureHandler failureHandler;
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -27,6 +33,8 @@ public class SecurityConfig {
 			.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 			.formLogin(form -> form
 				.loginProcessingUrl("/api/auth/login").permitAll()
+				.successHandler(successHandler)
+				.failureHandler(failureHandler)
 			)
 
 			.authorizeHttpRequests(requests -> requests
