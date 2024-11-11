@@ -11,11 +11,14 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import com.sparta.nanglangeats.domain.user.repository.UserRepository;
 import com.sparta.nanglangeats.global.config.security.entrypoint.CustomAuthenticationEntryPoint;
 import com.sparta.nanglangeats.global.config.security.filter.CustomAuthenticationFilter;
+import com.sparta.nanglangeats.global.config.security.filter.JwtAuthenticationFilter;
 import com.sparta.nanglangeats.global.config.security.handler.CustomAccessDeniedHandler;
 import com.sparta.nanglangeats.global.config.security.handler.CustomAuthenticationFailureHandler;
 import com.sparta.nanglangeats.global.config.security.handler.CustomAuthenticationSuccessHandler;
+import com.sparta.nanglangeats.global.config.security.jwt.JwtTokenProvider;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,7 +27,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+	private final JwtTokenProvider jwtTokenProvider;
 	private final AuthenticationConfiguration authenticationConfiguration;
+	private final UserRepository userRepository;
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -43,6 +48,7 @@ public class SecurityConfig {
 				.authenticationEntryPoint(new CustomAuthenticationEntryPoint()))
 
 			.addFilterBefore(customAuthenticationFilter(authenticationManager(authenticationConfiguration)), UsernamePasswordAuthenticationFilter.class)
+			.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
 			.build();
 	}
 
@@ -53,9 +59,13 @@ public class SecurityConfig {
 
 	private CustomAuthenticationFilter customAuthenticationFilter(AuthenticationManager authenticationManager) {
 		CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter();
-		customAuthenticationFilter.setAuthenticationSuccessHandler(new CustomAuthenticationSuccessHandler());
+		customAuthenticationFilter.setAuthenticationSuccessHandler(new CustomAuthenticationSuccessHandler(jwtTokenProvider));
 		customAuthenticationFilter.setAuthenticationFailureHandler(new CustomAuthenticationFailureHandler());
 		customAuthenticationFilter.setAuthenticationManager(authenticationManager);
 		return customAuthenticationFilter;
+	}
+
+	private JwtAuthenticationFilter jwtAuthenticationFilter() {
+		return new JwtAuthenticationFilter(jwtTokenProvider, userRepository);
 	}
 }
