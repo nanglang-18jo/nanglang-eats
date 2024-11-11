@@ -21,6 +21,9 @@ import com.sparta.nanglangeats.domain.address.entity.CommonAddress;
 import com.sparta.nanglangeats.global.common.exception.CustomException;
 import com.sparta.nanglangeats.global.common.exception.ErrorCode;
 
+import lombok.extern.log4j.Log4j2;
+
+@Log4j2
 @Service
 public class GeocodingService {
 
@@ -29,14 +32,15 @@ public class GeocodingService {
 
 	public CommonAddress getCoordinates(String address) {
 		try {
-			String apiUrl = "https://maps.googleapis.com/maps/api/geocode/json?address=" + address + "&key=" + apiKey;
+			String encodedAddress = URLEncoder.encode(address, "UTF-8");
+			String apiUrl = "https://maps.googleapis.com/maps/api/geocode/json?address=" + encodedAddress + "&key=" + apiKey;
 
 			URL url = new URL(apiUrl);
 			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 			connection.setRequestMethod("GET");
 
 			int responseCode = connection.getResponseCode();
-
+			
 			if (responseCode == HttpURLConnection.HTTP_OK) {
 				BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 				String line;
