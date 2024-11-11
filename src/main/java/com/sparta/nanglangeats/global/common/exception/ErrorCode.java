@@ -40,6 +40,12 @@ public enum ErrorCode {
     // Category
     CATEGORY_NOT_FOUND(NOT_FOUND, "존재하지 않는 카테고리입니다."),
 
+    // Image
+    UPLOAD_FAILED(HttpStatus.GATEWAY_TIMEOUT, "이미지 업로드에 실패하였습니다."),
+    UNSUPPORTED_MEDIA_TYPE(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "지원하지 않는 미디어 유형입니다."),
+    IMAGE_LIMIT_EXCEEDED(HttpStatus.PAYLOAD_TOO_LARGE, "이미지의 최대 용량은 10MB입니다."),
+    IMAGE_COUNT_EXCEEDED(HttpStatus.PAYLOAD_TOO_LARGE, "사진은 최대 5개까지 등록 가능합니다"),
+
 
     ;
 

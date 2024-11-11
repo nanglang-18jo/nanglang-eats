@@ -1,12 +1,16 @@
 package com.sparta.nanglangeats.domain.store.entity;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import com.sparta.nanglangeats.domain.address.entity.CommonAddress;
 import com.sparta.nanglangeats.domain.user.entity.User;
 import com.sparta.nanglangeats.global.common.entity.Timestamped;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -15,6 +19,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
@@ -35,7 +40,7 @@ public class Store extends Timestamped {
 	@Column(nullable = false, unique = true)
 	private UUID uuid; // 노출되는 식별자
 
-	@OneToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "category_id")
 	private Category category;
 
@@ -47,12 +52,12 @@ public class Store extends Timestamped {
 	private String name; // 상호명
 
 	@Column(nullable = false)
-	private LocalDateTime openTime; // 가게 운영 시작 시간
+	private LocalTime openTime; // 가게 운영 시작 시간
 
 	@Column(nullable = false)
-	private LocalDateTime closeTime; // 가게 운영 종료 시간
+	private LocalTime closeTime; // 가게 운영 종료 시간
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
 	@JoinColumn(name = "common_address_id")
 	private CommonAddress commonAddress; // 기본 주소
 
@@ -62,7 +67,7 @@ public class Store extends Timestamped {
 	@Column
 	private String phoneNumber; // 전화번호
 
-	@Column(nullable = false)
+	@Column
 	private Float rating; // 별점
 
 	@Column(nullable = false)
@@ -71,8 +76,11 @@ public class Store extends Timestamped {
 	@Column(nullable = false)
 	private Boolean isActive;
 
+	@OneToMany(mappedBy = "store", cascade = CascadeType.ALL)
+	private List<StoreImage> storeImages = new ArrayList<>();
+
 	@Builder
-	public Store(Category category, User user, String name, LocalDateTime openTime, LocalDateTime closeTime,
+	public Store(Category category, User user, String name, LocalTime openTime, LocalTime closeTime,
 		CommonAddress commonAddress, String addressDetail, String phoneNumber) {
 		this.uuid = UUID.randomUUID(); // uuid 자동 생성
 		this.category = category;
@@ -86,5 +94,13 @@ public class Store extends Timestamped {
 		this.rating = null; // 초기에는 별점을 null로 두고, 프론트에서도 안 보여주도록 함
 		this.reviewCount = 0;
 		this.isActive = true;
+	}
+
+	/**
+	 * 연관관계 편의 메서드
+	 */
+	public void addStoreImage(StoreImage storeImage) {
+		this.storeImages.add(storeImage);
+		storeImage.setStoreTo(this);
 	}
 }

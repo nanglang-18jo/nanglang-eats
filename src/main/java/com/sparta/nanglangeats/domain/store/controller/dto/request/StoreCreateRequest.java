@@ -1,6 +1,7 @@
 package com.sparta.nanglangeats.domain.store.controller.dto.request;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
@@ -21,10 +22,10 @@ public class StoreCreateRequest {
 	private String name;
 
 	@NotNull(message = "가게 운영 시작 시간을 입력해주세요.")
-	private LocalDateTime openTime;
+	private LocalTime openTime;
 
 	@NotNull(message = "가게 운영 종료 시간을 입력해주세요.")
-	private LocalDateTime closeTime;
+	private LocalTime closeTime;
 
 	@NotBlank(message = "가게 주소를 입력해주세요.")
 	private String address;
