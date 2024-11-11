@@ -34,7 +34,15 @@ public enum ErrorCode {
     GEOCODING_API_CALL_FAILED(INTERNAL_SERVER_ERROR, "Geocoding API 호출에 실패하였습니다."),
     IO_EXCEPTION_OCCURRED(INTERNAL_SERVER_ERROR, "서버에서 입출력 오류가 발생하였습니다."),
 
+    // Authorization
+    ACCESS_DENIED(FORBIDDEN, "접근 권한이 없습니다."),
+
+    // Category
+    CATEGORY_NOT_FOUND(NOT_FOUND, "존재하지 않는 카테고리입니다."),
+
+
     ;
+
     private final HttpStatus httpStatus;
     private final String message;
 

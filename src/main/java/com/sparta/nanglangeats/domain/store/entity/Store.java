@@ -56,7 +56,7 @@ public class Store extends Timestamped {
 	@JoinColumn(name = "common_address_id")
 	private CommonAddress commonAddress; // 기본 주소
 
-	@Column(nullable = false)
+	@Column
 	private String addressDetail; // 상세 주소
 
 	@Column
