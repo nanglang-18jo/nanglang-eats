@@ -15,10 +15,10 @@ public enum ErrorCode {
 
     // JWT
     INVALID_REFRESH_TOKEN(UNAUTHORIZED, "유효하지 않은 리프레시 토큰입니다. 다시 로그인 해주세요."),
-    CARD_ACCESS_FORBIDDEN(FORBIDDEN, "카드 작성자 및 매니저만 접근할 수 있습니다."),
 
     // User
     INVALID_PASSWORD(BAD_REQUEST, "유효하지 않은 비밀번호입니다"),
+    INVALID_USERNAME(BAD_REQUEST, "유효하지 않은 아이디입니다"),
 
     DUPLICATED_USERNAME(BAD_REQUEST, "이미 존재하는 사용자 아이디입니다."),
     DUPLICATED_NICKNAME(BAD_REQUEST, "이미 존재하는 사용자 유저네임입니다."),

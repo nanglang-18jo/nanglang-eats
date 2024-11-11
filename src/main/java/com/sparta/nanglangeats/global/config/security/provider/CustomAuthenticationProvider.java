@@ -44,7 +44,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 
 	private User getUser(String username) {
 		return userRepository.findByUsername(username)
-			.orElseThrow(() -> new UsernameNotFoundException(username));
+			.orElseThrow(() -> new UsernameNotFoundException(INVALID_USERNAME.getMessage()));
 	}
 
 	private void checkPassword(String password, User user) {
