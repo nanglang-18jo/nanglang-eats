@@ -2,6 +2,8 @@ package com.sparta.nanglangeats.domain.user.repository;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.util.Optional;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,28 @@ class UserRepositoryTest {
 
 	@Autowired
 	private UserRepository userRepository;
+
+	@Test
+	@DisplayName("findByUsername(유저네임): 유저네임을 받아 사용자를 조회한다.")
+	void findByUsername() {
+		// given
+		final String username = "tester";
+		final String nickname = "tester";
+		final String email = "tester";
+		final UserRole role = UserRole.CUSTOMER;
+
+		saveUser(username, nickname, email, role);
+
+		// when
+		Optional<User> result = userRepository.findByUsername(username);
+
+		// then
+		assertThat(result).isPresent();
+		assertThat(result.get().getUsername()).isEqualTo(username);
+		assertThat(result.get().getNickname()).isEqualTo(nickname);
+		assertThat(result.get().getEmail()).isEqualTo(email);
+	}
+
 
 	@Test
 	@DisplayName("existsByUsername(유저네임): 유저네임을 받아 사용자가 존재하는지 확인한다.")

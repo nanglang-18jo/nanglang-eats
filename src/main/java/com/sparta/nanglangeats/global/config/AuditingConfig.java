@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import com.sparta.nanglangeats.domain.user.entity.User;
+
 @Configuration
 @EnableJpaAuditing
 public class AuditingConfig {
@@ -16,15 +18,13 @@ public class AuditingConfig {
 	@Bean
 	public AuditorAware<String> auditorProvider() {
 		return () -> {
-			Authentication authentication = SecurityContextHolder.getContextHolderStrategy()
-				.getContext()
-				.getAuthentication();
+			Authentication authentication = SecurityContextHolder.getContextHolderStrategy().getContext().getAuthentication();
 
 			if (authentication == null || !authentication.isAuthenticated()) {
 				return Optional.empty();
 			}
 
-			return Optional.of(authentication.getName());
+			return Optional.of(((User)authentication.getPrincipal()).getUsername());
 		};
 	}
 }
