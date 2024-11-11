@@ -1,9 +1,9 @@
 package com.sparta.nanglangeats.domain.store.entity;
 
-import java.awt.print.Book;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import com.sparta.nanglangeats.domain.address.entity.CommonAddress;
 import com.sparta.nanglangeats.domain.user.entity.User;
 import com.sparta.nanglangeats.global.common.entity.Timestamped;
 
@@ -17,7 +17,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import jdk.jfr.Name;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -44,8 +43,6 @@ public class Store extends Timestamped {
 	@JoinColumn(name = "user_id")
 	private User user;
 
-	// 지역 관계 매핑 필요(추후에 개발)
-
 	@Column(nullable = false)
 	private String name; // 상호명
 
@@ -55,8 +52,12 @@ public class Store extends Timestamped {
 	@Column(nullable = false)
 	private LocalDateTime closeTime; // 가게 운영 종료 시간
 
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "common_address_id")
+	private CommonAddress commonAddress; // 기본 주소
+
 	@Column(nullable = false)
-	private String addressDetails; // 상세 주소
+	private String addressDetail; // 상세 주소
 
 	@Column
 	private String phoneNumber; // 전화번호
@@ -72,14 +73,15 @@ public class Store extends Timestamped {
 
 	@Builder
 	public Store(Category category, User user, String name, LocalDateTime openTime, LocalDateTime closeTime,
-		String addressDetails, String phoneNumber) {
+		CommonAddress commonAddress, String addressDetail, String phoneNumber) {
 		this.uuid = UUID.randomUUID(); // uuid 자동 생성
 		this.category = category;
 		this.user = user;
 		this.name = name;
 		this.openTime = openTime;
 		this.closeTime = closeTime;
-		this.addressDetails = addressDetails;
+		this.commonAddress = commonAddress;
+		this.addressDetail = addressDetail;
 		this.phoneNumber = phoneNumber;
 		this.rating = null; // 초기에는 별점을 null로 두고, 프론트에서도 안 보여주도록 함
 		this.reviewCount = 0;
