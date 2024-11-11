@@ -75,7 +75,7 @@ public class GeocodingService {
 			double longitude = location.get("lng").getAsDouble();
 			return new double[]{latitude, longitude};
 		} else {
-			return null;
+			throw new CustomException(ErrorCode.ADDRESS_NOT_FOUND);
 		}
 	}
 }
