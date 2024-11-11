@@ -1,0 +1,15 @@
+INSERT INTO p_category (name) VALUES ('치킨');
+INSERT INTO p_category (name) VALUES ('중식');
+INSERT INTO p_category (name) VALUES ('돈까스/회');
+INSERT INTO p_category (name) VALUES ('피자');
+INSERT INTO p_category (name) VALUES ('패스트푸드');
+INSERT INTO p_category (name) VALUES ('찜/탕');
+INSERT INTO p_category (name) VALUES ('족발/보쌈');
+INSERT INTO p_category (name) VALUES ('분식');
+INSERT INTO p_category (name) VALUES ('카페/디저트');
+INSERT INTO p_category (name) VALUES ('한식');
+INSERT INTO p_category (name) VALUES ('고기');
+INSERT INTO p_category (name) VALUES ('양식');
+INSERT INTO p_category (name) VALUES ('아시안');
+INSERT INTO p_category (name) VALUES ('야식');
+INSERT INTO p_category (name) VALUES ('도시락');
