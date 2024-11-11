@@ -1,7 +1,10 @@
 package com.sparta.nanglangeats.global.config;
 
+import static org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl.*;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -56,6 +59,15 @@ public class SecurityConfig {
 	public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
 		return configuration.getAuthenticationManager();
 	}
+
+	@Bean
+	public RoleHierarchy roleHierarchy() {
+		return fromHierarchy(
+			"ROLE_MANAGER > ROLE_CUSTOMER\n" +
+			"ROLE_MANAGER > ROLE_OWNER\n" +
+			"ROLE_MASTER > ROLE_MANAGER");
+	}
+
 
 	private CustomAuthenticationFilter customAuthenticationFilter(AuthenticationManager authenticationManager) {
 		CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter();
