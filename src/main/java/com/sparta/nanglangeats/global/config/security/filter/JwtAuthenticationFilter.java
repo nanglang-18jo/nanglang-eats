@@ -10,7 +10,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.sparta.nanglangeats.domain.user.repository.UserRepository;
+import com.sparta.nanglangeats.domain.user.service.UserService;
 import com.sparta.nanglangeats.global.config.security.jwt.JwtTokenProvider;
 
 import jakarta.servlet.FilterChain;
@@ -23,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -48,6 +48,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private Authentication createAuthentication(Long userId, String authority) {
-        return new UsernamePasswordAuthenticationToken(userRepository.findById(userId), null, List.of(new SimpleGrantedAuthority(authority)));
+        return new UsernamePasswordAuthenticationToken(userService.getUserById(userId), null, List.of(new SimpleGrantedAuthority(authority)));
     }
 }

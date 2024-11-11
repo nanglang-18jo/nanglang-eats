@@ -46,6 +46,12 @@ public class UserService {
 			.orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 	}
 
+	@Transactional(readOnly = true)
+	public User getUserById(Long userId) {
+		return userRepository.findById(userId)
+			.orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+	}
+
 	private void validateUserInfo(UserSignupRequest request) {
 		List<CustomFieldError> customFieldErrors = new ArrayList<>();
 

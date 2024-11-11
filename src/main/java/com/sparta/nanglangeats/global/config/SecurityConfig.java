@@ -11,7 +11,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.sparta.nanglangeats.domain.user.repository.UserRepository;
+import com.sparta.nanglangeats.domain.user.service.UserService;
 import com.sparta.nanglangeats.global.config.security.entrypoint.CustomAuthenticationEntryPoint;
 import com.sparta.nanglangeats.global.config.security.filter.CustomAuthenticationFilter;
 import com.sparta.nanglangeats.global.config.security.filter.JwtAuthenticationFilter;
@@ -29,7 +29,7 @@ public class SecurityConfig {
 
 	private final JwtTokenProvider jwtTokenProvider;
 	private final AuthenticationConfiguration authenticationConfiguration;
-	private final UserRepository userRepository;
+	private final UserService userService;
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -66,6 +66,6 @@ public class SecurityConfig {
 	}
 
 	private JwtAuthenticationFilter jwtAuthenticationFilter() {
-		return new JwtAuthenticationFilter(jwtTokenProvider, userRepository);
+		return new JwtAuthenticationFilter(jwtTokenProvider, userService);
 	}
 }
