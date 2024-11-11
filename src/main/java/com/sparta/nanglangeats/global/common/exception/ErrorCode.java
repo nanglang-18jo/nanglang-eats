@@ -29,6 +29,10 @@ public enum ErrorCode {
 
     // Review
 
+    // Address
+    ADDRESS_NOT_FOUND(NOT_FOUND, "해당 주소를 찾을 수 없습니다."),
+    GEOCODING_API_CALL_FAILED(INTERNAL_SERVER_ERROR, "Geocoding API 호출에 실패하였습니다."),
+    IO_EXCEPTION_OCCURRED(INTERNAL_SERVER_ERROR, "서버에서 입출력 오류가 발생하였습니다."),
 
     ;
     private final HttpStatus httpStatus;

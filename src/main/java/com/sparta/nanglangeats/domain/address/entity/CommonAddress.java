@@ -1,4 +1,4 @@
-package com.sparta.nanglangeats.global.common.entity;
+package com.sparta.nanglangeats.domain.address.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -24,13 +24,13 @@ public class CommonAddress {
 	private String address;
 
 	@Column(nullable = false)
-	private String latitude;
+	private Double latitude;
 
 	@Column(nullable = false)
-	private String longitude;
+	private Double longitude;
 
 	@Builder
-	public CommonAddress(String address, String latitude, String longitude) {
+	public CommonAddress(String address, Double latitude, Double longitude) {
 		this.address = address;
 		this.latitude = latitude;
 		this.longitude = longitude;
