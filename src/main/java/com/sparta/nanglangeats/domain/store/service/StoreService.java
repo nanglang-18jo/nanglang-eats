@@ -1,7 +1,5 @@
 package com.sparta.nanglangeats.domain.store.service;
 
-import java.util.List;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -9,12 +7,14 @@ import org.springframework.web.multipart.MultipartFile;
 import com.sparta.nanglangeats.domain.address.entity.CommonAddress;
 import com.sparta.nanglangeats.domain.address.repository.CommonAddressRepository;
 import com.sparta.nanglangeats.domain.address.service.GeocodingService;
-import com.sparta.nanglangeats.domain.image.service.dto.ImageResponse;
+import com.sparta.nanglangeats.domain.image.entity.Image;
+import com.sparta.nanglangeats.domain.image.enums.ImageCategory;
+import com.sparta.nanglangeats.domain.image.repository.ImageRepository;
+import com.sparta.nanglangeats.domain.image.service.dto.ImageService;
 import com.sparta.nanglangeats.domain.store.controller.dto.request.StoreCreateRequest;
 import com.sparta.nanglangeats.domain.store.controller.dto.response.StoreCreateResponse;
 import com.sparta.nanglangeats.domain.store.entity.Category;
 import com.sparta.nanglangeats.domain.store.entity.Store;
-import com.sparta.nanglangeats.domain.store.entity.StoreImage;
 import com.sparta.nanglangeats.domain.store.repository.CategoryRepository;
 import com.sparta.nanglangeats.domain.store.repository.StoreRepository;
 import com.sparta.nanglangeats.domain.user.entity.User;
@@ -32,7 +32,8 @@ public class StoreService {
 	private final CategoryRepository categoryRepository;
 	private final CommonAddressRepository commonAddressRepository;
 	private final GeocodingService geocodingService;
-	private final StoreImageService storeImageService;
+	private final ImageService imageService;
+	private final ImageRepository imageRepository;
 
 	@Transactional
 	public StoreCreateResponse insertStore(StoreCreateRequest request, User user) {
@@ -56,10 +57,11 @@ public class StoreService {
 
 		storeRepository.save(store);
 
-		if(!request.getImages().isEmpty()){
+		if (!request.getImages().isEmpty()) {
 			for (MultipartFile image : request.getImages()) {
-				StoreImage storeImage = new StoreImage(store, storeImageService.uploadImage(image));
-				store.addStoreImage(storeImage);
+				Image storeImage = new Image(imageService.uploadImage(image, "store-images"), store.getId(),
+					ImageCategory.STORE_IMAGE);
+				imageRepository.save(storeImage);
 			}
 		}
 
