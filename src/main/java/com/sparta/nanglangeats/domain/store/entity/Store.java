@@ -44,8 +44,8 @@ public class Store extends Timestamped {
 	private Category category;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id")
-	private User user;
+	@JoinColumn(name = "owner_id")
+	private User owner;
 
 	@Column(nullable = false)
 	private String name; // 상호명
@@ -76,11 +76,11 @@ public class Store extends Timestamped {
 	private Boolean isActive;
 
 	@Builder
-	public Store(Category category, User user, String name, LocalTime openTime, LocalTime closeTime,
+	public Store(Category category, User owner, String name, LocalTime openTime, LocalTime closeTime,
 		CommonAddress commonAddress, String addressDetail, String phoneNumber) {
 		this.uuid = UUID.randomUUID(); // uuid 자동 생성
 		this.category = category;
-		this.user = user;
+		this.owner = owner;
 		this.name = name;
 		this.openTime = openTime;
 		this.closeTime = closeTime;

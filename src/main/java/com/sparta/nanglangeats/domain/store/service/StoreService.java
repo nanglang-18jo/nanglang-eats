@@ -20,6 +20,7 @@ import com.sparta.nanglangeats.domain.store.repository.CategoryRepository;
 import com.sparta.nanglangeats.domain.store.repository.StoreRepository;
 import com.sparta.nanglangeats.domain.user.entity.User;
 import com.sparta.nanglangeats.domain.user.enums.UserRole;
+import com.sparta.nanglangeats.domain.user.repository.UserRepository;
 import com.sparta.nanglangeats.global.common.exception.CustomException;
 import com.sparta.nanglangeats.global.common.exception.ErrorCode;
 
@@ -34,6 +35,7 @@ public class StoreService {
 	private final ImageService imageService;
 	private final ImageRepository imageRepository;
 	private final CommonAddressService commonAddressService;
+	private final UserRepository userRepository;
 
 	@Transactional
 	public StoreCreateResponse createStore(StoreCreateRequest request, User user) {
@@ -41,12 +43,13 @@ public class StoreService {
 		if (!(user.getRole() == UserRole.MASTER || user.getRole() == UserRole.MANAGER))
 			throw new CustomException(ErrorCode.ACCESS_DENIED);
 
+		User owner = validateUser(request.getOwnerId());
 		Category category = findCategoryById(request.getCategoryId());
 		CommonAddress commonAddress = commonAddressService.findCommonAddressByAddress(request.getAddress());
 
 		Store store = Store.builder()
 			.category(category)
-			.user(user)
+			.owner(owner)
 			.name(request.getName())
 			.openTime(request.getOpenTime())
 			.closeTime(request.getCloseTime())
@@ -69,6 +72,11 @@ public class StoreService {
 	}
 
 	/* UTIL */
+	private User validateUser(Long userId) {
+		User user=userRepository.findById(userId).orElseThrow(()-> new CustomException(ErrorCode.USER_NOT_FOUND));
+		if(!user.getRole().equals(UserRole.OWNER)) throw new CustomException(ErrorCode.USER_ROLE_NOT_OWNER);
+		return user;
+	}
 
 	private Category findCategoryById(Long id) {
 		return categoryRepository.findById(id).orElseThrow(() -> new CustomException(ErrorCode.CATEGORY_NOT_FOUND));

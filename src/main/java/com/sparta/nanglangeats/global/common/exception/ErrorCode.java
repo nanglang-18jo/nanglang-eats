@@ -46,7 +46,8 @@ public enum ErrorCode {
     IMAGE_LIMIT_EXCEEDED(HttpStatus.PAYLOAD_TOO_LARGE, "이미지의 최대 용량은 10MB입니다."),
     IMAGE_COUNT_EXCEEDED(HttpStatus.PAYLOAD_TOO_LARGE, "사진은 최대 5개까지 등록 가능합니다"),
 
-
+    // Store
+    USER_ROLE_NOT_OWNER(BAD_REQUEST, "OWNER 권한을 가진 사용자만 가게 주인으로 등록할 수 있습니다."),
     ;
 
     private final HttpStatus httpStatus;
