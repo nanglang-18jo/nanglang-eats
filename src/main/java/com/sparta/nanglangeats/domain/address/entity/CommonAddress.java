@@ -1,5 +1,7 @@
 package com.sparta.nanglangeats.domain.address.entity;
 
+import com.sparta.nanglangeats.global.common.entity.Timestamped;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -15,7 +17,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "p_common_address")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class CommonAddress {
+public class CommonAddress extends Timestamped {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
