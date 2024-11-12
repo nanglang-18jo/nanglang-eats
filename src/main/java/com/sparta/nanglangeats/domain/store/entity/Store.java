@@ -1,12 +1,12 @@
 package com.sparta.nanglangeats.domain.store.entity;
 
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import com.sparta.nanglangeats.domain.address.entity.CommonAddress;
+import com.sparta.nanglangeats.domain.image.entity.Image;
 import com.sparta.nanglangeats.domain.user.entity.User;
 import com.sparta.nanglangeats.global.common.entity.Timestamped;
 
@@ -20,7 +20,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -76,9 +75,6 @@ public class Store extends Timestamped {
 	@Column(nullable = false)
 	private Boolean isActive;
 
-	@OneToMany(mappedBy = "store", cascade = CascadeType.ALL)
-	private List<StoreImage> storeImages = new ArrayList<>();
-
 	@Builder
 	public Store(Category category, User user, String name, LocalTime openTime, LocalTime closeTime,
 		CommonAddress commonAddress, String addressDetail, String phoneNumber) {
@@ -94,13 +90,5 @@ public class Store extends Timestamped {
 		this.rating = null; // 초기에는 별점을 null로 두고, 프론트에서도 안 보여주도록 함
 		this.reviewCount = 0;
 		this.isActive = true;
-	}
-
-	/**
-	 * 연관관계 편의 메서드
-	 */
-	public void addStoreImage(StoreImage storeImage) {
-		this.storeImages.add(storeImage);
-		storeImage.setStoreTo(this);
 	}
 }
