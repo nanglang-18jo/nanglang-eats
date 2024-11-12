@@ -1,5 +1,7 @@
 # nanglang-eats
+
 프로젝트 소개글 작성
+
 ```
 - 반드시 포함해야 할 것
   - 팀원 역할분담
@@ -10,12 +12,17 @@
   - (선택)API docs
 ```
 
+<details>
+<summary>to be updated...</summary>
+
 ## R&R
+
 역할분담 작성
 
 ## Dependency
+
 - Java SDK 17
-- ㅇㅇㅇ
+-
 
 ## Git Convention
 
@@ -23,12 +30,12 @@
 
 - `main`         : 최종 확인 완료
 - `hotfix`       : 최종 배포 버전에서의 오류 긴급 수정
-- `develop`      : 기능 개발 및 수정, 오류 해결 완료 버전
-- `feature`      : develop에서 따서 각자 작업 (feature/작업내용)
+- `dev`      : 기능 개발 및 수정, 오류 해결 완료 버전
+- `feat`      : dev에서 따서 각자 작업 (feat/작업내용)
     ```
-    ex1) feature/asset-vm
-    ex2) feature/fix-login-error
-    ex3) feature/mod-properties
+    ex1) feat/asset-vm
+    ex2) feat/fix-login-error
+    ex3) feat/mod-properties
     ```
 
 ### Commit Rule
@@ -47,6 +54,7 @@
 --blank line--
 상세내용...
 ```
+
 ```
 ex) 
 [feat] Asset Management > VM 조회 기능 추가
@@ -54,6 +62,7 @@ ex)
 - VM 목록 조회
 - VM 상세 조회
 ```
+
 ```
 $ git commit -m "this is Subject
 >> 
@@ -76,22 +85,28 @@ $ git commit -m "this is Subject
 +-- src
 | +-- main
 | | +-- java.com.sparta.nanglangeats
-| | | +-- common
+| | | +-- domain
+| | | | +-- auth  // 도메인명
+| | | | | +-- controller
+| | | | | +-- service
+| | | | | +-- repository
+| | | | | +-- dto
+| | | | | +-- entity
+| | | +-- global
+| | | | +-- config
 | | | | +-- util
-| | | +-- controller
-| | | +-- service
-| | | | +-- admin    // 기능(메뉴) 단위로 패키지 생성
-| | +-- resources
 ```
 
 ### Naming Rule
 
 **기본 규칙**
+
 - 클래스명 : Pascal Case 사용 `ex) UserService.java`
 - 메소드명 : Camel Case 사용 `ex) getUser()`
 - DB스키마명 : Snake Case & Upper Case 사용 `ex) USER_PERMITION`
 
 **메소드**
+
 - getXxxList : 목록 조회
 - getXxxDetail : 단건, 상세 조회
 - insertXxx : 등록
@@ -99,7 +114,11 @@ $ git commit -m "this is Subject
 - deleteXxx : 삭제
 
 ## Deploy
+
 배포 매뉴얼 작성
 
 ## Test
+
 테스트 매뉴얼 작성
+
+</details>
