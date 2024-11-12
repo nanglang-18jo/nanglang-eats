@@ -24,9 +24,9 @@ public class StoreController {
 	private final StoreService storeService;
 
 	@PostMapping
-	public ResponseEntity<CommonResponse<?>> insertStore(
+	public ResponseEntity<CommonResponse<?>> createStore(
 		@ModelAttribute @Valid StoreCreateRequest request,
 		@AuthenticationPrincipal User user) {
-		return getResponseEntity(storeService.insertStore(request, user), "가게 등록 완료");
+		return getResponseEntity(storeService.createStore(request, user), "가게 등록 완료");
 	}
 }

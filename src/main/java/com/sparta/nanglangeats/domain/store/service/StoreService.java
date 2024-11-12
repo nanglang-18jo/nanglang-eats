@@ -36,7 +36,7 @@ public class StoreService {
 	private final ImageRepository imageRepository;
 
 	@Transactional
-	public StoreCreateResponse insertStore(StoreCreateRequest request, User user) {
+	public StoreCreateResponse createStore(StoreCreateRequest request, User user) {
 		// 권한 확인
 		if (!(user.getRole() == UserRole.MASTER || user.getRole() == UserRole.MANAGER))
 			throw new CustomException(ErrorCode.ACCESS_DENIED);
