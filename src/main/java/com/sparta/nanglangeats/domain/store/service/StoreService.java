@@ -6,6 +6,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.sparta.nanglangeats.domain.address.entity.CommonAddress;
 import com.sparta.nanglangeats.domain.address.repository.CommonAddressRepository;
+import com.sparta.nanglangeats.domain.address.service.CommonAddressService;
 import com.sparta.nanglangeats.domain.address.service.GeocodingService;
 import com.sparta.nanglangeats.domain.image.entity.Image;
 import com.sparta.nanglangeats.domain.image.enums.ImageCategory;
@@ -30,10 +31,9 @@ import lombok.RequiredArgsConstructor;
 public class StoreService {
 	private final StoreRepository storeRepository;
 	private final CategoryRepository categoryRepository;
-	private final CommonAddressRepository commonAddressRepository;
-	private final GeocodingService geocodingService;
 	private final ImageService imageService;
 	private final ImageRepository imageRepository;
+	private final CommonAddressService commonAddressService;
 
 	@Transactional
 	public StoreCreateResponse createStore(StoreCreateRequest request, User user) {
@@ -42,7 +42,7 @@ public class StoreService {
 			throw new CustomException(ErrorCode.ACCESS_DENIED);
 
 		Category category = findCategoryById(request.getCategoryId());
-		CommonAddress commonAddress = findCommonAddressByAddress(request.getAddress());
+		CommonAddress commonAddress = commonAddressService.findCommonAddressByAddress(request.getAddress());
 
 		Store store = Store.builder()
 			.category(category)
@@ -72,11 +72,5 @@ public class StoreService {
 
 	private Category findCategoryById(Long id) {
 		return categoryRepository.findById(id).orElseThrow(() -> new CustomException(ErrorCode.CATEGORY_NOT_FOUND));
-	}
-
-	private CommonAddress findCommonAddressByAddress(String address) {
-		return commonAddressRepository.findByAddress(address).orElse(
-			geocodingService.getCoordinates(address)
-		);
 	}
 }
