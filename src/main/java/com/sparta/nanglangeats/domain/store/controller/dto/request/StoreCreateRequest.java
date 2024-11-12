@@ -21,6 +21,9 @@ public class StoreCreateRequest {
 	@NotBlank(message = "상호명을 입력해주세요.")
 	private String name;
 
+	@NotNull(message = "가게 주인 ID를 입력해주세요.")
+	private Long ownerId;
+
 	@NotNull(message = "가게 운영 시작 시간을 입력해주세요.")
 	private LocalTime openTime;
 
