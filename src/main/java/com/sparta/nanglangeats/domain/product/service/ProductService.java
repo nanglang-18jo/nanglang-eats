@@ -53,7 +53,7 @@ public class ProductService {
 				imageRepository.save(productImage);
 			}
 		}
-		return ProductCreateResponse.builder().productId(product.getUuid().toString()).build();
+		return ProductCreateResponse.builder().productId(product.getUuid()).build();
 	}
 
 	/* UTIL */

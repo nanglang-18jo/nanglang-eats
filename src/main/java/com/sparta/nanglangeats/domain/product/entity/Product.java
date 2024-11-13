@@ -29,7 +29,7 @@ public class Product extends Timestamped {
 	private Long id;
 
 	@Column(nullable = false, unique = true)
-	private UUID uuid; // 노출되는 식별자
+	private String uuid; // 노출되는 식별자
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "store_id")
@@ -52,7 +52,7 @@ public class Product extends Timestamped {
 
 	@Builder
 	public Product(Store store, String name, String description, int price) {
-		this.uuid = UUID.randomUUID();
+		this.uuid = UUID.randomUUID().toString();
 		this.store = store;
 		this.name = name;
 		this.description = description;
