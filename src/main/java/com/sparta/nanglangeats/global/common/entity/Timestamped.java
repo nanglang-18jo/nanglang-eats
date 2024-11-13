@@ -42,4 +42,8 @@ public abstract class Timestamped {
 
     @Column
     private String deletedBy;
+
+    protected void initCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
 }
