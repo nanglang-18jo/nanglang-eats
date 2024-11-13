@@ -45,8 +45,8 @@ class UserControllerTest {
 	}
 
 	@Test
-	@DisplayName("create(고객회원가입DTO): ")
-	void create() throws Exception {
+	@DisplayName("createUser(회원가입DTO): 회원가입 정보를 입력받아 유저를 생성한다.")
+	void createUser() throws Exception {
 		// given
 		final String uri = "/api/users/signup";
 		final UserSignupRequest request = new UserSignupRequest("tester12", "password", "nickname", "tester@gmail.com", UserRole.CUSTOMER);

@@ -22,7 +22,7 @@ public class UserController {
 	private final UserService userService;
 
 	@PostMapping("/api/users/signup")
-	public ResponseEntity<CommonResponse<?>> create(@Valid @RequestBody UserSignupRequest request) {
-		return getResponseEntity(CREATED, userService.create(request.toServiceRequest()), "고객 회원 가입 성공");
+	public ResponseEntity<CommonResponse<?>> createUser(@Valid @RequestBody UserSignupRequest request) {
+		return getResponseEntity(CREATED, userService.createUser(request.toServiceRequest()), "고객 회원 가입 성공");
 	}
 }
