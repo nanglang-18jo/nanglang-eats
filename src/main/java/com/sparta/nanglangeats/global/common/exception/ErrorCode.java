@@ -29,8 +29,27 @@ public enum ErrorCode {
 
     // Review
 
+    // Address
+    ADDRESS_NOT_FOUND(NOT_FOUND, "해당 주소를 찾을 수 없습니다."),
+    GEOCODING_API_CALL_FAILED(INTERNAL_SERVER_ERROR, "Geocoding API 호출에 실패하였습니다."),
+    IO_EXCEPTION_OCCURRED(INTERNAL_SERVER_ERROR, "서버에서 입출력 오류가 발생하였습니다."),
 
+    // Authorization
+    ACCESS_DENIED(FORBIDDEN, "접근 권한이 없습니다."),
+
+    // Category
+    CATEGORY_NOT_FOUND(NOT_FOUND, "존재하지 않는 카테고리입니다."),
+
+    // Image
+    UPLOAD_FAILED(HttpStatus.GATEWAY_TIMEOUT, "이미지 업로드에 실패하였습니다."),
+    UNSUPPORTED_MEDIA_TYPE(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "지원하지 않는 미디어 유형입니다."),
+    IMAGE_LIMIT_EXCEEDED(HttpStatus.PAYLOAD_TOO_LARGE, "이미지의 최대 용량은 10MB입니다."),
+    IMAGE_COUNT_EXCEEDED(HttpStatus.PAYLOAD_TOO_LARGE, "사진은 최대 5개까지 등록 가능합니다"),
+
+    // Store
+    USER_ROLE_NOT_OWNER(BAD_REQUEST, "OWNER 권한을 가진 사용자만 가게 주인으로 등록할 수 있습니다."),
     ;
+
     private final HttpStatus httpStatus;
     private final String message;
 
