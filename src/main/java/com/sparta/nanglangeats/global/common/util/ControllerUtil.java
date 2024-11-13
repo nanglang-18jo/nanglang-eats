@@ -17,7 +17,7 @@ public final class ControllerUtil {
     }
 
     public static ResponseEntity<CommonResponse<?>> getResponseEntity(HttpStatus status, Object response, String msg) {
-        return ResponseEntity.ok().body(CommonResponse.builder()
+        return ResponseEntity.status(status).body(CommonResponse.builder()
             .statusCode(status.value())
             .msg(msg)
             .data(response)
