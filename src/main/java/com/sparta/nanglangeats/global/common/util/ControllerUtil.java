@@ -8,44 +8,25 @@ import org.springframework.http.ResponseEntity;
 @Slf4j
 public final class ControllerUtil {
 
-    /**
-     * 응답 데이터가 있는 ResponseEntity
-     *
-     * @param response 응답 데이터
-     * @param msg 응답 메시지
-     * @return ResponseEntity
-     */
-    public static ResponseEntity<CommonResponse<?>> getResponseEntity(Object response, String msg) {
-        return ResponseEntity.ok().body(CommonResponse.builder()
-                .statusCode(HttpStatus.OK.value())
-                .msg(msg)
-                .data(response)
-                .build());
+    public static ResponseEntity<CommonResponse<?>> getOkResponseEntity(String msg) {
+        return getResponseEntity(HttpStatus.OK, null, msg);
     }
 
-    /**
-     * 응답 데이터가 없는 ResponseEntity
-     *
-     * @param msg 응답 메시지
-     * @return ResponseEntity
-     */
-    public static ResponseEntity<CommonResponse<?>> getResponseEntity(String msg) {
-        return ResponseEntity.ok().body(CommonResponse.builder()
-                .statusCode(HttpStatus.OK.value())
-                .msg(msg)
-                .build());
+    public static ResponseEntity<CommonResponse<?>> getOkResponseEntity(Object response, String msg) {
+        return getResponseEntity(HttpStatus.OK, response, msg);
     }
 
-    /**
-     * PathVariable의 Id와 RequestBody의 Id와 일치하는지 확인
-     *
-     * @param pathId PathVariable의 Id
-     * @param bodyId RequestBody의 Id
-     */
+    public static ResponseEntity<CommonResponse<?>> getResponseEntity(HttpStatus status, Object response, String msg) {
+        return ResponseEntity.status(status).body(CommonResponse.builder()
+            .statusCode(status.value())
+            .msg(msg)
+            .data(response)
+            .build());
+    }
+
     public static void verifyPathIdWithBody(Long pathId, Long bodyId) {
         if (!pathId.equals(bodyId)) {
             throw new IllegalArgumentException("PathVariable의 Id가 RequestBody의 Id와 일치하지 않습니다.");
         }
     }
-
 }
