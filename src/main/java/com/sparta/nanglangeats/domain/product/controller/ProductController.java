@@ -1,5 +1,6 @@
 package com.sparta.nanglangeats.domain.product.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -28,6 +29,6 @@ public class ProductController {
 	public ResponseEntity<CommonResponse<?>> createProduct(
 		@ModelAttribute @Valid ProductCreateRequest request,
 		@AuthenticationPrincipal User user){
-		return getResponseEntity(productService.createProduct(request, user), "상품 등록 완료");
+		return getResponseEntity(HttpStatus.CREATED, productService.createProduct(request, user), "상품 등록 완료");
 	}
 }
