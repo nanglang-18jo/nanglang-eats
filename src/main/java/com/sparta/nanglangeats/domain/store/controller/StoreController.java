@@ -1,5 +1,6 @@
 package com.sparta.nanglangeats.domain.store.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -27,6 +28,6 @@ public class StoreController {
 	public ResponseEntity<CommonResponse<?>> createStore(
 		@ModelAttribute @Valid StoreCreateRequest request,
 		@AuthenticationPrincipal User user) {
-		return getResponseEntity(storeService.createStore(request, user), "가게 등록 완료");
+		return getResponseEntity(HttpStatus.CREATED, storeService.createStore(request, user), "가게 등록 완료");
 	}
 }
