@@ -26,7 +26,7 @@ public class User extends Timestamped {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(nullable = false, unique = true)
+	@Column(nullable = false, unique = true, length = 10)
 	private String username;
 
 	@Column(nullable = false)
@@ -46,12 +46,13 @@ public class User extends Timestamped {
 	private boolean isActive;
 
 	@Builder
-	private User(String username, String password, String nickname, String email, UserRole role) {
+	public User(String username, String password, String nickname, String email, UserRole role) {
 		this.username = username;
 		this.password = password;
 		this.nickname = nickname;
 		this.email = email;
 		this.role = role;
 		this.isActive = true;
+		initCreatedBy(username);
 	}
 }
