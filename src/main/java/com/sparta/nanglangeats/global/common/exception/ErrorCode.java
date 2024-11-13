@@ -20,11 +20,14 @@ public enum ErrorCode {
     INVALID_PASSWORD(BAD_REQUEST, "유효하지 않은 비밀번호입니다"),
     INVALID_USERNAME(BAD_REQUEST, "유효하지 않은 아이디입니다"),
 
+    INVALID_ROLE_REQUEST(BAD_REQUEST, "유효하지 않은 권한 요청입니다"),
+
     DUPLICATED_USERNAME(BAD_REQUEST, "이미 존재하는 사용자 아이디입니다."),
     DUPLICATED_NICKNAME(BAD_REQUEST, "이미 존재하는 사용자 유저네임입니다."),
     DUPLICATED_EMAIL(BAD_REQUEST, "이미 존재하는 사용자 이메일입니다."),
 
     USER_NOT_FOUND(NOT_FOUND, "유저를 찾을 수 없습니다."),
+
     // Order
 
     // Review

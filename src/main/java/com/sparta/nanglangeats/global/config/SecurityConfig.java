@@ -44,6 +44,7 @@ public class SecurityConfig {
 
 			.authorizeHttpRequests(requests -> requests
 				.requestMatchers("/api/auth/login").permitAll()
+				.requestMatchers("/api/users/signup").permitAll()
 				.anyRequest().authenticated())
 
 			.exceptionHandling(exception -> exception
