@@ -46,4 +46,9 @@ public class GlobalExceptionHandler {
 		}
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionDto(builder.toString()));
 	}
+
+	@ExceptionHandler(RuntimeException.class)
+	public ResponseEntity<?> handleException(RuntimeException e) {
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ExceptionDto(e.getMessage()));
+	}
 }
