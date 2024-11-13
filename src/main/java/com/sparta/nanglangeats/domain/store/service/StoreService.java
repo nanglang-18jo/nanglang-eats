@@ -13,6 +13,7 @@ import com.sparta.nanglangeats.domain.image.enums.ImageCategory;
 import com.sparta.nanglangeats.domain.image.repository.ImageRepository;
 import com.sparta.nanglangeats.domain.image.service.dto.ImageService;
 import com.sparta.nanglangeats.domain.store.controller.dto.request.StoreCreateRequest;
+import com.sparta.nanglangeats.domain.store.controller.dto.request.StoreUpdateRequest;
 import com.sparta.nanglangeats.domain.store.controller.dto.response.StoreCreateResponse;
 import com.sparta.nanglangeats.domain.store.entity.Category;
 import com.sparta.nanglangeats.domain.store.entity.Store;
@@ -71,6 +72,13 @@ public class StoreService {
 		return StoreCreateResponse.builder().storeId(store.getUuid().toString()).build();
 	}
 
+	@Transactional
+	public StoreCreateResponse updateStore(Long storeId, StoreUpdateRequest request, User user) {
+		Store store = findStoreById(storeId);
+
+		return null;
+	}
+
 	/* UTIL */
 	private User validateUser(Long userId) {
 		User user=userRepository.findById(userId).orElseThrow(()-> new CustomException(ErrorCode.USER_NOT_FOUND));
@@ -80,5 +88,9 @@ public class StoreService {
 
 	private Category findCategoryById(Long id) {
 		return categoryRepository.findById(id).orElseThrow(() -> new CustomException(ErrorCode.CATEGORY_NOT_FOUND));
+	}
+
+	private Store findStoreById(Long id) {
+		return storeRepository.findById(id).orElseThrow(() -> new CustomException(ErrorCode.STORE_NOT_FOUND));
 	}
 }
