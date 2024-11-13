@@ -51,7 +51,6 @@ public enum ErrorCode {
     STORE_NOT_FOUND(NOT_FOUND, "존재하지 않는 가게입니다."),
 
     ;
-
     private final HttpStatus httpStatus;
     private final String message;
 
