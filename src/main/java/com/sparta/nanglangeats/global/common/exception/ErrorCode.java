@@ -1,10 +1,11 @@
 package com.sparta.nanglangeats.global.common.exception;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import static org.springframework.http.HttpStatus.*;
+
 import org.springframework.http.HttpStatus;
 
-import static org.springframework.http.HttpStatus.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
@@ -12,6 +13,7 @@ public enum ErrorCode {
 
     // COMMON
     COMMON_INVALID_PARAMETER(BAD_REQUEST, "요청한 값이 올바르지 않습니다."),
+    INVALID_SORTBY_PARAMETER(BAD_REQUEST, "유효하지 않은 정렬 기준입니다."),
 
     // JWT
     INVALID_REFRESH_TOKEN(UNAUTHORIZED, "유효하지 않은 리프레시 토큰입니다. 다시 로그인 해주세요."),

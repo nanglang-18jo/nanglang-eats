@@ -1,5 +1,10 @@
 package com.sparta.nanglangeats.domain.store.controller;
 
+import static com.sparta.nanglangeats.global.common.util.ControllerUtil.*;
+
+import java.util.Arrays;
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -11,18 +16,18 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sparta.nanglangeats.domain.store.controller.dto.request.StoreRequest;
 import com.sparta.nanglangeats.domain.store.service.StoreService;
 import com.sparta.nanglangeats.domain.user.entity.User;
 import com.sparta.nanglangeats.global.common.dto.CommonResponse;
+import com.sparta.nanglangeats.global.common.exception.CustomException;
+import com.sparta.nanglangeats.global.common.exception.ErrorCode;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-
-import static com.sparta.nanglangeats.global.common.util.ControllerUtil.getResponseEntity;
-import static com.sparta.nanglangeats.global.common.util.ControllerUtil.getOkResponseEntity;
 
 @RestController
 @RequiredArgsConstructor
@@ -59,5 +64,23 @@ public class StoreController {
 	public ResponseEntity<CommonResponse<?>> getStoreDetail(
 		@PathVariable String uuid) {
 		return getOkResponseEntity(storeService.getStoreDetail(uuid), "가게 상세 조회 완료");
+	}
+
+	@GetMapping
+	public ResponseEntity<CommonResponse<?>> getStoresList(
+		@RequestParam Long categoryId,
+		@RequestParam(defaultValue = "0") int page,
+		@RequestParam(defaultValue = "10") int size,
+		@RequestParam(defaultValue = "name") String sortBy) {
+		List<String> validSortByFields = Arrays.asList("name", "reviewCount", "rating");
+		if (!validSortByFields.contains(sortBy))
+			throw new CustomException(ErrorCode.INVALID_SORTBY_PARAMETER);
+
+		String direction = "desc";
+		if (sortBy.equals("name"))
+			direction = "asc";
+
+		return getOkResponseEntity(storeService.getStoresList(categoryId, page, size, sortBy, direction),
+			"가게 목록 조회 완료");
 	}
 }
