@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -42,5 +43,14 @@ public class StoreController {
 		@ModelAttribute StoreRequest request,
 		@AuthenticationPrincipal User user){
 		return getOkResponseEntity(storeService.updateStore(storeId, request, user), "가게 수정 완료");
+	}
+
+	@DeleteMapping("/{storeId}")
+	@PreAuthorize("hasAnyRole('OWNER')")
+	public ResponseEntity<CommonResponse<?>> deleteStore(
+		@PathVariable Long storeId,
+		@AuthenticationPrincipal User user){
+		storeService.deleteStore(storeId, user);
+		return getResponseEntity(HttpStatus.NO_CONTENT, null, "가게 삭제 완료");
 	}
 }
