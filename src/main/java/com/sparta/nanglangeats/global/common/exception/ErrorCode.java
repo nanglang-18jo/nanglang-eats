@@ -51,8 +51,9 @@ public enum ErrorCode {
 
     // Store
     USER_ROLE_NOT_OWNER(BAD_REQUEST, "OWNER 권한을 가진 사용자만 가게 주인으로 등록할 수 있습니다."),
-    ;
+    STORE_NOT_FOUND(NOT_FOUND, "존재하지 않는 가게입니다."),
 
+    ;
     private final HttpStatus httpStatus;
     private final String message;
 

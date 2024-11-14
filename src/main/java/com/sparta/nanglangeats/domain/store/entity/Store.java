@@ -1,12 +1,9 @@
 package com.sparta.nanglangeats.domain.store.entity;
 
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 import com.sparta.nanglangeats.domain.address.entity.CommonAddress;
-import com.sparta.nanglangeats.domain.image.entity.Image;
 import com.sparta.nanglangeats.domain.user.entity.User;
 import com.sparta.nanglangeats.global.common.entity.Timestamped;
 
@@ -19,7 +16,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -37,7 +33,7 @@ public class Store extends Timestamped {
 	private Long id;
 
 	@Column(nullable = false, unique = true)
-	private UUID uuid; // 노출되는 식별자
+	private String uuid; // 노출되는 식별자
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "category_id")
@@ -78,7 +74,7 @@ public class Store extends Timestamped {
 	@Builder
 	public Store(Category category, User owner, String name, LocalTime openTime, LocalTime closeTime,
 		CommonAddress commonAddress, String addressDetail, String phoneNumber) {
-		this.uuid = UUID.randomUUID(); // uuid 자동 생성
+		this.uuid = UUID.randomUUID().toString(); // uuid 자동 생성
 		this.category = category;
 		this.owner = owner;
 		this.name = name;
