@@ -32,9 +32,8 @@ public class StoreController {
 	@PostMapping
 	@PreAuthorize("hasAnyRole('MANAGER')")
 	public ResponseEntity<CommonResponse<?>> createStore(
-		@ModelAttribute @Valid StoreRequest request,
-		@AuthenticationPrincipal User user) {
-		return getResponseEntity(HttpStatus.CREATED, storeService.createStore(request, user), "가게 등록 완료");
+		@ModelAttribute @Valid StoreRequest request) {
+		return getResponseEntity(HttpStatus.CREATED, storeService.createStore(request), "가게 등록 완료");
 	}
 
 	@PutMapping("/{storeId}")
