@@ -32,6 +32,6 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
 		response.setStatus(HttpStatus.OK.value());
 		response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 		response.setCharacterEncoding("UTF-8");
-		response.getWriter().write(mapper.writeValueAsString(ControllerUtil.getResponseEntity(LOGIN_SUCCESS)));
+		response.getWriter().write(mapper.writeValueAsString(ControllerUtil.getOkResponseEntity(LOGIN_SUCCESS)));
 	}
 }
