@@ -10,8 +10,8 @@ import jakarta.validation.ConstraintValidatorContext;
 @Component
 public class UsernameValidator implements ConstraintValidator<Username, String> {
 
-    private static final int MIN_SIZE = 8;
-    private static final int MAX_SIZE = 15;
+    private static final int MIN_SIZE = 4;
+    private static final int MAX_SIZE = 10;
     private static final String REGEX_USERNAME = "^[a-z0-9]{" + MIN_SIZE + "," + MAX_SIZE + "}$";
 
     @Override
