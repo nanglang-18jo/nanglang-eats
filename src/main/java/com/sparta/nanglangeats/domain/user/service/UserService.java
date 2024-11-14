@@ -26,7 +26,7 @@ public class UserService {
 	private final PasswordEncoder passwordEncoder;
 
 	@Transactional
-	public Long create(UserSignupServiceRequest request) {
+	public Long createUser(UserSignupServiceRequest request) {
 		validateUserInfo(request.getUsername(), request.getNickname(), request.getEmail());
 
 		return userRepository.save(User.builder()
