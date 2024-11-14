@@ -1,9 +1,11 @@
 package com.sparta.nanglangeats.domain.store.entity;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.UUID;
 
 import com.sparta.nanglangeats.domain.address.entity.CommonAddress;
+import com.sparta.nanglangeats.domain.store.controller.dto.request.StoreRequest;
 import com.sparta.nanglangeats.domain.user.entity.User;
 import com.sparta.nanglangeats.global.common.entity.Timestamped;
 
@@ -86,5 +88,21 @@ public class Store extends Timestamped {
 		this.rating = null; // 초기에는 별점을 null로 두고, 프론트에서도 안 보여주도록 함
 		this.reviewCount = 0;
 		this.isActive = true;
+	}
+
+	public void update(StoreRequest request, Category category, CommonAddress commonAddress) {
+		this.category = category;
+		this.commonAddress = commonAddress;
+		this.name = request.getName();
+		this.openTime = request.getOpenTime();
+		this.closeTime = request.getCloseTime();
+		this.addressDetail = request.getAddressDetail();
+		this.phoneNumber = request.getPhoneNumber();
+	}
+
+	public void delete(String deletedBy){
+		this.isActive=false;
+		this.setDeletedAt(LocalDateTime.now());
+		this.setDeletedBy(deletedBy);
 	}
 }

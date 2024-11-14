@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.sparta.nanglangeats.domain.user.controller.dto.request.UserUpdateRequest;
 import com.sparta.nanglangeats.domain.user.entity.User;
 import com.sparta.nanglangeats.domain.user.repository.UserRepository;
+import com.sparta.nanglangeats.domain.user.service.dto.request.ManagerSignupServiceRequest;
 import com.sparta.nanglangeats.domain.user.service.dto.request.UserSignupServiceRequest;
 import com.sparta.nanglangeats.global.common.exception.CustomException;
 import com.sparta.nanglangeats.global.common.exception.CustomFieldError;
@@ -28,6 +29,19 @@ public class UserService {
 
 	@Transactional
 	public Long createUser(UserSignupServiceRequest request) {
+		validateUserInfo(request.getUsername(), request.getNickname(), request.getEmail());
+
+		return userRepository.save(User.builder()
+			.username(request.getUsername())
+			.password(passwordEncoder.encode(request.getPassword()))
+			.nickname(request.getNickname())
+			.email(request.getEmail())
+			.role(request.getRole())
+			.build()).getId();
+	}
+
+	@Transactional
+	public Long createManager(ManagerSignupServiceRequest request) {
 		validateUserInfo(request.getUsername(), request.getNickname(), request.getEmail());
 
 		return userRepository.save(User.builder()
