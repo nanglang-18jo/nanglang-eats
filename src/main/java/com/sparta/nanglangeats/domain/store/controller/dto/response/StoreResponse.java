@@ -4,11 +4,11 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-public class StoreCreateResponse {
+public class StoreResponse {
 	private final String storeId;
 
 	@Builder
-	public StoreCreateResponse(String storeId) {
+	public StoreResponse(String storeId) {
 		this.storeId = storeId;
 	}
 }

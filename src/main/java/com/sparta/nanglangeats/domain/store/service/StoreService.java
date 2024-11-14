@@ -5,16 +5,13 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.sparta.nanglangeats.domain.address.entity.CommonAddress;
-import com.sparta.nanglangeats.domain.address.repository.CommonAddressRepository;
 import com.sparta.nanglangeats.domain.address.service.CommonAddressService;
-import com.sparta.nanglangeats.domain.address.service.GeocodingService;
 import com.sparta.nanglangeats.domain.image.entity.Image;
 import com.sparta.nanglangeats.domain.image.enums.ImageCategory;
 import com.sparta.nanglangeats.domain.image.repository.ImageRepository;
 import com.sparta.nanglangeats.domain.image.service.dto.ImageService;
-import com.sparta.nanglangeats.domain.store.controller.dto.request.StoreCreateRequest;
-import com.sparta.nanglangeats.domain.store.controller.dto.request.StoreUpdateRequest;
-import com.sparta.nanglangeats.domain.store.controller.dto.response.StoreCreateResponse;
+import com.sparta.nanglangeats.domain.store.controller.dto.request.StoreRequest;
+import com.sparta.nanglangeats.domain.store.controller.dto.response.StoreResponse;
 import com.sparta.nanglangeats.domain.store.entity.Category;
 import com.sparta.nanglangeats.domain.store.entity.Store;
 import com.sparta.nanglangeats.domain.store.repository.CategoryRepository;
@@ -39,12 +36,12 @@ public class StoreService {
 	private final UserRepository userRepository;
 
 	@Transactional
-	public StoreCreateResponse createStore(StoreCreateRequest request, User user) {
+	public StoreResponse createStore(StoreRequest request, User user) {
 		// 권한 확인
 		if (!(user.getRole() == UserRole.MASTER || user.getRole() == UserRole.MANAGER))
 			throw new CustomException(ErrorCode.ACCESS_DENIED);
 
-		User owner = validateUser(request.getOwnerId());
+		User owner = validateOwner(request.getOwnerId());
 		Category category = findCategoryById(request.getCategoryId());
 		CommonAddress commonAddress = commonAddressService.findCommonAddressByAddress(request.getAddress());
 
@@ -62,25 +59,30 @@ public class StoreService {
 		storeRepository.save(store);
 
 		if (!request.getImages().isEmpty()) {
-			for (MultipartFile image : request.getImages()) {
-				Image storeImage = new Image(imageService.uploadImage(image, "store-images"), store.getId(),
-					ImageCategory.STORE_IMAGE);
-				imageRepository.save(storeImage);
-			}
+			imageService.uploadAllImages(request.getImages(), ImageCategory.STORE_IMAGE, store.getId());
 		}
 
-		return StoreCreateResponse.builder().storeId(store.getUuid()).build();
+		return StoreResponse.builder().storeId(store.getUuid()).build();
 	}
 
 	@Transactional
-	public StoreCreateResponse updateStore(Long storeId, StoreUpdateRequest request, User user) {
+	public StoreResponse updateStore(Long storeId, StoreRequest request, User user) {
 		Store store = findStoreById(storeId);
 
-		return null;
+		if(user.getRole().equals(UserRole.OWNER) && !store.getOwner().equals(user)) throw new CustomException(ErrorCode.ACCESS_DENIED);
+
+		Category category = findCategoryById(request.getCategoryId());
+		CommonAddress commonAddress = commonAddressService.findCommonAddressByAddress(request.getAddress());
+		store.update(request, category, commonAddress);
+
+		imageService.deleteAllImages(ImageCategory.STORE_IMAGE, store.getId());
+		imageService.uploadAllImages(request.getImages(), ImageCategory.STORE_IMAGE, store.getId());
+
+		return StoreResponse.builder().storeId(store.getUuid()).build();
 	}
 
 	/* UTIL */
-	private User validateUser(Long userId) {
+	private User validateOwner(Long userId) {
 		User user=userRepository.findById(userId).orElseThrow(()-> new CustomException(ErrorCode.USER_NOT_FOUND));
 		if(!user.getRole().equals(UserRole.OWNER)) throw new CustomException(ErrorCode.USER_ROLE_NOT_OWNER);
 		return user;
