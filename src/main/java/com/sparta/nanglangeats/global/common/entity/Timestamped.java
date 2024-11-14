@@ -43,6 +43,14 @@ public abstract class Timestamped {
     @Column
     private String deletedBy;
 
+    protected void setDeletedAt(LocalDateTime deletedAt) {
+        this.deletedAt = deletedAt;
+    }
+
+    protected void setDeletedBy(String deletedBy) {
+        this.deletedBy = deletedBy;
+    }
+
     protected void initCreatedBy(String createdBy) {
         this.createdBy = createdBy;
     }

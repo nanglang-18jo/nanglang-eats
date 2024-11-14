@@ -69,7 +69,8 @@ public class StoreService {
 	public StoreResponse updateStore(Long storeId, StoreRequest request, User user) {
 		Store store = findStoreById(storeId);
 
-		if(user.getRole().equals(UserRole.OWNER) && !store.getOwner().equals(user)) throw new CustomException(ErrorCode.ACCESS_DENIED);
+		if (user.getRole().equals(UserRole.OWNER) && !store.getOwner().equals(user))
+			throw new CustomException(ErrorCode.ACCESS_DENIED);
 
 		Category category = findCategoryById(request.getCategoryId());
 		CommonAddress commonAddress = commonAddressService.findCommonAddressByAddress(request.getAddress());
@@ -81,10 +82,21 @@ public class StoreService {
 		return StoreResponse.builder().storeId(store.getUuid()).build();
 	}
 
+	@Transactional
+	public void deleteStore(Long storeId, User user) {
+		Store store = findStoreById(storeId);
+
+		if (user.getRole().equals(UserRole.OWNER) && !store.getOwner().equals(user))
+			throw new CustomException(ErrorCode.ACCESS_DENIED);
+
+		store.delete(user.getUsername());
+	}
+
 	/* UTIL */
 	private User validateOwner(Long userId) {
-		User user=userRepository.findById(userId).orElseThrow(()-> new CustomException(ErrorCode.USER_NOT_FOUND));
-		if(!user.getRole().equals(UserRole.OWNER)) throw new CustomException(ErrorCode.USER_ROLE_NOT_OWNER);
+		User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+		if (!user.getRole().equals(UserRole.OWNER))
+			throw new CustomException(ErrorCode.USER_ROLE_NOT_OWNER);
 		return user;
 	}
 

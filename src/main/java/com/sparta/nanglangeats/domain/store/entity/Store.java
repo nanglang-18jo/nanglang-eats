@@ -1,5 +1,6 @@
 package com.sparta.nanglangeats.domain.store.entity;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.UUID;
 
@@ -97,5 +98,11 @@ public class Store extends Timestamped {
 		this.closeTime = request.getCloseTime();
 		this.addressDetail = request.getAddressDetail();
 		this.phoneNumber = request.getPhoneNumber();
+	}
+
+	public void delete(String deletedBy){
+		this.isActive=false;
+		this.setDeletedAt(LocalDateTime.now());
+		this.setDeletedBy(deletedBy);
 	}
 }
