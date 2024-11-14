@@ -1,5 +1,7 @@
 package com.sparta.nanglangeats.domain.order.service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,12 +34,17 @@ public class OrderService {
 	public OrderCreateResponse createOrder(@Valid OrderCreateRequest request, User user) {
 		validateOrderProducts(request.getProducts());
 
+		int todayOrderCount = getTodayOrderCountByStore(request.getStoreId()); // 해당 가게의 오늘 주문 수 조회
+		int orderNumber = todayOrderCount + 1;  // 오늘의 주문 순서대로 orderNumber 설정
+
 		Order order = Order.builder()
 			.userId(user.getUsername())
 			.storeId(request.getStoreId())
+			.orderNumber(orderNumber)
 			.address(request.getAddress())
 			.requirement(request.getRequirement())
 			.type(Order.OrderType.valueOf(request.getType().name()))
+			.status(Order.OrderStatus.PENDING)
 			.totalPrice(request.getTotalPrice())
 			.build();
 		orderRepository.save(order);
@@ -55,18 +62,25 @@ public class OrderService {
 	}
 
 	private void validateOrderProducts(List<OrderCreateRequest.OrderProductRequestDto> products) {
-		List<CustomFieldError> fieldErrors = new ArrayList<>();
+		List<CustomFieldError> customFieldErrors = new ArrayList<>();
 		for (OrderCreateRequest.OrderProductRequestDto product : products) {
+			if (product.getProductId() == null || product.getProductId().isEmpty()) {
+				customFieldErrors.add(new CustomFieldError("", ErrorCode.ORDER_PRODUCT_ID_INVALID));
+			}
 			if (product.getQuantity() <= 0) {
-				fieldErrors.add(new CustomFieldError(product.getProductId(), ErrorCode.COMMON_INVALID_PARAMETER));
+				customFieldErrors.add(
+					new CustomFieldError(product.getProductId(), ErrorCode.ORDER_PRODUCT_QUANTITY_INVALID));
 			}
 		}
-		if (!fieldErrors.isEmpty()) {
-			throw new ParameterException(ErrorCode.COMMON_INVALID_PARAMETER, fieldErrors);
+		if (!customFieldErrors.isEmpty()) {
+			throw new ParameterException(ErrorCode.COMMON_INVALID_PARAMETER, customFieldErrors);
 		}
 	}
 
-	private void validateUser(User user) {
-		//
+	public int getTodayOrderCountByStore(String storeId) {
+		LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
+		LocalDateTime endOfDay = startOfDay.plusDays(1).minusSeconds(1);
+
+		return orderRepository.countByStoreIdAndCreatedAtBetween(storeId, startOfDay, endOfDay);
 	}
 }
