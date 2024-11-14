@@ -13,10 +13,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.sparta.nanglangeats.domain.user.controller.dto.request.UserSignupRequest;
 import com.sparta.nanglangeats.domain.user.entity.User;
 import com.sparta.nanglangeats.domain.user.enums.UserRole;
 import com.sparta.nanglangeats.domain.user.repository.UserRepository;
+import com.sparta.nanglangeats.domain.user.service.dto.request.UserSignupServiceRequest;
 import com.sparta.nanglangeats.global.common.exception.CustomException;
 import com.sparta.nanglangeats.global.common.exception.CustomFieldError;
 import com.sparta.nanglangeats.global.common.exception.ParameterException;
@@ -35,14 +35,14 @@ class UserServiceTest {
 	private PasswordEncoder passwordEncoder;
 
 	@Test
-	@DisplayName("insertUser(회원가입DTO, 유저역할): 회원가입 정보와 유저 역할을 입력받아서 유저를 생성한다.")
-	void insertUser_success() {
+	@DisplayName("createUser(고객회원가입DTO): 고객회원가입 정보를 입력받아서 유저를 생성한다.")
+	void createUser_success() {
 		// given
-		final UserSignupRequest request = new UserSignupRequest("testerId", "password", "tester", "test@gmail.com");
+		final UserSignupServiceRequest request = new UserSignupServiceRequest("testerId", "password", "tester", "test@gmail.com", UserRole.CUSTOMER);
 		final UserRole role = UserRole.CUSTOMER;
 
 		// when
-		final Long userId = userService.insertUser(request, role);
+		final Long userId = userService.createUser(request);
 
 		// then
 		final Optional<User> result = userRepository.findById(userId);
@@ -56,8 +56,8 @@ class UserServiceTest {
 	}
 
 	@Test
-	@DisplayName("insertUser(회원가입DTO, 유저역할): 회원가입 DTO의 유저네임이 중복되면 유저 생성을 실패한다.")
-	void insertUser_duplicated_username_fail() {
+	@DisplayName("createUser(고객회원가입DTO): 고객회원가입 DTO의 유저네임이 중복되면 유저 생성을 실패한다.")
+	void createUser_duplicated_username_fail() {
 		// given
 		final String username = "testerId";
 		final String nickname = "tester";
@@ -68,11 +68,10 @@ class UserServiceTest {
 		final String password2 = "password";
 		final String nickname2 = "tester2";
 		final String email2 = "tester2@gmail.com";
-		final UserRole role = UserRole.CUSTOMER;
-		final UserSignupRequest request = new UserSignupRequest(duplicatedUsername, password2, nickname2, email2);
+		final UserSignupServiceRequest request = new UserSignupServiceRequest(duplicatedUsername, password2, nickname2, email2, UserRole.CUSTOMER);
 
 		// expected
-		assertThatThrownBy(() -> userService.insertUser(request, role))
+		assertThatThrownBy(() -> userService.createUser(request))
 			.isInstanceOf(ParameterException.class)
 			.hasMessage(COMMON_INVALID_PARAMETER.getMessage())
 			.extracting("customFieldErrors")
@@ -83,8 +82,8 @@ class UserServiceTest {
 	}
 
 	@Test
-	@DisplayName("insertUser(회원가입DTO, 유저역할): 회원가입 DTO의 닉네임이 중복되면 유저 생성을 실패한다.")
-	void insertUser_duplicated_nickname_fail() {
+	@DisplayName("createUser(고객회원가입DTO): 고객회원가입 DTO의 닉네임이 중복되면 유저 생성을 실패한다.")
+	void createUser_duplicated_nickname_fail() {
 		// given
 		final String username = "testerId";
 		final String nickname = "tester";
@@ -95,11 +94,10 @@ class UserServiceTest {
 		final String password2 = "password";
 		final String duplicatedNickname = "tester";
 		final String email2 = "tester2@gmail.com";
-		final UserRole role = UserRole.CUSTOMER;
-		final UserSignupRequest request = new UserSignupRequest(username2, password2, duplicatedNickname, email2);
+		final UserSignupServiceRequest request = new UserSignupServiceRequest(username2, password2, duplicatedNickname, email2, UserRole.CUSTOMER);
 
 		// expected
-		assertThatThrownBy(() -> userService.insertUser(request, role))
+		assertThatThrownBy(() -> userService.createUser(request))
 			.isInstanceOf(ParameterException.class)
 			.hasMessage(COMMON_INVALID_PARAMETER.getMessage())
 			.extracting("customFieldErrors")
@@ -110,8 +108,8 @@ class UserServiceTest {
 	}
 
 	@Test
-	@DisplayName("insertUser(회원가입DTO, 유저역할): 회원가입 DTO의 이메일이 중복되면 유저 생성을 실패한다.")
-	void insertUser_duplicated_email_fail() {
+	@DisplayName("createUser(고객회원가입DTO): 고객회원가입 DTO의 이메일이 중복되면 유저 생성을 실패한다.")
+	void createUser_duplicated_email_fail() {
 		// given
 		final String username = "testerId";
 		final String nickname = "tester";
@@ -122,11 +120,10 @@ class UserServiceTest {
 		final String password2 = "password";
 		final String nickname2 = "tester2";
 		final String duplicatedEmail = "tester@gmail.com";
-		final UserRole role = UserRole.CUSTOMER;
-		final UserSignupRequest request = new UserSignupRequest(username2, password2, nickname2, duplicatedEmail);
+		final UserSignupServiceRequest request = new UserSignupServiceRequest(username2, password2, nickname2, duplicatedEmail, UserRole.CUSTOMER);
 
 		// expected
-		assertThatThrownBy(() -> userService.insertUser(request, role))
+		assertThatThrownBy(() -> userService.createUser(request))
 			.isInstanceOf(ParameterException.class)
 			.hasMessage(COMMON_INVALID_PARAMETER.getMessage())
 			.extracting("customFieldErrors")
@@ -137,8 +134,8 @@ class UserServiceTest {
 	}
 
 	@Test
-	@DisplayName("insertUser(회원가입DTO, 유저역할): 회원가입 DTO의 여러 필드가 중복되면 유저 생성을 실패한다.")
-	void insertUser_multiple_duplicated_info_fail() {
+	@DisplayName("createUser(고객회원가입DTO): 고객회원가입 DTO의 여러 필드가 중복되면 유저 생성을 실패한다.")
+	void createUser_multiple_duplicated_info_fail() {
 		// given
 		final String username = "testerId";
 		final String nickname = "tester";
@@ -149,11 +146,10 @@ class UserServiceTest {
 		final String password2 = "password";
 		final String nickname2 = "tester2";
 		final String duplicatedEmail = "tester@gmail.com";
-		final UserRole role = UserRole.CUSTOMER;
-		final UserSignupRequest request = new UserSignupRequest(duplicatedUsername, password2, nickname2, duplicatedEmail);
+		final UserSignupServiceRequest request = new UserSignupServiceRequest(duplicatedUsername, password2, nickname2, duplicatedEmail, UserRole.CUSTOMER);
 
 		// expected
-		assertThatThrownBy(() -> userService.insertUser(request, role))
+		assertThatThrownBy(() -> userService.createUser(request))
 			.isInstanceOf(ParameterException.class)
 			.hasMessage(COMMON_INVALID_PARAMETER.getMessage())
 			.extracting("customFieldErrors")
@@ -202,6 +198,42 @@ class UserServiceTest {
 			.hasMessage(USER_NOT_FOUND.getMessage());
 	}
 
+	@Test
+	@DisplayName("getUserById(유저PK): 유저PK를 받아 사용자를 조회한다.")
+	void getUserById_success() {
+		// given
+		final String username = "testerId";
+		final String nickname = "tester";
+		final String email = "tester@gmail.com";
+
+		final User savedUser = saveUser(username, nickname, email);
+
+		// when
+		User findUser = userService.getUserById(savedUser.getId());
+
+		// then
+		assertThat(findUser).isEqualTo(savedUser);
+		assertThat(findUser.getUsername()).isEqualTo(username);
+		assertThat(findUser.getNickname()).isEqualTo(nickname);
+		assertThat(findUser.getEmail()).isEqualTo(email);
+	}
+
+	@Test
+	@DisplayName("getUserById(유저PK): 유저PK가 존재하지 않는 경우 조회에 실패한다.")
+	void getUserById_does_not_exist_id_fail() {
+		// given
+		final String username = "testerId";
+		final String nickname = "tester";
+		final String email = "tester@gmail.com";
+		saveUser(username, nickname, email);
+
+		final Long WrongUserId = Long.valueOf(userRepository.count() + 1L);
+
+		// when
+		assertThatThrownBy(() -> userService.getUserById(WrongUserId))
+			.isInstanceOf(CustomException.class)
+			.hasMessage(USER_NOT_FOUND.getMessage());
+	}
 	
 	private User saveUser(String username, String nickname, String email) {
 		return userRepository.save(User.builder()

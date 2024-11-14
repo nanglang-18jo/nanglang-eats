@@ -69,7 +69,7 @@ public class StoreService {
 			}
 		}
 
-		return StoreCreateResponse.builder().storeId(store.getUuid().toString()).build();
+		return StoreCreateResponse.builder().storeId(store.getUuid()).build();
 	}
 
 	@Transactional
