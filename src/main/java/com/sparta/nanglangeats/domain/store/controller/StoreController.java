@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,21 +37,27 @@ public class StoreController {
 		return getResponseEntity(HttpStatus.CREATED, storeService.createStore(request), "가게 등록 완료");
 	}
 
-	@PutMapping("/{storeId}")
+	@PutMapping("/{uuid}")
 	@PreAuthorize("hasAnyRole('OWNER')")
 	public ResponseEntity<CommonResponse<?>> updateStore(
-		@PathVariable Long storeId,
+		@PathVariable String uuid,
 		@ModelAttribute StoreRequest request,
-		@AuthenticationPrincipal User user){
-		return getOkResponseEntity(storeService.updateStore(storeId, request, user), "가게 수정 완료");
+		@AuthenticationPrincipal User user) {
+		return getOkResponseEntity(storeService.updateStore(uuid, request, user), "가게 수정 완료");
 	}
 
-	@DeleteMapping("/{storeId}")
+	@DeleteMapping("/{uuid}")
 	@PreAuthorize("hasAnyRole('OWNER')")
 	public ResponseEntity<CommonResponse<?>> deleteStore(
-		@PathVariable Long storeId,
-		@AuthenticationPrincipal User user){
-		storeService.deleteStore(storeId, user);
+		@PathVariable String uuid,
+		@AuthenticationPrincipal User user) {
+		storeService.deleteStore(uuid, user);
 		return getResponseEntity(HttpStatus.NO_CONTENT, null, "가게 삭제 완료");
+	}
+
+	@GetMapping("/{uuid}")
+	public ResponseEntity<CommonResponse<?>> getStoreDetail(
+		@PathVariable String uuid) {
+		return getOkResponseEntity(storeService.getStoreDetail(uuid), "가게 상세 조회 완료");
 	}
 }

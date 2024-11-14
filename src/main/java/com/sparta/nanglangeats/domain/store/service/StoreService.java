@@ -11,6 +11,7 @@ import com.sparta.nanglangeats.domain.image.enums.ImageCategory;
 import com.sparta.nanglangeats.domain.image.repository.ImageRepository;
 import com.sparta.nanglangeats.domain.image.service.dto.ImageService;
 import com.sparta.nanglangeats.domain.store.controller.dto.request.StoreRequest;
+import com.sparta.nanglangeats.domain.store.controller.dto.response.StoreDetailResponse;
 import com.sparta.nanglangeats.domain.store.controller.dto.response.StoreResponse;
 import com.sparta.nanglangeats.domain.store.entity.Category;
 import com.sparta.nanglangeats.domain.store.entity.Store;
@@ -62,8 +63,8 @@ public class StoreService {
 	}
 
 	@Transactional
-	public StoreResponse updateStore(Long storeId, StoreRequest request, User user) {
-		Store store = findStoreById(storeId);
+	public StoreResponse updateStore(String uuid, StoreRequest request, User user) {
+		Store store = findStoreByUuid(uuid);
 
 		if (user.getRole().equals(UserRole.OWNER) && !store.getOwner().equals(user))
 			throw new CustomException(ErrorCode.ACCESS_DENIED);
@@ -79,13 +80,18 @@ public class StoreService {
 	}
 
 	@Transactional
-	public void deleteStore(Long storeId, User user) {
-		Store store = findStoreById(storeId);
+	public void deleteStore(String uuid, User user) {
+		Store store = findStoreByUuid(uuid);
 
 		if (user.getRole().equals(UserRole.OWNER) && !store.getOwner().equals(user))
 			throw new CustomException(ErrorCode.ACCESS_DENIED);
 
 		store.delete(user.getUsername());
+	}
+
+	public StoreDetailResponse getStoreDetail(String uuid){
+		Store store = findStoreByUuid(uuid);
+		return null;
 	}
 
 	/* UTIL */
@@ -100,7 +106,7 @@ public class StoreService {
 		return categoryRepository.findById(id).orElseThrow(() -> new CustomException(ErrorCode.CATEGORY_NOT_FOUND));
 	}
 
-	private Store findStoreById(Long id) {
-		return storeRepository.findById(id).orElseThrow(() -> new CustomException(ErrorCode.STORE_NOT_FOUND));
+	private Store findStoreByUuid(String uuid) {
+		return storeRepository.findByUuid(uuid).orElseThrow(() -> new CustomException(ErrorCode.STORE_NOT_FOUND));
 	}
 }
