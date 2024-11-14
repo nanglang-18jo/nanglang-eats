@@ -91,7 +91,7 @@ public class StoreService {
 
 	public StoreDetailResponse getStoreDetail(String uuid){
 		Store store = findStoreByUuid(uuid);
-		return null;
+		return StoreDetailResponse.builder().store(store).build();
 	}
 
 	/* UTIL */
