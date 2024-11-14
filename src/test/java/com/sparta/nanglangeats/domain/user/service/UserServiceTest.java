@@ -13,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.sparta.nanglangeats.domain.user.controller.dto.request.UserUpdateRequest;
 import com.sparta.nanglangeats.domain.user.entity.User;
 import com.sparta.nanglangeats.domain.user.enums.UserRole;
 import com.sparta.nanglangeats.domain.user.repository.UserRepository;
@@ -161,6 +162,34 @@ class UserServiceTest {
 				tuple(duplicatedEmail, DUPLICATED_EMAIL.getMessage())
 			);
 	}
+
+	@Test
+	@DisplayName("updateUser(유저변경정보DTO): 변경 정보를 입력받아 유저를 변경한다.")
+	void updateUser_success() {
+		// given
+		final String username = "testerId";
+		final String nickname = "tester";
+		final String email = "tester@gmail.com";
+		final User savedUser = saveUser(username, nickname, email);
+
+		final String updatePassword = "newPassword";
+		final String updateNickname = "tester2";
+		final String updateEmail = "tester@gmail.com";
+		final Boolean isActive = false;
+		final UserUpdateRequest request = new UserUpdateRequest(updatePassword, updateNickname, updateEmail, isActive);
+
+		// when
+		Long userId = userService.updateUser(savedUser, request);
+
+		// then
+		Optional<User> result = userRepository.findById(userId);
+		assertThat(result.isPresent()).isTrue();
+		assertThat(passwordEncoder.matches(updatePassword, result.get().getPassword())).isTrue();
+		assertThat(result.get().getNickname()).isEqualTo(updateNickname);
+		assertThat(result.get().getEmail()).isEqualTo(updateEmail);
+		assertThat(result.get().isActive()).isEqualTo(isActive);
+	}
+
 
 	@Test
 	@DisplayName("getUserByUsername(유저네임): 유저네임을 받아 사용자를 조회한다.")

@@ -22,6 +22,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.nanglangeats.domain.user.controller.dto.request.UserSignupRequest;
+import com.sparta.nanglangeats.domain.user.controller.dto.request.UserUpdateRequest;
 import com.sparta.nanglangeats.domain.user.enums.UserRole;
 import com.sparta.nanglangeats.domain.user.service.UserService;
 
@@ -59,4 +60,18 @@ class UserControllerTest {
 			.andExpect(status().isCreated());
 	}
 
+	@Test
+	@DisplayName("updateUser(유저변경정보DTO): 변경 정보를 입력받아 유저를 변경한다.")
+	void updateUser() throws Exception {
+		// given
+		final String uri = "/api/users";
+		final UserUpdateRequest request = new UserUpdateRequest("newPassword", "updateNick", "tester@gmail.com", false);
+
+		// expected
+		mockMvc.perform(put(uri).with(csrf())
+				.contentType(APPLICATION_JSON_VALUE)
+				.content(objectMapper.writeValueAsString(request)))
+			.andDo(print())
+			.andExpect(status().isOk());
+	}
 }

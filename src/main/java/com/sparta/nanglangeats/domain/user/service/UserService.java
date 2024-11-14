@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.sparta.nanglangeats.domain.user.controller.dto.request.UserUpdateRequest;
 import com.sparta.nanglangeats.domain.user.entity.User;
 import com.sparta.nanglangeats.domain.user.repository.UserRepository;
 import com.sparta.nanglangeats.domain.user.service.dto.request.UserSignupServiceRequest;
@@ -38,6 +39,14 @@ public class UserService {
 			.build()).getId();
 	}
 
+	@Transactional
+	public Long updateUser(User user, UserUpdateRequest request) {
+		validateUpdateUserInfo(user, request);
+		User findUser = getUserById(user.getId());
+		findUser.updateUserInfo(passwordEncoder.encode(request.getPassword()), request.getNickname(), request.getEmail(), request.getIsActive());
+		return findUser.getId();
+	}
+
 	@Transactional(readOnly = true)
 	public User getUserByUsername(String username) {
 		return userRepository.findByUsername(username)
@@ -48,6 +57,12 @@ public class UserService {
 	public User getUserById(Long userId) {
 		return userRepository.findById(userId)
 			.orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+	}
+
+	private void validateUpdateUserInfo(User user, UserUpdateRequest request) {
+		String nickname = user.getNickname().equals(request.getNickname()) ? null : request.getNickname();
+		String email = user.getEmail().equals(request.getEmail()) ? null : request.getEmail();
+		validateUserInfo(null, nickname, email);
 	}
 
 	private void validateUserInfo(String username, String nickname, String email) {

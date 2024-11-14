@@ -55,4 +55,11 @@ public class User extends Timestamped {
 		this.isActive = true;
 		initCreatedBy(username);
 	}
+
+	public void updateUserInfo(String password, String nickname, String email, Boolean isActive) {
+		this.password = password;
+		this.nickname = nickname;
+		this.email = email;
+		this.isActive = isActive;
+	}
 }
