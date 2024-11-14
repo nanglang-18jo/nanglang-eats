@@ -36,11 +36,7 @@ public class StoreService {
 	private final UserRepository userRepository;
 
 	@Transactional
-	public StoreResponse createStore(StoreRequest request, User user) {
-		// 권한 확인
-		if (!(user.getRole() == UserRole.MASTER || user.getRole() == UserRole.MANAGER))
-			throw new CustomException(ErrorCode.ACCESS_DENIED);
-
+	public StoreResponse createStore(StoreRequest request) {
 		User owner = validateOwner(request.getOwnerId());
 		Category category = findCategoryById(request.getCategoryId());
 		CommonAddress commonAddress = commonAddressService.findCommonAddressByAddress(request.getAddress());
