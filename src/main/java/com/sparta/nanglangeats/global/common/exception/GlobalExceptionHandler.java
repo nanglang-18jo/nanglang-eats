@@ -34,7 +34,7 @@ public class GlobalExceptionHandler {
 			builder.append(customFieldError.getRejectedValue()).append(" : ")
 				.append(customFieldError.getErrorMessage()).append("\n");
 		}
-
+		builder.deleteCharAt(builder.length() -1);
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionDto(builder.toString()));
 	}
 
@@ -47,6 +47,7 @@ public class GlobalExceptionHandler {
 			builder.append(fieldError.getField()).append(" : ")
 				.append(fieldError.getDefaultMessage()).append("\n");
 		}
+		builder.deleteCharAt(builder.length() -1);
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionDto(builder.toString()));
 	}
 
