@@ -75,4 +75,8 @@ public class Order extends Timestamped {
 		this.totalPrice = totalPrice;
 		this.isActive = true;
 	}
+
+	public void updateStatus(OrderStatus newStatus) {
+		this.status = newStatus;
+	}
 }

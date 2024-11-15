@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sparta.nanglangeats.domain.order.controller.dto.request.OrderCreateRequest;
+import com.sparta.nanglangeats.domain.order.controller.dto.request.OrderStatusUpdateRequest;
 import com.sparta.nanglangeats.domain.order.controller.dto.request.OrderUpdateRequest;
+import com.sparta.nanglangeats.domain.order.controller.dto.response.OrderStatusUpdateResponse;
 import com.sparta.nanglangeats.domain.order.service.OrderService;
 import com.sparta.nanglangeats.domain.user.entity.User;
 import com.sparta.nanglangeats.global.common.dto.CommonResponse;
@@ -49,5 +51,16 @@ public class OrderController {
 
 		return ControllerUtil.getResponseEntity(HttpStatus.OK, orderService.updateOrder(orderId, request, user),
 			"주문 정보 수정 완료");
+	}
+
+	@PreAuthorize("hasRole('OWNER')")
+	@PatchMapping("/{orderId}/status")
+	public ResponseEntity<CommonResponse<?>> updateOrderStatus(
+		@AuthenticationPrincipal User user,
+		@PathVariable Long orderId,
+		@RequestBody @Valid OrderStatusUpdateRequest request) {
+
+		orderService.updateOrderStatus(orderId, user, request.getStatus());
+		return ControllerUtil.getResponseEntity(HttpStatus.OK, new OrderStatusUpdateResponse(orderId), "주문 상태 수정 완료");
 	}
 }

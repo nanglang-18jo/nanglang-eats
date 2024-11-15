@@ -43,7 +43,7 @@ public class OrderService {
 
 		// 현장 주문(ONSITE)인 경우, 요청 사용자가 해당 가게의 주인인지 확인
 		if (request.getType().equals(OrderType.ONSITE)) {
-			validateOwnerForOnsiteOrder(request.getStoreId(), user.getId());
+			validateStoreOwner(request.getStoreId(), user.getId());
 		}
 
 		// 주문 상품 검증
@@ -115,6 +115,29 @@ public class OrderService {
 		return new OrderUpdateResponse(order.getOrderId());
 	}
 
+	@Transactional
+	public void updateOrderStatus(Long orderId, User user, OrderStatus newStatus) {
+		// 주문 조회
+		Order order = orderRepository.findById(orderId)
+			.orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
+
+		// 가게 주인 검증
+		validateStoreOwner(order.getStoreId(), user.getId());
+
+		// 상태 변경 검증
+		if (order.getStatus() == OrderStatus.PENDING && newStatus == OrderStatus.CANCELED) {
+			// 취소 가능 시간 확인 (5분 제한)
+			if (order.getCreatedAt().isBefore(LocalDateTime.now().minusMinutes(5))) {
+				throw new CustomException(ErrorCode.ORDER_CANCEL_TIME_EXCEEDED);
+			}
+		} else if (order.getStatus() != OrderStatus.PENDING) {
+			throw new CustomException(ErrorCode.ORDER_STATUS_CHANGE_INVALID);
+		}
+
+		// 상태 업데이트
+		order.updateStatus(newStatus);
+	}
+
 	// 주문 상품 검증
 	private <T extends ProductRequestDto> void validateOrderProducts(List<T> products) {
 		List<CustomFieldError> customFieldErrors = new ArrayList<>();
@@ -134,8 +157,8 @@ public class OrderService {
 		}
 	}
 
-	// 현장 주문(ONSITE)인 경우, 요청 사용자가 해당 가게의 주인인지 확인
-	public void validateOwnerForOnsiteOrder(String storeId, Long userId) {
+	// 요청 사용자가 해당 가게의 주인인지 확인
+	public void validateStoreOwner(String storeId, Long userId) {
 		// 가게 주인의 ID를 가져오고, 없거나 잘못된 경우 예외 처리
 		// TODO: StoreService에 getStoreOwnerId() 구현 필요
 		/*
@@ -146,7 +169,7 @@ public class OrderService {
 
 		// 요청 사용자가 가게 주인이 아닌 경우 예외 처리
 		if (!storeOwnerId.equals(user.getId())) {
-			throw new CustomException(ErrorCode.ONSITE_ORDER_NOT_ALLOWED);
+			throw new CustomException(ErrorCode.ORDER_UPDATE_FORBIDDEN);
 		}
 		*/
 	}
