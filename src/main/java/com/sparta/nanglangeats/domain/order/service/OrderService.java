@@ -65,7 +65,7 @@ public class OrderService {
 		// 주문 상품 저장
 		request.getProducts().forEach(productDto -> {
 			OrderProduct orderProduct = OrderProduct.builder()
-				.orderId(order.getOrderUuid())
+				.order(order)
 				.productId(productDto.getProductId())
 				.quantity(productDto.getQuantity())
 				.build();
