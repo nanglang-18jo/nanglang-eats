@@ -47,10 +47,10 @@ public class Product extends Timestamped {
 	private int price;
 
 	@Column(nullable = false)
-	private boolean isPublic;
+	private Boolean isPublic;
 
 	@Column(nullable = false)
-	private boolean isActive;
+	private Boolean isActive;
 
 	@Builder
 	public Product(Store store, String name, String description, int price) {
