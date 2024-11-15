@@ -102,6 +102,8 @@ public class StoreService {
 
 	public StoreDetailResponse getStoreDetail(String uuid){
 		Store store = findStoreByUuid(uuid);
+		validateStore(store);
+
 		List<String> imageUrls = imageRepository.findUrlsByImageCategoryAndContentId(ImageCategory.STORE_IMAGE, store.getId());
 		return StoreDetailResponse.builder().store(store).imageUrls(imageUrls).build();
 	}
@@ -144,6 +146,10 @@ public class StoreService {
 		if (!user.getRole().equals(UserRole.OWNER))
 			throw new CustomException(ErrorCode.USER_ROLE_NOT_OWNER);
 		return user;
+	}
+
+	private void validateStore(Store store) {
+		if(!store.getIsActive()) throw new CustomException(ErrorCode.STORE_NOT_FOUND);
 	}
 
 	private Category findCategoryById(Long id) {

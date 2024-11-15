@@ -57,6 +57,7 @@ public enum ErrorCode {
 
     // Product
     PRODUCT_NOT_FOUND(NOT_FOUND, "존재하지 않는 상품입니다."),
+    PRODUCT_NOT_PUBLIC(FORBIDDEN, "해당 상품에 접근할 수 없습니다."),
 
     ;
     private final HttpStatus httpStatus;

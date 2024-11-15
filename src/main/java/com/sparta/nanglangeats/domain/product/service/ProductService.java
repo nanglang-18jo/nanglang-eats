@@ -1,5 +1,7 @@
 package com.sparta.nanglangeats.domain.product.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -9,6 +11,7 @@ import com.sparta.nanglangeats.domain.image.enums.ImageCategory;
 import com.sparta.nanglangeats.domain.image.repository.ImageRepository;
 import com.sparta.nanglangeats.domain.image.service.ImageService;
 import com.sparta.nanglangeats.domain.product.controller.dto.request.ProductRequest;
+import com.sparta.nanglangeats.domain.product.controller.dto.response.ProductDetailResponse;
 import com.sparta.nanglangeats.domain.product.controller.dto.response.ProductResponse;
 import com.sparta.nanglangeats.domain.product.entity.Product;
 import com.sparta.nanglangeats.domain.product.repository.ProductRepository;
@@ -78,10 +81,26 @@ public class ProductService {
 		imageService.softDeleteAllImages(ImageCategory.PRODUCT_IMAGE, product.getId(), user.getUsername());
 	}
 
+	public ProductDetailResponse getProductDetail(String uuid) {
+		Product product = findProductByUuid(uuid);
+		validateProduct(product);
+
+		List<String> imageUrls = imageRepository.findUrlsByImageCategoryAndContentId(ImageCategory.PRODUCT_IMAGE,
+			product.getId());
+		return ProductDetailResponse.builder().product(product).imageUrls(imageUrls).build();
+	}
+
 	/* UTIL */
 	private void validateUser(Store store, User user) {
 		if (user.getRole() == UserRole.OWNER && !store.getOwner().equals(user))
 			throw new CustomException(ErrorCode.ACCESS_DENIED);
+	}
+
+	private void validateProduct(Product product) {
+		if (!product.getIsPublic())
+			throw new CustomException(ErrorCode.PRODUCT_NOT_PUBLIC);
+		if (!product.getIsActive())
+			throw new CustomException(ErrorCode.PRODUCT_NOT_FOUND);
 	}
 
 	private Product findProductByUuid(String uuid) {
