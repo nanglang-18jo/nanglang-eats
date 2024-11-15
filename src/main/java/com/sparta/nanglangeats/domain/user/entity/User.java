@@ -1,5 +1,9 @@
 package com.sparta.nanglangeats.domain.user.entity;
 
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.SQLRestriction;
+
 import com.sparta.nanglangeats.domain.user.enums.UserRole;
 import com.sparta.nanglangeats.global.common.entity.Timestamped;
 
@@ -19,6 +23,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @Table(name ="p_user")
+@SQLRestriction("deleted_at IS NULL")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends Timestamped {
 
@@ -61,5 +66,11 @@ public class User extends Timestamped {
 		this.nickname = nickname;
 		this.email = email;
 		this.isActive = isActive;
+	}
+
+	public void delete(String username) {
+		isActive = false;
+		this.setDeletedAt(LocalDateTime.now());
+		this.setDeletedBy(username);
 	}
 }

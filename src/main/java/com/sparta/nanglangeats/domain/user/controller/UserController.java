@@ -6,6 +6,7 @@ import static org.springframework.http.HttpStatus.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -40,6 +41,11 @@ public class UserController {
 
 	@PutMapping("/api/users")
 	public ResponseEntity<CommonResponse<?>> updateUser(@AuthenticationPrincipal User user, @Valid @RequestBody UserUpdateRequest request) {
-		return getResponseEntity(OK, userService.updateUser(user, request), "유저 회원 정보 수정 완료");
+		return getResponseEntity(OK, userService.updateUser(user, request), "유저 회원 정보 수정 성공");
+	}
+	
+	@DeleteMapping("/api/users")
+	public ResponseEntity<CommonResponse<?>> deleteUser(@AuthenticationPrincipal User user) {
+		return getResponseEntity(NO_CONTENT, userService.deleteUser(user), "유저 회원 탈퇴 성공");
 	}
 }

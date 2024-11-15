@@ -61,6 +61,13 @@ public class UserService {
 		return findUser.getId();
 	}
 
+	@Transactional
+	public Long deleteUser(User user) {
+		User findUser = getUserById(user.getId());
+		findUser.delete(findUser.getUsername());
+		return findUser.getId();
+	}
+
 	@Transactional(readOnly = true)
 	public User getUserByUsername(String username) {
 		return userRepository.findByUsername(username)
