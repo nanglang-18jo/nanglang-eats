@@ -1,5 +1,6 @@
 package com.sparta.nanglangeats.domain.product.entity;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import com.sparta.nanglangeats.domain.product.controller.dto.request.ProductRequest;
@@ -66,5 +67,12 @@ public class Product extends Timestamped {
 		this.name = request.getName();
 		this.description = request.getDescription();
 		this.price = request.getPrice();
+	}
+
+	public void delete(String deletedBy){
+		this.isPublic = false;
+		this.isActive = false;
+		this.setDeletedAt(LocalDateTime.now());
+		this.setDeletedBy(deletedBy);
 	}
 }

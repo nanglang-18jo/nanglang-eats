@@ -68,6 +68,14 @@ public class ProductService {
 		return ProductResponse.builder().productUuid(product.getUuid()).build();
 	}
 
+	@Transactional
+	public void deleteProduct(String uuid, User user) {
+		Product product = findProductByUuid(uuid);
+		validateUser(product.getStore(), user);
+
+		product.delete(user.getUsername());
+	}
+
 	/* UTIL */
 	private void validateUser(Store store, User user) {
 		if (user.getRole() == UserRole.OWNER && !store.getOwner().equals(user))
