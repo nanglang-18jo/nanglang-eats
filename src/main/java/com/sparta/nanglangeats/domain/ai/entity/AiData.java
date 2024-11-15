@@ -1,6 +1,9 @@
 package com.sparta.nanglangeats.domain.ai.entity;
 
+import java.util.UUID;
+
 import com.sparta.nanglangeats.domain.store.entity.Store;
+import com.sparta.nanglangeats.domain.user.entity.User;
 import com.sparta.nanglangeats.global.common.entity.Timestamped;
 
 import jakarta.persistence.Column;
@@ -27,11 +30,11 @@ public class AiData extends Timestamped {
 	private Long aiDataId;
 
 	@Column(nullable = false, unique = true)
-	private String uuid; // 노출되는 식별자
+	private String uuid;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "store_id")
-	private Store store;
+	@JoinColumn(name = "user_id")
+	private User user;
 
 	@Column(nullable = false, length = 100)
 	private String question;
@@ -40,13 +43,10 @@ public class AiData extends Timestamped {
 	private String answer;
 
 	@Builder
-	public AiData(Store store, String question, String answer) {
-		this.store = store;
+	public AiData(User user, String question, String answer) {
+		this.uuid = UUID.randomUUID().toString();
+		this.user = user;
 		this.question = question;
-		this.answer = answer;
-	}
-
-	public void updateAnswer(String answer) {
 		this.answer = answer;
 	}
 }

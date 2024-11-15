@@ -22,8 +22,7 @@ import lombok.RequiredArgsConstructor;
 public class AiService {
 
 	private final AiRepository aiDataRepository;
-	private	final StoreRepository storeRepository;
-	private final UserRepository userRepository;
+	private	final UserRepository userRepository;
 
 	@Transactional
 	public CommonResponse<AiResponse> createMenuDescription(AiRequest request, User user) {
@@ -34,10 +33,10 @@ public class AiService {
 		User owner = validateUser(request.getOwnerId());
 
 		// Google AI API 호출하여 응답을 받는 로직을 여기에 추가합니다.
-		String aiAnswer = "맛있는 " + request.getProductName() + "입니다. 단무지와 드세요."; // 실제 응답 예시
+		String aiAnswer = "맛있는 " + request.getProductName() + "입니다."; // 실제 응답 예시
 
 		// DB 저장
-		AiData aiData = new AiData(request.getStore(), request.getProductName(), aiAnswer);
+		AiData aiData = new AiData(request.getUser(), request.getProductName(), aiAnswer);
 		aiDataRepository.save(aiData);
 
 		// 응답 생성
