@@ -2,6 +2,8 @@ package com.sparta.nanglangeats.domain.order.entity;
 
 import java.util.UUID;
 
+import com.sparta.nanglangeats.domain.order.enums.OrderStatus;
+import com.sparta.nanglangeats.domain.order.enums.OrderType;
 import com.sparta.nanglangeats.global.common.entity.Timestamped;
 
 import jakarta.persistence.Column;
@@ -70,13 +72,5 @@ public class Order extends Timestamped {
 		this.status = status;
 		this.totalPrice = totalPrice;
 		this.isActive = true;
-	}
-
-	public enum OrderType {
-		ONLINE, ONSITE
-	}
-
-	public enum OrderStatus {
-		PENDING, COMPLETE, CANCELED
 	}
 }

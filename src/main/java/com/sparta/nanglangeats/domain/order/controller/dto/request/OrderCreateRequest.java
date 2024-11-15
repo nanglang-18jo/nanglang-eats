@@ -2,6 +2,8 @@ package com.sparta.nanglangeats.domain.order.controller.dto.request;
 
 import java.util.List;
 
+import com.sparta.nanglangeats.domain.order.enums.OrderType;
+
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -49,9 +51,5 @@ public class OrderCreateRequest {
 		@NotNull(message = "상품 가격(price)은 필수 항목입니다.")
 		@Positive(message = "상품 가격(price)은 0보다 커야 합니다.")
 		private Long price;
-	}
-
-	public enum OrderType {
-		ONLINE, ONSITE
 	}
 }
