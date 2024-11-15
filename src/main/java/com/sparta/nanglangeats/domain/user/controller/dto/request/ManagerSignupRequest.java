@@ -1,16 +1,12 @@
 package com.sparta.nanglangeats.domain.user.controller.dto.request;
 
-import static com.sparta.nanglangeats.global.common.exception.ErrorCode.*;
-
 import com.sparta.nanglangeats.domain.user.enums.UserRole;
-import com.sparta.nanglangeats.domain.user.service.dto.request.UserSignupServiceRequest;
+import com.sparta.nanglangeats.domain.user.service.dto.request.ManagerSignupServiceRequest;
 import com.sparta.nanglangeats.global.common.annotation.Email;
 import com.sparta.nanglangeats.global.common.annotation.Password;
 import com.sparta.nanglangeats.global.common.annotation.Username;
-import com.sparta.nanglangeats.global.common.exception.CustomException;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserSignupRequest {
+public class ManagerSignupRequest {
 
 	@Username
 	private String username;
@@ -28,23 +24,14 @@ public class UserSignupRequest {
 	private String nickname;
 	@Email
 	private String email;
-	@NotNull(message = "유저의 권한을 선택해 주세요.")
-	private UserRole role;
 
-	public UserSignupServiceRequest toServiceRequest() {
-		validateRole();
-		return UserSignupServiceRequest.builder()
+	public ManagerSignupServiceRequest toServiceRequest() {
+		return ManagerSignupServiceRequest.builder()
 			.username(username)
 			.password(password)
 			.nickname(nickname)
 			.email(email)
-			.role(role)
+			.role(UserRole.MANAGER)
 			.build();
-	}
-
-	private void validateRole() {
-		if (role == UserRole.MANAGER || role == UserRole.MASTER) {
-			throw new CustomException(INVALID_ROLE_REQUEST);
-		}
 	}
 }

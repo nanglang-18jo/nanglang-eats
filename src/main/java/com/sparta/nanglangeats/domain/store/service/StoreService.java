@@ -1,8 +1,17 @@
 package com.sparta.nanglangeats.domain.store.service;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.sparta.nanglangeats.domain.address.entity.CommonAddress;
 import com.sparta.nanglangeats.domain.address.service.CommonAddressService;
@@ -11,6 +20,8 @@ import com.sparta.nanglangeats.domain.image.enums.ImageCategory;
 import com.sparta.nanglangeats.domain.image.repository.ImageRepository;
 import com.sparta.nanglangeats.domain.image.service.dto.ImageService;
 import com.sparta.nanglangeats.domain.store.controller.dto.request.StoreRequest;
+import com.sparta.nanglangeats.domain.store.controller.dto.response.StoreDetailResponse;
+import com.sparta.nanglangeats.domain.store.controller.dto.response.StoreListResponse;
 import com.sparta.nanglangeats.domain.store.controller.dto.response.StoreResponse;
 import com.sparta.nanglangeats.domain.store.entity.Category;
 import com.sparta.nanglangeats.domain.store.entity.Store;
@@ -62,8 +73,8 @@ public class StoreService {
 	}
 
 	@Transactional
-	public StoreResponse updateStore(Long storeId, StoreRequest request, User user) {
-		Store store = findStoreById(storeId);
+	public StoreResponse updateStore(String uuid, StoreRequest request, User user) {
+		Store store = findStoreByUuid(uuid);
 
 		if (user.getRole().equals(UserRole.OWNER) && !store.getOwner().equals(user))
 			throw new CustomException(ErrorCode.ACCESS_DENIED);
@@ -79,13 +90,50 @@ public class StoreService {
 	}
 
 	@Transactional
-	public void deleteStore(Long storeId, User user) {
-		Store store = findStoreById(storeId);
+	public void deleteStore(String uuid, User user) {
+		Store store = findStoreByUuid(uuid);
 
 		if (user.getRole().equals(UserRole.OWNER) && !store.getOwner().equals(user))
 			throw new CustomException(ErrorCode.ACCESS_DENIED);
 
 		store.delete(user.getUsername());
+	}
+
+	public StoreDetailResponse getStoreDetail(String uuid){
+		Store store = findStoreByUuid(uuid);
+		return StoreDetailResponse.builder().store(store).build();
+	}
+
+	public Page<StoreListResponse> getStoresList(Long categoryId, int page, int size, String sortBy, String direction) {
+		Sort sort = Sort.by(Sort.Direction.fromString(direction), sortBy);
+		Pageable pageable = PageRequest.of(page, size, sort);
+
+		Page<Store> stores = storeRepository.findAllByCategoryId(categoryId, pageable);
+
+		List<Long> storeIds = stores.stream()
+			.map(Store::getId)
+			.toList();
+
+		List<Image> images = imageRepository.findByContentIdInAndImageCategory(storeIds, ImageCategory.STORE_IMAGE);
+
+		Map<Long, List<String>> imageUrlMap = images.stream()
+			.collect(Collectors.groupingBy(
+				Image::getContentId,
+				Collectors.mapping(Image::getUrl, Collectors.toList())
+			));
+
+		// Store 엔티티와 이미지 리스트 매핑
+		List<StoreListResponse> storeResponses = stores.stream()
+			.map(store -> new StoreListResponse(
+				store.getUuid(),
+				store.getName(),
+				store.getRating(),
+				store.getReviewCount(),
+				imageUrlMap.getOrDefault(store.getId(), Collections.emptyList()) // 해당 Store의 이미지 리스트
+			))
+			.toList();
+
+		return new PageImpl<>(storeResponses, pageable, stores.getTotalElements());
 	}
 
 	/* UTIL */
@@ -100,7 +148,7 @@ public class StoreService {
 		return categoryRepository.findById(id).orElseThrow(() -> new CustomException(ErrorCode.CATEGORY_NOT_FOUND));
 	}
 
-	private Store findStoreById(Long id) {
-		return storeRepository.findById(id).orElseThrow(() -> new CustomException(ErrorCode.STORE_NOT_FOUND));
+	private Store findStoreByUuid(String uuid) {
+		return storeRepository.findByUuid(uuid).orElseThrow(() -> new CustomException(ErrorCode.STORE_NOT_FOUND));
 	}
 }

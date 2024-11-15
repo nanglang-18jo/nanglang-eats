@@ -9,4 +9,6 @@ import com.sparta.nanglangeats.domain.image.enums.ImageCategory;
 
 public interface ImageRepository extends JpaRepository<Image, Long> {
 	List<Image> findAllByImageCategoryAndAndContentId(ImageCategory imageCategory, Long contentId);
+
+	List<Image> findByContentIdInAndImageCategory(List<Long> contentId, ImageCategory imageCategory);
 }
