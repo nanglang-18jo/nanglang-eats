@@ -13,9 +13,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.sparta.nanglangeats.domain.user.controller.dto.request.UserUpdateRequest;
 import com.sparta.nanglangeats.domain.user.entity.User;
 import com.sparta.nanglangeats.domain.user.enums.UserRole;
 import com.sparta.nanglangeats.domain.user.repository.UserRepository;
+import com.sparta.nanglangeats.domain.user.service.dto.request.ManagerSignupServiceRequest;
 import com.sparta.nanglangeats.domain.user.service.dto.request.UserSignupServiceRequest;
 import com.sparta.nanglangeats.global.common.exception.CustomException;
 import com.sparta.nanglangeats.global.common.exception.CustomFieldError;
@@ -39,7 +41,6 @@ class UserServiceTest {
 	void createUser_success() {
 		// given
 		final UserSignupServiceRequest request = new UserSignupServiceRequest("testerId", "password", "tester", "test@gmail.com", UserRole.CUSTOMER);
-		final UserRole role = UserRole.CUSTOMER;
 
 		// when
 		final Long userId = userService.createUser(request);
@@ -52,7 +53,7 @@ class UserServiceTest {
 		assertThat(passwordEncoder.matches(request.getPassword(), result.get().getPassword())).isTrue();
 		assertThat(result.get().getNickname()).isEqualTo(request.getNickname());
 		assertThat(result.get().getEmail()).isEqualTo(request.getEmail());
-		assertThat(result.get().getRole()).isEqualTo(role);
+		assertThat(result.get().getRole()).isEqualTo(request.getRole());
 	}
 
 	@Test
@@ -163,6 +164,26 @@ class UserServiceTest {
 	}
 
 	@Test
+	@DisplayName("createUser(매니저회원가입DTO): 매니저 회원가입 정보를 입력받아서 유저를 생성한다.")
+	void createManager_success() {
+		// given
+		final ManagerSignupServiceRequest request = new ManagerSignupServiceRequest("testerId", "password", "tester", "test@gmail.com", UserRole.MANAGER);
+
+		// when
+		final Long userId = userService.createManager(request);
+
+		// then
+		final Optional<User> result = userRepository.findById(userId);
+
+		assertThat(result.isPresent()).isTrue();
+		assertThat(result.get().getUsername()).isEqualTo(request.getUsername());
+		assertThat(passwordEncoder.matches(request.getPassword(), result.get().getPassword())).isTrue();
+		assertThat(result.get().getNickname()).isEqualTo(request.getNickname());
+		assertThat(result.get().getEmail()).isEqualTo(request.getEmail());
+		assertThat(result.get().getRole()).isEqualTo(request.getRole());
+	}
+
+	@Test
 	@DisplayName("getUserByUsername(유저네임): 유저네임을 받아 사용자를 조회한다.")
 	void getUserByUsername_success() {
 		// given
@@ -179,6 +200,33 @@ class UserServiceTest {
 		assertThat(result.getUsername()).isEqualTo(username);
 		assertThat(result.getNickname()).isEqualTo(nickname);
 		assertThat(result.getEmail()).isEqualTo(email);
+	}
+
+	@Test
+	@DisplayName("updateUser(유저변경정보DTO): 변경 정보를 입력받아 유저를 변경한다.")
+	void updateUser_success() {
+		// given
+		final String username = "testerId";
+		final String nickname = "tester";
+		final String email = "tester@gmail.com";
+		final User savedUser = saveUser(username, nickname, email);
+
+		final String updatePassword = "newPassword";
+		final String updateNickname = "tester2";
+		final String updateEmail = "tester@gmail.com";
+		final Boolean isActive = false;
+		final UserUpdateRequest request = new UserUpdateRequest(updatePassword, updateNickname, updateEmail, isActive);
+
+		// when
+		Long userId = userService.updateUser(savedUser, request);
+
+		// then
+		Optional<User> result = userRepository.findById(userId);
+		assertThat(result.isPresent()).isTrue();
+		assertThat(passwordEncoder.matches(updatePassword, result.get().getPassword())).isTrue();
+		assertThat(result.get().getNickname()).isEqualTo(updateNickname);
+		assertThat(result.get().getEmail()).isEqualTo(updateEmail);
+		assertThat(result.get().isActive()).isEqualTo(isActive);
 	}
 
 	@Test
