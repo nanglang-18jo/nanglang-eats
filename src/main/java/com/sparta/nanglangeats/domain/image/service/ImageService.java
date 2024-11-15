@@ -1,4 +1,4 @@
-package com.sparta.nanglangeats.domain.image.service.dto;
+package com.sparta.nanglangeats.domain.image.service;
 
 import java.util.List;
 
@@ -9,8 +9,8 @@ import org.springframework.web.multipart.MultipartFile;
 import com.sparta.nanglangeats.domain.image.entity.Image;
 import com.sparta.nanglangeats.domain.image.enums.ImageCategory;
 import com.sparta.nanglangeats.domain.image.repository.ImageRepository;
+import com.sparta.nanglangeats.domain.image.service.dto.ImageResponse;
 import com.sparta.nanglangeats.domain.image.util.S3Util;
-import com.sparta.nanglangeats.domain.user.entity.User;
 
 import lombok.RequiredArgsConstructor;
 
@@ -42,8 +42,16 @@ public class ImageService {
 	}
 
 	@Transactional
-	public void deleteAllImages(ImageCategory category, Long contentId) {
+	public void hardDeleteAllImages(ImageCategory category, Long contentId) {
 		List<Image> images = imageRepository.findAllByImageCategoryAndAndContentId(category, contentId);
 		imageRepository.deleteAll(images);
+		images.forEach(image -> s3Util.deleteFile(image.getFileName()));
 	}
+
+	@Transactional
+	public void softDeleteAllImages(ImageCategory category, Long contentId, String deleteBy) {
+		List<Image> images = imageRepository.findAllByImageCategoryAndAndContentId(category, contentId);
+		images.forEach(image -> image.delete(deleteBy));
+	}
+
 }
