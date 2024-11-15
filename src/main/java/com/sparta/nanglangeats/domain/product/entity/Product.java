@@ -2,6 +2,7 @@ package com.sparta.nanglangeats.domain.product.entity;
 
 import java.util.UUID;
 
+import com.sparta.nanglangeats.domain.product.controller.dto.request.ProductRequest;
 import com.sparta.nanglangeats.domain.store.entity.Store;
 import com.sparta.nanglangeats.global.common.entity.Timestamped;
 
@@ -59,5 +60,11 @@ public class Product extends Timestamped {
 		this.price = price;
 		this.isPublic = true;
 		this.isActive = true;
+	}
+
+	public void update(ProductRequest request){
+		this.name = request.getName();
+		this.description = request.getDescription();
+		this.price = request.getPrice();
 	}
 }

@@ -69,7 +69,7 @@ public class StoreService {
 			imageService.uploadAllImages(request.getImages(), ImageCategory.STORE_IMAGE, store.getId());
 		}
 
-		return StoreResponse.builder().storeId(store.getUuid()).build();
+		return StoreResponse.builder().storeUuid(store.getUuid()).build();
 	}
 
 	@Transactional
@@ -86,7 +86,7 @@ public class StoreService {
 		imageService.deleteAllImages(ImageCategory.STORE_IMAGE, store.getId());
 		imageService.uploadAllImages(request.getImages(), ImageCategory.STORE_IMAGE, store.getId());
 
-		return StoreResponse.builder().storeId(store.getUuid()).build();
+		return StoreResponse.builder().storeUuid(store.getUuid()).build();
 	}
 
 	@Transactional
