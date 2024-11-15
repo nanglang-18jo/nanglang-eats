@@ -18,8 +18,10 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
+@Setter
 @Entity
 @Table(name = "p_order")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -30,7 +32,7 @@ public class Order extends Timestamped {
 	private Long orderId;
 
 	@Column(nullable = false)
-	private String userId;
+	private Long userId;
 
 	@Column(nullable = false)
 	private String storeId;
@@ -60,7 +62,7 @@ public class Order extends Timestamped {
 	private boolean isActive;
 
 	@Builder
-	public Order(String userId, String storeId, String orderUuid, Integer orderNumber, String address,
+	public Order(Long userId, String storeId, String orderUuid, Integer orderNumber, String address,
 		String requirement, OrderType type, OrderStatus status, Long totalPrice) {
 		this.userId = userId;
 		this.storeId = storeId;

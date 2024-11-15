@@ -5,12 +5,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sparta.nanglangeats.domain.order.controller.dto.request.OrderCreateRequest;
+import com.sparta.nanglangeats.domain.order.controller.dto.request.OrderUpdateRequest;
 import com.sparta.nanglangeats.domain.order.service.OrderService;
 import com.sparta.nanglangeats.domain.user.entity.User;
 import com.sparta.nanglangeats.global.common.dto.CommonResponse;
@@ -35,5 +38,16 @@ public class OrderController {
 
 		return ControllerUtil.getResponseEntity(HttpStatus.CREATED, orderService.createOrder(request, user),
 			"주문 등록 완료");
+	}
+
+	@PreAuthorize("hasAnyRole('CUSTOMER', 'OWNER')")
+	@PatchMapping("/{orderId}")
+	public ResponseEntity<CommonResponse<?>> updateOrder(
+		@PathVariable Long orderId,
+		@AuthenticationPrincipal User user,
+		@Valid @RequestBody OrderUpdateRequest request) {
+
+		return ControllerUtil.getResponseEntity(HttpStatus.OK, orderService.updateOrder(orderId, request, user),
+			"주문 정보 수정 완료");
 	}
 }

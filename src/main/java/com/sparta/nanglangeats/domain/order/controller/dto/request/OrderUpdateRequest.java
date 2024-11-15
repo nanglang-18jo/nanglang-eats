@@ -17,11 +17,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class OrderCreateRequest {
+public class OrderUpdateRequest {
 
-	@NotNull(message = "storeId는 필수 항목입니다.")
-	private String storeId;
-
+	@NotBlank(message = "주소는 필수 항목입니다.")
 	private String address;
 
 	private String requirement;
@@ -34,12 +32,12 @@ public class OrderCreateRequest {
 	private Long totalPrice;
 
 	@NotEmpty(message = "상품(products)은 최소 하나 이상 포함되어야 합니다.")
-	private List<@Valid OrderProductRequestDto> products;
+	private List<@Valid OrderProductUpdateRequestDto> products;
 
 	@Getter
 	@Setter
 	@NoArgsConstructor
-	public static class OrderProductRequestDto implements ProductRequestDto {
+	public static class OrderProductUpdateRequestDto implements ProductRequestDto {
 
 		@NotBlank(message = "productId는 필수 항목입니다.")
 		private String productId;
