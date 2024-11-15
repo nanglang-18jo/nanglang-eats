@@ -102,7 +102,8 @@ public class StoreService {
 
 	public StoreDetailResponse getStoreDetail(String uuid){
 		Store store = findStoreByUuid(uuid);
-		return StoreDetailResponse.builder().store(store).build();
+		List<String> imageUrls = imageRepository.findUrlsByImageCategoryAndContentId(ImageCategory.STORE_IMAGE, store.getId());
+		return StoreDetailResponse.builder().store(store).imageUrls(imageUrls).build();
 	}
 
 	public Page<StoreListResponse> getStoresList(Long categoryId, int page, int size, String sortBy, String direction) {

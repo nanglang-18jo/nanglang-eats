@@ -1,6 +1,7 @@
 package com.sparta.nanglangeats.domain.store.controller.dto.response;
 
 import java.time.LocalTime;
+import java.util.List;
 
 import com.sparta.nanglangeats.domain.store.entity.Category;
 import com.sparta.nanglangeats.domain.store.entity.Store;
@@ -19,9 +20,10 @@ public class StoreDetailResponse {
 	private final String phoneNumber;
 	private final Float rating;
 	private final Integer reviewCount;
+	private final List<String> imageUrls;
 
 	@Builder
-	public StoreDetailResponse(Store store){
+	public StoreDetailResponse(Store store, List<String> imageUrls) {
 		this.category = store.getCategory().getName();
 		this.owner=store.getOwner().getUsername();
 		this.name = store.getName();
@@ -31,5 +33,6 @@ public class StoreDetailResponse {
 		this.phoneNumber=store.getPhoneNumber();
 		this.rating=store.getRating();
 		this.reviewCount=store.getReviewCount();
+		this.imageUrls=imageUrls;
 	}
 }

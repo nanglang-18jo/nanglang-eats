@@ -43,14 +43,14 @@ public class ImageService {
 
 	@Transactional
 	public void hardDeleteAllImages(ImageCategory category, Long contentId) {
-		List<Image> images = imageRepository.findAllByImageCategoryAndAndContentId(category, contentId);
+		List<Image> images = imageRepository.findAllByImageCategoryAndContentId(category, contentId);
 		imageRepository.deleteAll(images);
 		images.forEach(image -> s3Util.deleteFile(image.getFileName()));
 	}
 
 	@Transactional
 	public void softDeleteAllImages(ImageCategory category, Long contentId, String deleteBy) {
-		List<Image> images = imageRepository.findAllByImageCategoryAndAndContentId(category, contentId);
+		List<Image> images = imageRepository.findAllByImageCategoryAndContentId(category, contentId);
 		images.forEach(image -> image.delete(deleteBy));
 	}
 
