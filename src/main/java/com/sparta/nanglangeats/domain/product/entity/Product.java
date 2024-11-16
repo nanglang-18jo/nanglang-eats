@@ -46,6 +46,12 @@ public class Product extends Timestamped {
 	@Column(nullable = false)
 	private int price;
 
+	@Column
+	private String thumbnailUrl;
+
+	@Column
+	private String thumbnailName;
+
 	@Column(nullable = false)
 	private Boolean isPublic;
 
@@ -53,12 +59,14 @@ public class Product extends Timestamped {
 	private Boolean isActive;
 
 	@Builder
-	public Product(Store store, String name, String description, int price) {
+	public Product(Store store, String name, String description, int price, String thumbnailUrl, String thumbnailName) {
 		this.uuid = UUID.randomUUID().toString();
 		this.store = store;
 		this.name = name;
 		this.description = description;
 		this.price = price;
+		this.thumbnailUrl = thumbnailUrl;
+		this.thumbnailName = thumbnailName;
 		this.isPublic = true;
 		this.isActive = true;
 	}
