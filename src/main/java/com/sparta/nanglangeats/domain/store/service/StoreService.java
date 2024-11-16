@@ -19,6 +19,7 @@ import com.sparta.nanglangeats.domain.image.entity.Image;
 import com.sparta.nanglangeats.domain.image.enums.ImageCategory;
 import com.sparta.nanglangeats.domain.image.repository.ImageRepository;
 import com.sparta.nanglangeats.domain.image.service.ImageService;
+import com.sparta.nanglangeats.domain.image.service.dto.ImageResponse;
 import com.sparta.nanglangeats.domain.store.controller.dto.request.StoreRequest;
 import com.sparta.nanglangeats.domain.store.controller.dto.response.StoreDetailResponse;
 import com.sparta.nanglangeats.domain.store.controller.dto.response.StoreListResponse;
@@ -52,6 +53,12 @@ public class StoreService {
 		Category category = findCategoryById(request.getCategoryId());
 		CommonAddress commonAddress = commonAddressService.findCommonAddressByAddress(request.getAddress());
 
+		ImageResponse thumbnailResponse = null;
+
+		if (request.getThumbnail() != null) {
+			thumbnailResponse = imageService.uploadImage(request.getThumbnail(), "store-thumbnails");
+		}
+
 		Store store = Store.builder()
 			.category(category)
 			.owner(owner)
@@ -61,6 +68,8 @@ public class StoreService {
 			.commonAddress(commonAddress)
 			.addressDetail(request.getAddressDetail())
 			.phoneNumber(request.getPhoneNumber())
+			.thumbnailName(thumbnailResponse != null ? thumbnailResponse.getFileName() : null)
+			.thumbnailUrl(thumbnailResponse != null ? thumbnailResponse.getUrl() : null)
 			.build();
 
 		storeRepository.save(store);
@@ -100,11 +109,12 @@ public class StoreService {
 		imageService.softDeleteAllImages(ImageCategory.STORE_IMAGE, store.getId(), user.getUsername());
 	}
 
-	public StoreDetailResponse getStoreDetail(String uuid){
+	public StoreDetailResponse getStoreDetail(String uuid) {
 		Store store = findStoreByUuid(uuid);
 		validateStore(store);
 
-		List<String> imageUrls = imageRepository.findUrlsByImageCategoryAndContentId(ImageCategory.STORE_IMAGE, store.getId());
+		List<String> imageUrls = imageRepository.findUrlsByImageCategoryAndContentId(ImageCategory.STORE_IMAGE,
+			store.getId());
 		return StoreDetailResponse.builder().store(store).imageUrls(imageUrls).build();
 	}
 
@@ -149,7 +159,8 @@ public class StoreService {
 	}
 
 	private void validateStore(Store store) {
-		if(!store.getIsActive()) throw new CustomException(ErrorCode.STORE_NOT_FOUND);
+		if (!store.getIsActive())
+			throw new CustomException(ErrorCode.STORE_NOT_FOUND);
 	}
 
 	private Category findCategoryById(Long id) {
