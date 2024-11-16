@@ -99,7 +99,7 @@ public class Store extends Timestamped {
 		this.thumbnailName = thumbnailName;
 	}
 
-	public void update(StoreRequest request, Category category, CommonAddress commonAddress) {
+	public void update(StoreRequest request, Category category, CommonAddress commonAddress, ImageResponse imageResponse) {
 		this.category = category;
 		this.commonAddress = commonAddress;
 		this.name = request.getName();
@@ -107,6 +107,10 @@ public class Store extends Timestamped {
 		this.closeTime = request.getCloseTime();
 		this.addressDetail = request.getAddressDetail();
 		this.phoneNumber = request.getPhoneNumber();
+		if(imageResponse != null) {
+			this.thumbnailName = imageResponse.getFileName();
+			this.thumbnailUrl = imageResponse.getUrl();
+		}
 	}
 
 	public void delete(String deletedBy){

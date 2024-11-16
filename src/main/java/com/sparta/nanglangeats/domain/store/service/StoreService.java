@@ -90,7 +90,14 @@ public class StoreService {
 
 		Category category = findCategoryById(request.getCategoryId());
 		CommonAddress commonAddress = commonAddressService.findCommonAddressByAddress(request.getAddress());
-		store.update(request, category, commonAddress);
+
+		ImageResponse thumbnailResponse = null;
+		if (request.getThumbnail() != null) {
+			thumbnailResponse = imageService.changeImage(store.getThumbnailName(),
+				"store-thumbnails", request.getThumbnail());
+		}
+
+		store.update(request, category, commonAddress, thumbnailResponse);
 
 		imageService.hardDeleteAllImages(ImageCategory.STORE_IMAGE, store.getId());
 		imageService.uploadAllImages(request.getImages(), ImageCategory.STORE_IMAGE, store.getId());
