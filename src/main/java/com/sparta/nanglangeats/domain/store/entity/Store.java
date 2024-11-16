@@ -5,6 +5,7 @@ import java.time.LocalTime;
 import java.util.UUID;
 
 import com.sparta.nanglangeats.domain.address.entity.CommonAddress;
+import com.sparta.nanglangeats.domain.image.service.dto.ImageResponse;
 import com.sparta.nanglangeats.domain.store.controller.dto.request.StoreRequest;
 import com.sparta.nanglangeats.domain.user.entity.User;
 import com.sparta.nanglangeats.global.common.entity.Timestamped;
@@ -70,12 +71,18 @@ public class Store extends Timestamped {
 	@Column(nullable = false)
 	private Integer reviewCount;
 
+	@Column
+	private String thumbnailName;
+
+	@Column
+	private String thumbnailUrl;
+
 	@Column(nullable = false)
 	private Boolean isActive;
 
 	@Builder
 	public Store(Category category, User owner, String name, LocalTime openTime, LocalTime closeTime,
-		CommonAddress commonAddress, String addressDetail, String phoneNumber) {
+		CommonAddress commonAddress, String addressDetail, String phoneNumber, String thumbnailUrl, String thumbnailName) {
 		this.uuid = UUID.randomUUID().toString(); // uuid 자동 생성
 		this.category = category;
 		this.owner = owner;
@@ -88,6 +95,8 @@ public class Store extends Timestamped {
 		this.rating = null; // 초기에는 별점을 null로 두고, 프론트에서도 안 보여주도록 함
 		this.reviewCount = 0;
 		this.isActive = true;
+		this.thumbnailUrl = thumbnailUrl;
+		this.thumbnailName = thumbnailName;
 	}
 
 	public void update(StoreRequest request, Category category, CommonAddress commonAddress) {
