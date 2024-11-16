@@ -25,12 +25,12 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/products")
+@RequestMapping("/api")
 public class ProductController {
 
 	private final ProductService productService;
 
-	@PostMapping
+	@PostMapping("/products")
 	@PreAuthorize("hasAnyRole('OWNER')")
 	public ResponseEntity<CommonResponse<?>> createProduct(
 		@ModelAttribute @Valid ProductRequest request,
@@ -38,27 +38,33 @@ public class ProductController {
 		return getResponseEntity(HttpStatus.CREATED, productService.createProduct(request, user), "상품 등록 완료");
 	}
 	
-	@PutMapping("/{uuid}")
+	@PutMapping("/products/{productUuid}")
 	@PreAuthorize("hasAnyRole('OWNER')")
 	public ResponseEntity<CommonResponse<?>> updateProduct(
-		@PathVariable String uuid,
+		@PathVariable String productUuid,
 		@ModelAttribute @Valid ProductRequest request,
 		@AuthenticationPrincipal User user){
-		return getOkResponseEntity(productService.updateProduct(uuid, request, user), "상품 수정 완료");
+		return getOkResponseEntity(productService.updateProduct(productUuid, request, user), "상품 수정 완료");
 	}
 
-	@DeleteMapping("/{uuid}")
+	@DeleteMapping("/products/{productUuid}")
 	@PreAuthorize("hasAnyRole('OWNER')")
 	public ResponseEntity<CommonResponse<?>> deleteProduct(
-		@PathVariable String uuid,
+		@PathVariable String productUuid,
 		@AuthenticationPrincipal User user){
-		productService.deleteProduct(uuid, user);
+		productService.deleteProduct(productUuid, user);
 		return getResponseEntity(HttpStatus.NO_CONTENT, null, "상품 삭제 완료");
 	}
 
-	@GetMapping("/{uuid}")
+	@GetMapping("/products/{productUuid}")
 	public ResponseEntity<CommonResponse<?>> getProductDetail(
-		@PathVariable String uuid){
-		return getOkResponseEntity(productService.getProductDetail(uuid), "상품 상세 조회 완료");
+		@PathVariable String productUuid){
+		return getOkResponseEntity(productService.getProductDetail(productUuid), "상품 상세 조회 완료");
+	}
+
+	@GetMapping("/stores/{storeUuid}/products")
+	public ResponseEntity<CommonResponse<?>> getProductsByStoresList(
+		@PathVariable String storeUuid){
+		return getOkResponseEntity(productService.getProductsByStoresList(storeUuid), "상품 목록 조회 완료");
 	}
 }
