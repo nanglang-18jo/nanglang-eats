@@ -20,6 +20,7 @@ import com.sparta.nanglangeats.domain.image.enums.ImageCategory;
 import com.sparta.nanglangeats.domain.image.repository.ImageRepository;
 import com.sparta.nanglangeats.domain.image.service.ImageService;
 import com.sparta.nanglangeats.domain.image.service.dto.ImageResponse;
+import com.sparta.nanglangeats.domain.image.util.S3Util;
 import com.sparta.nanglangeats.domain.store.controller.dto.request.StoreRequest;
 import com.sparta.nanglangeats.domain.store.controller.dto.response.StoreDetailResponse;
 import com.sparta.nanglangeats.domain.store.controller.dto.response.StoreListResponse;
@@ -46,6 +47,7 @@ public class StoreService {
 	private final ImageRepository imageRepository;
 	private final CommonAddressService commonAddressService;
 	private final UserRepository userRepository;
+	private final S3Util s3Util;
 
 	@Transactional
 	public StoreResponse createStore(StoreRequest request) {
@@ -56,7 +58,7 @@ public class StoreService {
 		ImageResponse thumbnailResponse = null;
 
 		if (request.getThumbnail() != null) {
-			thumbnailResponse = imageService.uploadImage(request.getThumbnail(), "store-thumbnails");
+			thumbnailResponse = s3Util.uploadFile(request.getThumbnail(), "store-thumbnails");
 		}
 
 		Store store = Store.builder()
@@ -93,8 +95,9 @@ public class StoreService {
 
 		ImageResponse thumbnailResponse = null;
 		if (request.getThumbnail() != null) {
-			thumbnailResponse = imageService.changeImage(store.getThumbnailName(),
-				"store-thumbnails", request.getThumbnail());
+			if (store.getThumbnailName() != null)
+				s3Util.deleteFile(store.getThumbnailName());
+			thumbnailResponse = s3Util.uploadFile(request.getThumbnail(), "store-thumbnails");
 		}
 
 		store.update(request, category, commonAddress, thumbnailResponse);

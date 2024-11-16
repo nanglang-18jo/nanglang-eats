@@ -20,19 +20,21 @@ public class StoreDetailResponse {
 	private final String phoneNumber;
 	private final Float rating;
 	private final Integer reviewCount;
+	private final String thumbnailUrl;
 	private final List<String> imageUrls;
 
 	@Builder
 	public StoreDetailResponse(Store store, List<String> imageUrls) {
 		this.category = store.getCategory().getName();
-		this.owner=store.getOwner().getUsername();
+		this.owner = store.getOwner().getUsername();
 		this.name = store.getName();
 		this.openTime = store.getOpenTime().toString();
 		this.closeTime = store.getCloseTime().toString();
-		this.address=store.getCommonAddress().getAddress() + " " + store.getAddressDetail();
-		this.phoneNumber=store.getPhoneNumber();
-		this.rating=store.getRating();
-		this.reviewCount=store.getReviewCount();
-		this.imageUrls=imageUrls;
+		this.address = store.getCommonAddress().getAddress() + " " + store.getAddressDetail();
+		this.phoneNumber = store.getPhoneNumber();
+		this.rating = store.getRating();
+		this.reviewCount = store.getReviewCount();
+		this.thumbnailUrl = store.getThumbnailUrl();
+		this.imageUrls = imageUrls;
 	}
 }
