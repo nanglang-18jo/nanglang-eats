@@ -38,6 +38,7 @@ public class OrderService {
 	private final OrderProductRepository orderProductRepository;
 	private final StoreService storeService;
 
+	// 주문 등록
 	@Transactional
 	public OrderCreateResponse createOrder(@Valid OrderCreateRequest request, User user) {
 
@@ -79,6 +80,7 @@ public class OrderService {
 		return new OrderCreateResponse(order.getOrderId());
 	}
 
+	// 주문 수정
 	@Transactional
 	public OrderUpdateResponse updateOrder(Long orderId, OrderUpdateRequest request, User user) {
 		// 주문 존재 여부 확인
@@ -115,6 +117,7 @@ public class OrderService {
 		return new OrderUpdateResponse(order.getOrderId());
 	}
 
+	// 주문 상태 수정
 	@Transactional
 	public void updateOrderStatus(Long orderId, User user, OrderStatus newStatus) {
 		// 주문 조회
@@ -136,6 +139,62 @@ public class OrderService {
 
 		// 상태 업데이트
 		order.updateStatus(newStatus);
+	}
+
+	// 주문 취소
+	@Transactional
+	public void cancelOrder(Long orderId, User user) {
+		// 주문 조회
+		Order order = orderRepository.findById(orderId)
+			.orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
+
+		// 주문이 PENDING 상태가 아닌 경우 예외 처리
+		if (!order.getStatus().equals(OrderStatus.PENDING)) {
+			throw new CustomException(ErrorCode.ORDER_NOT_CANCELABLE);
+		}
+
+		// 5분 이내인지 확인
+		if (order.getCreatedAt().isBefore(LocalDateTime.now().minusMinutes(5))) {
+			throw new CustomException(ErrorCode.ORDER_CANCEL_TIME_EXCEEDED);
+		}
+
+		// 권한별 사용자 확인
+		switch (user.getRole()) {
+			case CUSTOMER:
+				if (!order.getUserId().equals(user.getId())) {
+					throw new CustomException(ErrorCode.ORDER_UPDATE_FORBIDDEN);
+				}
+				break;
+			case OWNER:
+				validateStoreOwner(order.getStoreId(), user.getId());
+				break;
+			case MANAGER:
+				// MANAGER는 취소 가능, 추가 검증 없음
+				break;
+			default:
+				throw new CustomException(ErrorCode.ORDER_UPDATE_FORBIDDEN);
+		}
+
+		// 상태를 CANCELED로 변경
+		order.setStatus(OrderStatus.CANCELED);
+		orderRepository.save(order);
+	}
+
+	// 주문 삭제
+	@Transactional
+	public void deleteOrder(Long orderId, User user) {
+		// 주문 조회
+		Order order = orderRepository.findById(orderId)
+			.orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
+
+		// 상태 확인 (삭제 가능한 상태인지 검증)
+		if (!OrderStatus.CANCELED.equals(order.getStatus())) {
+			throw new CustomException(ErrorCode.ORDER_NOT_DELETABLE);
+		}
+
+		// Soft Delete
+		order.delete(user.getId());
+		orderRepository.save(order); // 상태 저장
 	}
 
 	// 주문 상품 검증

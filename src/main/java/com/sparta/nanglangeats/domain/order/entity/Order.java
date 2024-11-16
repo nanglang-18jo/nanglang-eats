@@ -1,5 +1,6 @@
 package com.sparta.nanglangeats.domain.order.entity;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import com.sparta.nanglangeats.domain.order.enums.OrderStatus;
@@ -76,7 +77,14 @@ public class Order extends Timestamped {
 		this.isActive = true;
 	}
 
-	public void updateStatus(OrderStatus newStatus) {
-		this.status = newStatus;
+	public void updateStatus(OrderStatus status) {
+		this.status = status;
+	}
+
+	// Soft Delete
+	public void delete(Long userId) {
+		this.isActive = false;
+		this.setDeletedAt(LocalDateTime.now());
+		this.setDeletedBy(userId.toString());
 	}
 }
