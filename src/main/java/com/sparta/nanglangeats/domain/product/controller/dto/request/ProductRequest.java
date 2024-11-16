@@ -1,6 +1,7 @@
 package com.sparta.nanglangeats.domain.product.controller.dto.request;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,6 +23,8 @@ public class ProductRequest {
 
 	@NotNull(message = "상품 가격을 입력해주세요.")
 	private int price;
+
+	private MultipartFile thumbnail;
 
 	private List<MultipartFile> images;
 }

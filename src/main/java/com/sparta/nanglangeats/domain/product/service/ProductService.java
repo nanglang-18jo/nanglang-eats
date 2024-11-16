@@ -1,6 +1,8 @@
 package com.sparta.nanglangeats.domain.product.service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,8 +12,10 @@ import com.sparta.nanglangeats.domain.image.entity.Image;
 import com.sparta.nanglangeats.domain.image.enums.ImageCategory;
 import com.sparta.nanglangeats.domain.image.repository.ImageRepository;
 import com.sparta.nanglangeats.domain.image.service.ImageService;
+import com.sparta.nanglangeats.domain.image.service.dto.ImageResponse;
 import com.sparta.nanglangeats.domain.product.controller.dto.request.ProductRequest;
 import com.sparta.nanglangeats.domain.product.controller.dto.response.ProductDetailResponse;
+import com.sparta.nanglangeats.domain.product.controller.dto.response.ProductListResponse;
 import com.sparta.nanglangeats.domain.product.controller.dto.response.ProductResponse;
 import com.sparta.nanglangeats.domain.product.entity.Product;
 import com.sparta.nanglangeats.domain.product.repository.ProductRepository;
@@ -39,11 +43,19 @@ public class ProductService {
 		Store store = findStoreByUuid(request.getStoreUuid());
 		validateUser(store, user);
 
+		ImageResponse thumbnailResponse = null;
+
+		if (!request.getThumbnail().isEmpty()) {
+			thumbnailResponse = imageService.uploadImage(request.getThumbnail(), "product-thumbnails");
+		}
+
 		Product product = Product.builder()
 			.store(store)
 			.name(request.getName())
 			.description(request.getDescription())
 			.price(request.getPrice())
+			.thumbnailName(thumbnailResponse != null ? thumbnailResponse.getFileName() : null)
+			.thumbnailUrl(thumbnailResponse != null ? thumbnailResponse.getUrl() : null)
 			.build();
 
 		productRepository.save(product);
@@ -88,6 +100,14 @@ public class ProductService {
 		List<String> imageUrls = imageRepository.findUrlsByImageCategoryAndContentId(ImageCategory.PRODUCT_IMAGE,
 			product.getId());
 		return ProductDetailResponse.builder().product(product).imageUrls(imageUrls).build();
+	}
+
+	public List<ProductListResponse> getProductsByStoresList(String storeUuid) {
+		Store store = findStoreByUuid(storeUuid);
+
+		List<Product> products = productRepository.findByStoreId(store.getId());
+
+		return null;
 	}
 
 	/* UTIL */
