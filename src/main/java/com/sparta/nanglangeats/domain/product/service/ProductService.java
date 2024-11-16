@@ -112,7 +112,7 @@ public class ProductService {
 
 		List<Product> products = productRepository.findByStoreId(store.getId());
 
-		return null;
+		return products.stream().map(product -> ProductListResponse.builder().product(product).build()).toList();
 	}
 
 	/* UTIL */
