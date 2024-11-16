@@ -3,6 +3,7 @@ package com.sparta.nanglangeats.domain.product.entity;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import com.sparta.nanglangeats.domain.image.service.dto.ImageResponse;
 import com.sparta.nanglangeats.domain.product.controller.dto.request.ProductRequest;
 import com.sparta.nanglangeats.domain.store.entity.Store;
 import com.sparta.nanglangeats.global.common.entity.Timestamped;
@@ -71,13 +72,17 @@ public class Product extends Timestamped {
 		this.isActive = true;
 	}
 
-	public void update(ProductRequest request){
+	public void update(ProductRequest request, ImageResponse imageResponse) {
 		this.name = request.getName();
 		this.description = request.getDescription();
 		this.price = request.getPrice();
+		if(imageResponse != null) {
+			this.thumbnailName = imageResponse.getFileName();
+			this.thumbnailUrl = imageResponse.getUrl();
+		}
 	}
 
-	public void delete(String deletedBy){
+	public void delete(String deletedBy) {
 		this.isPublic = false;
 		this.isActive = false;
 		this.setDeletedAt(LocalDateTime.now());

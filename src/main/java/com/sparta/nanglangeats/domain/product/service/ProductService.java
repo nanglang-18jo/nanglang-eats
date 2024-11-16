@@ -75,7 +75,12 @@ public class ProductService {
 		Product product = findProductByUuid(uuid);
 		validateUser(product.getStore(), user);
 
-		product.update(request);
+		ImageResponse thumbnailResponse = null;
+		if (!request.getThumbnail().isEmpty()) {
+			thumbnailResponse = imageService.changeImage(product.getThumbnailName(),
+				"product-thumbnails", request.getThumbnail());
+		}
+		product.update(request, thumbnailResponse);
 
 		imageService.hardDeleteAllImages(ImageCategory.PRODUCT_IMAGE, product.getId());
 		imageService.uploadAllImages(request.getImages(), ImageCategory.PRODUCT_IMAGE, product.getId());
