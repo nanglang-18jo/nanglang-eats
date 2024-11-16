@@ -12,6 +12,7 @@ import com.sparta.nanglangeats.domain.order.controller.dto.request.OrderCreateRe
 import com.sparta.nanglangeats.domain.order.controller.dto.request.OrderUpdateRequest;
 import com.sparta.nanglangeats.domain.order.controller.dto.request.ProductRequestDto;
 import com.sparta.nanglangeats.domain.order.controller.dto.response.OrderCreateResponse;
+import com.sparta.nanglangeats.domain.order.controller.dto.response.OrderDetailResponse;
 import com.sparta.nanglangeats.domain.order.controller.dto.response.OrderUpdateResponse;
 import com.sparta.nanglangeats.domain.order.entity.Order;
 import com.sparta.nanglangeats.domain.order.entity.OrderProduct;
@@ -37,6 +38,31 @@ public class OrderService {
 	private final OrderRepository orderRepository;
 	private final OrderProductRepository orderProductRepository;
 	private final StoreService storeService;
+
+	// 주문 조회 (단 건)
+	@Transactional(readOnly = true)
+	public OrderDetailResponse getOrder(Long orderId, User user) {
+		// 주문 조회
+		Order order = orderRepository.findById(orderId)
+			.orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
+
+		switch (user.getRole()) {
+			case CUSTOMER:
+				if (!order.getUserId().equals(user.getId())) {
+					throw new CustomException(ErrorCode.ACCESS_DENIED);
+				}
+				break;
+			case OWNER:
+				validateStoreOwner(order.getStoreId(), user.getId());
+				break;
+			case MANAGER:
+				break; // MANAGER는 모든 주문 조회 가능
+			default:
+				throw new CustomException(ErrorCode.ACCESS_DENIED);
+		}
+
+		return new OrderDetailResponse(order);
+	}
 
 	// 주문 등록
 	@Transactional
@@ -73,6 +99,7 @@ public class OrderService {
 				.order(order)
 				.productId(productDto.getProductId())
 				.quantity(productDto.getQuantity())
+				.price(productDto.getPrice())
 				.build();
 			orderProductRepository.save(orderProduct);
 		});

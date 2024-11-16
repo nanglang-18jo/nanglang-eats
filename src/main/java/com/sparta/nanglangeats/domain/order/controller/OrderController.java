@@ -6,6 +6,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,6 +33,16 @@ import lombok.RequiredArgsConstructor;
 public class OrderController {
 
 	private final OrderService orderService;
+
+	// 주문 조회 (단 건)
+	@PreAuthorize("hasAnyRole('CUSTOMER', 'OWNER', 'MANAGER')")
+	@GetMapping("/{orderId}")
+	public ResponseEntity<CommonResponse<?>> getOrder(
+		@PathVariable Long orderId,
+		@AuthenticationPrincipal User user) {
+
+		return ControllerUtil.getResponseEntity(HttpStatus.OK, orderService.getOrder(orderId, user), "주문 조회 성공");
+	}
 
 	// 주문 등록
 	@PreAuthorize("hasAnyRole('CUSTOMER', 'OWNER')")

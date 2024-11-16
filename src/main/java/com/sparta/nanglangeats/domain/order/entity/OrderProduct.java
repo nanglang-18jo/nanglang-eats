@@ -38,10 +38,14 @@ public class OrderProduct extends Timestamped {
 	@Column(nullable = false)
 	private Integer quantity;
 
+	@Column(nullable = false)
+	private Long price;
+
 	@Builder
-	public OrderProduct(Order order, String productId, Integer quantity) {
+	public OrderProduct(Order order, String productId, Integer quantity, Long price) {
 		this.order = order;
 		this.productId = productId;
 		this.quantity = quantity;
+		this.price = price;
 	}
 }
