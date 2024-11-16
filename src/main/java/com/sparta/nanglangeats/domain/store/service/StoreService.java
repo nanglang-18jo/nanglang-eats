@@ -134,30 +134,7 @@ public class StoreService {
 
 		Page<Store> stores = storeRepository.findAllByCategoryId(categoryId, pageable);
 
-		List<Long> storeIds = stores.stream()
-			.map(Store::getId)
-			.toList();
-
-		List<Image> images = imageRepository.findByContentIdInAndImageCategory(storeIds, ImageCategory.STORE_IMAGE);
-
-		Map<Long, List<String>> imageUrlMap = images.stream()
-			.collect(Collectors.groupingBy(
-				Image::getContentId,
-				Collectors.mapping(Image::getUrl, Collectors.toList())
-			));
-
-		// Store 엔티티와 이미지 리스트 매핑
-		List<StoreListResponse> storeResponses = stores.stream()
-			.map(store -> new StoreListResponse(
-				store.getUuid(),
-				store.getName(),
-				store.getRating(),
-				store.getReviewCount(),
-				imageUrlMap.getOrDefault(store.getId(), Collections.emptyList()) // 해당 Store의 이미지 리스트
-			))
-			.toList();
-
-		return new PageImpl<>(storeResponses, pageable, stores.getTotalElements());
+		return stores.map(store -> StoreListResponse.builder().store(store).build());
 	}
 
 	/* UTIL */
