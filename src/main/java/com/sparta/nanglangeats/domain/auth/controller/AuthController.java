@@ -25,4 +25,10 @@ public class AuthController {
 		refreshTokenService.reissue(request, response);
 		return getResponseEntity(CREATED, "토큰 재발급 성공");
 	}
+
+	@PostMapping("/api/auth/logout")
+	public ResponseEntity<CommonResponse<?>> logout(HttpServletRequest request, HttpServletResponse response) {
+		refreshTokenService.logout(request, response);
+		return getResponseEntity(NO_CONTENT, "로그아웃 성공");
+	}
 }
