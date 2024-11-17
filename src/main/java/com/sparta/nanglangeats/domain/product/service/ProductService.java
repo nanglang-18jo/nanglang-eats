@@ -111,7 +111,7 @@ public class ProductService {
 	public List<ProductListResponse> getProductsByStoresList(String storeUuid) {
 		Store store = findStoreByUuid(storeUuid);
 
-		List<Product> products = productRepository.findByStoreId(store.getId());
+		List<Product> products = productRepository.findByStoreIdAndIsPublicTrue(store.getId());
 
 		return products.stream().map(product -> ProductListResponse.builder().product(product).build()).toList();
 	}
