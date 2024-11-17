@@ -1,5 +1,6 @@
 package com.sparta.nanglangeats.global.config;
 
+import static org.springframework.http.HttpMethod.*;
 import static org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl.*;
 
 import org.springframework.context.annotation.Bean;
@@ -47,6 +48,8 @@ public class SecurityConfig {
 			.authorizeHttpRequests(requests -> requests
 				.requestMatchers("/api/auth/login").permitAll()
 				.requestMatchers("/api/users/signup").permitAll()
+				.requestMatchers(GET, "/api/users/me").authenticated()
+				.requestMatchers(GET, "/api/users/**").permitAll()
 				.anyRequest().authenticated())
 
 			.exceptionHandling(exception -> exception

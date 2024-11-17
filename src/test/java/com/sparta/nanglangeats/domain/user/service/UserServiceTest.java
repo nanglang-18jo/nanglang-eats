@@ -14,6 +14,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.sparta.nanglangeats.domain.user.controller.dto.request.UserUpdateRequest;
+import com.sparta.nanglangeats.domain.user.controller.dto.response.MyInfoResponse;
+import com.sparta.nanglangeats.domain.user.controller.dto.response.UserDetailResponse;
 import com.sparta.nanglangeats.domain.user.entity.User;
 import com.sparta.nanglangeats.domain.user.enums.UserRole;
 import com.sparta.nanglangeats.domain.user.repository.UserRepository;
@@ -184,22 +186,35 @@ class UserServiceTest {
 	}
 
 	@Test
-	@DisplayName("getUserByUsername(유저네임): 유저네임을 받아 사용자를 조회한다.")
-	void getUserByUsername_success() {
+	@DisplayName("getMyInfo(User): 내 정보를 조회한다.")
+	void getMyInfo_success() {
+		// given
+		final User user = saveUser("testerId", "tester", "test@gmail.com");
+
+		// when
+		final MyInfoResponse result = userService.getMyInfo(user);
+
+		// then
+		assertThat(result.getUsername()).isEqualTo(user.getUsername());
+		assertThat(result.getNickname()).isEqualTo(user.getNickname());
+		assertThat(result.getEmail()).isEqualTo(user.getEmail());
+	}
+
+	@Test
+	@DisplayName("getUserDetailByNickname(닉네임): 닉네임을 받아 유저 상세 정보를 조회한다.")
+	void getUserDetailByNickname_success() {
 		// given
 		final String username = "testerId";
 		final String nickname = "tester";
 		final String email = "tester@gmail.com";
+
 		saveUser(username, nickname, email);
 
 		// when
-		User result = userService.getUserByUsername(username);
+		UserDetailResponse result = userService.getUserDetailByNickname(nickname);
 
 		// then
-		assertThat(result).isNotNull();
-		assertThat(result.getUsername()).isEqualTo(username);
 		assertThat(result.getNickname()).isEqualTo(nickname);
-		assertThat(result.getEmail()).isEqualTo(email);
 	}
 
 	@Test
@@ -227,6 +242,53 @@ class UserServiceTest {
 		assertThat(result.get().getNickname()).isEqualTo(updateNickname);
 		assertThat(result.get().getEmail()).isEqualTo(updateEmail);
 		assertThat(result.get().isActive()).isEqualTo(isActive);
+	}
+
+	@Test
+	@DisplayName("getUserByNickname(): 닉네임을 받아 사용자를 조회한다.")
+	void getUserByNickname_success() {
+		// given
+		final User user = saveUser("testerId", "tester", "test@gmail.com");
+
+		// when
+		final User findUser = userService.getUserByNickname(user.getNickname());
+
+		// then
+		assertThat(findUser.getUsername()).isEqualTo(user.getUsername());
+		assertThat(findUser.getEmail()).isEqualTo(user.getEmail());
+		assertThat(findUser.getNickname()).isEqualTo(user.getNickname());
+	}
+
+	@Test
+	@DisplayName("getUserByNickname(): 닉네임이 존재하지 않는 경우 조회에 실패한다.")
+	void getUserByNickname_does_not_exist_nickname_fail() {
+		// given
+		final String wrongNickname = "wrongNickname";
+		saveUser("testerId", "tester", "test@gmail.com");
+
+		// expected
+		assertThatThrownBy(() -> userService.getUserByNickname(wrongNickname))
+			.isInstanceOf(CustomException.class)
+			.hasMessage(USER_NOT_FOUND.getMessage());
+	}
+
+	@Test
+	@DisplayName("getUserByUsername(유저네임): 유저네임을 받아 사용자를 조회한다.")
+	void getUserByUsername_success() {
+		// given
+		final String username = "testerId";
+		final String nickname = "tester";
+		final String email = "tester@gmail.com";
+		saveUser(username, nickname, email);
+
+		// when
+		User result = userService.getUserByUsername(username);
+
+		// then
+		assertThat(result).isNotNull();
+		assertThat(result.getUsername()).isEqualTo(username);
+		assertThat(result.getNickname()).isEqualTo(nickname);
+		assertThat(result.getEmail()).isEqualTo(email);
 	}
 
 	@Test
