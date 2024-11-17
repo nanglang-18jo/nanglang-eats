@@ -116,6 +116,16 @@ public class ProductService {
 		return products.stream().map(product -> ProductListResponse.builder().product(product).build()).toList();
 	}
 
+	@Transactional
+	public ProductResponse updateProductVisibility(String productUuid, User user) {
+		Product product = findProductByUuid(productUuid);
+		validateUser(product.getStore(), user);
+
+		product.toggleVisibility();
+
+		return ProductResponse.builder().productUuid(product.getUuid()).build();
+	}
+
 	/* UTIL */
 	private void validateUser(Store store, User user) {
 		if (user.getRole() == UserRole.OWNER && !store.getOwner().equals(user))

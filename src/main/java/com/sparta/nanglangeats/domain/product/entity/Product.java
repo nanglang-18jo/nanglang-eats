@@ -88,4 +88,8 @@ public class Product extends Timestamped {
 		this.setDeletedAt(LocalDateTime.now());
 		this.setDeletedBy(deletedBy);
 	}
+
+	public void toggleVisibility() {
+		this.isPublic = !this.isPublic;
+	}
 }
