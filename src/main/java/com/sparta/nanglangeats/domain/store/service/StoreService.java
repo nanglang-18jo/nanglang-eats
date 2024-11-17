@@ -41,6 +41,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class StoreService {
+	private static final int PAGE_SIZE = 10;
 	private final StoreRepository storeRepository;
 	private final CategoryRepository categoryRepository;
 	private final ImageService imageService;
@@ -128,11 +129,20 @@ public class StoreService {
 		return StoreDetailResponse.builder().store(store).imageUrls(imageUrls).build();
 	}
 
-	public Page<StoreListResponse> getStoresList(Long categoryId, int page, int size, String sortBy, String direction) {
+	public Page<StoreListResponse> getStoresList(Long categoryId, int page, String sortBy, String direction) {
 		Sort sort = Sort.by(Sort.Direction.fromString(direction), sortBy);
-		Pageable pageable = PageRequest.of(page, size, sort);
+		Pageable pageable = PageRequest.of(page, PAGE_SIZE, sort);
 
 		Page<Store> stores = storeRepository.findAllByCategoryId(categoryId, pageable);
+
+		return stores.map(store -> StoreListResponse.builder().store(store).build());
+	}
+
+	public Page<StoreListResponse> searchStore(String keyword, int page){
+		Sort sort = Sort.by(Sort.Direction.ASC, "name");
+		Pageable pageable = PageRequest.of(page, PAGE_SIZE, sort);
+
+		Page<Store> stores = storeRepository.findByKeyword(keyword, pageable);
 
 		return stores.map(store -> StoreListResponse.builder().store(store).build());
 	}
