@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 public class AiRequest {
 	private User user;
 	private String productName;
-	@NotNull(message = "가게 주인 ID를 입력해주세요.")
-	private Long ownerId;
+	public String getQuestion() {
+		return "어떤 메뉴의 설명을 원하십니까? : " + productName;
+	}
 }

@@ -2,7 +2,6 @@ package com.sparta.nanglangeats.domain.ai.entity;
 
 import java.util.UUID;
 
-import com.sparta.nanglangeats.domain.store.entity.Store;
 import com.sparta.nanglangeats.domain.user.entity.User;
 import com.sparta.nanglangeats.global.common.entity.Timestamped;
 
