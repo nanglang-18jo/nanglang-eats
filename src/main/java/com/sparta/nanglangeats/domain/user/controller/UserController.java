@@ -40,12 +40,12 @@ public class UserController {
 	}
 
 	@PutMapping("/api/users/me")
-	public ResponseEntity<CommonResponse<?>> updateUser(@AuthenticationPrincipal User user, @Valid @RequestBody UserUpdateRequest request) {
-		return getResponseEntity(OK, userService.updateUser(user, request), "내 정보 수정 성공");
+	public ResponseEntity<CommonResponse<?>> updateMyInfo(@AuthenticationPrincipal User user, @Valid @RequestBody UserUpdateRequest request) {
+		return getResponseEntity(OK, userService.updateMyInfo(user, request), "내 정보 수정 성공");
 	}
 	
 	@DeleteMapping("/api/users/me")
-	public ResponseEntity<CommonResponse<?>> deleteUser(@AuthenticationPrincipal User user) {
-		return getResponseEntity(NO_CONTENT, userService.deleteUser(user), "회원 탈퇴 성공");
+	public ResponseEntity<CommonResponse<?>> deleteMyAccount(@AuthenticationPrincipal User user) {
+		return getResponseEntity(NO_CONTENT, userService.deleteMyAccount(user), "회원 탈퇴 성공");
 	}
 }

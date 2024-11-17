@@ -203,8 +203,8 @@ class UserServiceTest {
 	}
 
 	@Test
-	@DisplayName("updateUser(유저변경정보DTO): 변경 정보를 입력받아 유저를 변경한다.")
-	void updateUser_success() {
+	@DisplayName("updateMyInfo(유저변경정보DTO): 변경 정보를 입력받아 유저를 변경한다.")
+	void updateMyInfo_success() {
 		// given
 		final String username = "testerId";
 		final String nickname = "tester";
@@ -218,7 +218,7 @@ class UserServiceTest {
 		final UserUpdateRequest request = new UserUpdateRequest(updatePassword, updateNickname, updateEmail, isActive);
 
 		// when
-		Long userId = userService.updateUser(savedUser, request);
+		Long userId = userService.updateMyInfo(savedUser, request);
 
 		// then
 		Optional<User> result = userRepository.findById(userId);

@@ -54,7 +54,7 @@ public class UserService {
 	}
 
 	@Transactional
-	public Long updateUser(User user, UserUpdateRequest request) {
+	public Long updateMyInfo(User user, UserUpdateRequest request) {
 		validateUpdateUserInfo(user, request);
 		User findUser = getUserById(user.getId());
 		findUser.updateUserInfo(passwordEncoder.encode(request.getPassword()), request.getNickname(), request.getEmail(), request.getIsActive());
@@ -62,7 +62,7 @@ public class UserService {
 	}
 
 	@Transactional
-	public Long deleteUser(User user) {
+	public Long deleteMyAccount(User user) {
 		User findUser = getUserById(user.getId());
 		findUser.delete(findUser.getUsername());
 		return findUser.getId();
