@@ -30,10 +30,7 @@ public enum ErrorCode {
 
 	USER_NOT_FOUND(NOT_FOUND, "유저를 찾을 수 없습니다."),
 
-	// Order
-	ORDER_PRODUCT_QUANTITY_INVALID(BAD_REQUEST, "상품 수량은 0보다 커야 합니다."),
-	ORDER_PRODUCT_ID_INVALID(BAD_REQUEST, "상품 아이디가 유효하지 않습니다."),
-	ORDER_STORE_ID_INVALID(BAD_REQUEST, "가게 아이디가 유효하지 않습니다."),
+    // Order
 
 	// Review
 
@@ -58,8 +55,11 @@ public enum ErrorCode {
 	USER_ROLE_NOT_OWNER(BAD_REQUEST, "OWNER 권한을 가진 사용자만 가게 주인으로 등록할 수 있습니다."),
 	STORE_NOT_FOUND(NOT_FOUND, "존재하지 않는 가게입니다."),
 
-	;
-	private final HttpStatus httpStatus;
-	private final String message;
+    // Product
+    PRODUCT_NOT_FOUND(NOT_FOUND, "존재하지 않는 상품입니다."),
+
+    ;
+    private final HttpStatus httpStatus;
+    private final String message;
 
 }
