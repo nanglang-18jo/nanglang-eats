@@ -63,9 +63,31 @@ public class ReviewService {
 			imagesUrl = imageService.uploadAllImages(request.getImages(), ImageCategory.REVIEW_IMAGE, review.getId());
 		}
 
-		store.updateRating(request.getRating());
+		store.calculateNewRating(request.getRating());
 		return ReviewResponse.builder().review(review).imagesUrl(imagesUrl).build();
 	}
+
+	//리뷰 수정
+	@Transactional
+	public ReviewResponse updateReview(String reviewUuid, ReviewRequest request, User user) {
+		Review review = findReviewByUuid(reviewUuid);
+
+		validateReviewOwner(review.getUser().getId(), user.getId());
+
+		review.update(request);
+
+		imageService.hardDeleteAllImages(ImageCategory.REVIEW_IMAGE, review.getId());
+
+		List<String> imagesUrl = null;
+		if (request.getImages() != null) {
+			imagesUrl = imageService.uploadAllImages(request.getImages(), ImageCategory.REVIEW_IMAGE, review.getId());
+		}
+
+		review.getStore().calculateEditRating(request.getRating());
+
+		return ReviewResponse.builder().review(review).imagesUrl(imagesUrl).build();
+	}
+
 	//
 	// // 가게 고유 ID로 리뷰 리스트 조회
 	// @Transactional(readOnly = true)
@@ -92,19 +114,7 @@ public class ReviewService {
 	// 		.collect(Collectors.toList());
 	// }
 	//
-	// //리뷰 수정
-	// @Transactional
-	// public ReviewResponse updateReview(UUID reviewId, ReviewRequest request, User user) {
-	// 	Review review = reviewRepository.findById(reviewId)
-	// 		.orElseThrow(() -> new CustomException(ErrorCode.REVIEW_NOT_FOUND));
-	//
-	// 	if(!review.getUser().equals(user)){
-	// 		throw new SecurityException("해당 리뷰는 수정할 수가 없습니다.");
-	// 	}
-	// 	review.updateReview(request.getContent(), request.getImages().toString(), request.getRating());
-	// 	return new ReviewResponse(review);
-	// }
-	//
+
 	// @Transactional
 	// public void deleteReview(UUID reviewId, String deletedBy) {
 	//
@@ -117,16 +127,29 @@ public class ReviewService {
 	// }
 
 	/* UTIL */
-	private Order findOrderByUuid(String uuid) {
-		return orderRepository.findByOrderUuid(uuid).orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
+
+	private void checkDuplicateReview(Long orderId) {
+		if (reviewRepository.existsByOrderOrderId(orderId))
+			throw new CustomException(ErrorCode.REVIEW_ALREADY_EXISTS);
 	}
 
-	private void checkDuplicateReview(Long orderId){
-		if(reviewRepository.existsByOrderOrderId(orderId)) throw new CustomException(ErrorCode.REVIEW_ALREADY_EXISTS);
-	}
 	private void validateOrderOwner(Long orderOwnerId, Long requestUserId) {
 		if (!orderOwnerId.equals(requestUserId))
 			throw new CustomException(ErrorCode.ACCESS_DENIED);
+	}
+
+	private void validateReviewOwner(Long reviewOwnerId, Long requestUserId) {
+		if (!reviewOwnerId.equals(requestUserId))
+			throw new CustomException(ErrorCode.ACCESS_DENIED);
+	}
+
+	private Review findReviewByUuid(String reviewUuid) {
+		return reviewRepository.findByUuid(reviewUuid)
+			.orElseThrow(() -> new CustomException(ErrorCode.REVIEW_NOT_FOUND));
+	}
+
+	private Order findOrderByUuid(String uuid) {
+		return orderRepository.findByOrderUuid(uuid).orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
 	}
 
 	private Store findStoreByUuid(String storeUuid) {

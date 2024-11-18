@@ -121,13 +121,17 @@ public class Store extends Timestamped {
 		this.setDeletedBy(deletedBy);
 	}
 
-	public void updateRating(int rating) {
+	public void calculateNewRating(int rating) {
 		if (this.reviewCount == 0)
 			this.rating = (float)rating;
 		else {
 			this.rating = (this.rating * this.reviewCount + rating) / (this.reviewCount + 1);
 		}
 		increaseReviewCount();
+	}
+
+	public void calculateEditRating(int rating) {
+		this.rating = (this.rating * this.reviewCount - this.rating + rating) / this.reviewCount;
 	}
 
 	private void increaseReviewCount() {

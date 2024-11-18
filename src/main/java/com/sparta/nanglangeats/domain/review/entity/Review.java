@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import com.sparta.nanglangeats.domain.order.entity.Order;
+import com.sparta.nanglangeats.domain.review.controller.dto.request.ReviewRequest;
 import com.sparta.nanglangeats.domain.store.entity.Store;
 import com.sparta.nanglangeats.domain.user.entity.User;
 import com.sparta.nanglangeats.global.common.entity.Timestamped;
@@ -65,13 +66,12 @@ public class Review extends Timestamped {
 		this.content = content;
 		this.isActive = true;
 	}
-	//
-	// public void updateReview(String content, String image, float rating) {
-	// 	this.content = content;
-	// 	this.image = image;
-	// 	this.rating = rating;
-	// }
-	//
+
+	public void update(ReviewRequest request) {
+		this.content = request.getContent();
+		this.rating = request.getRating();
+	}
+
 	// public void deleteReview(String deleteBy){
 	// 	this.isActive = false;
 	// 	this.setDeletedAt(LocalDateTime.now());
