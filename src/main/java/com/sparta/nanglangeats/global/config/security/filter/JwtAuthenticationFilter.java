@@ -32,22 +32,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (StringUtils.hasText(authorizationHeaderValue)) {
             String token = jwtTokenProvider.substringToken(authorizationHeaderValue);
 
-            if (jwtTokenProvider.isValidToken(token)) {
-                String userId = jwtTokenProvider.getSubject(token);
+            if (jwtTokenProvider.isValid(token)) {
+                String email = jwtTokenProvider.getSubject(token);
                 String authority = jwtTokenProvider.getAuthority(token);
-                setAuthentication(userId, authority);
+                setAuthentication(email, authority);
             }
         }
 
         filterChain.doFilter(request, response);
     }
 
-    private void setAuthentication(String userId, String authority) {
-        Authentication authentication = createAuthentication(Long.valueOf(userId), authority);
+    private void setAuthentication(String email, String authority) {
+        Authentication authentication = createAuthentication(email, authority);
         SecurityContextHolder.getContextHolderStrategy().getContext().setAuthentication(authentication);
     }
 
-    private Authentication createAuthentication(Long userId, String authority) {
-        return new UsernamePasswordAuthenticationToken(userService.getUserById(userId), null, List.of(new SimpleGrantedAuthority(authority)));
+    private Authentication createAuthentication(String email, String authority) {
+        return new UsernamePasswordAuthenticationToken(userService.getUserByEmail(email), null, List.of(new SimpleGrantedAuthority(authority)));
     }
 }

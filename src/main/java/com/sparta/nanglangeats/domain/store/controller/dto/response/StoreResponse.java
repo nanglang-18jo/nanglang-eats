@@ -5,10 +5,10 @@ import lombok.Getter;
 
 @Getter
 public class StoreResponse {
-	private final String storeId;
+	private final String storeUuid;
 
 	@Builder
-	public StoreResponse(String storeId) {
-		this.storeId = storeId;
+	public StoreResponse(String storeUuid) {
+		this.storeUuid = storeUuid;
 	}
 }

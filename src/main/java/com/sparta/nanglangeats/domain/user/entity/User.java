@@ -51,7 +51,7 @@ public class User extends Timestamped {
 	private boolean isActive;
 
 	@Builder
-	public User(String username, String password, String nickname, String email, UserRole role) {
+	private User(String username, String password, String nickname, String email, UserRole role) {
 		this.username = username;
 		this.password = password;
 		this.nickname = nickname;

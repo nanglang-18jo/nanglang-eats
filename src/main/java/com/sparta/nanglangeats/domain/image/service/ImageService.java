@@ -1,4 +1,4 @@
-package com.sparta.nanglangeats.domain.image.service.dto;
+package com.sparta.nanglangeats.domain.image.service;
 
 import java.util.List;
 
@@ -9,8 +9,8 @@ import org.springframework.web.multipart.MultipartFile;
 import com.sparta.nanglangeats.domain.image.entity.Image;
 import com.sparta.nanglangeats.domain.image.enums.ImageCategory;
 import com.sparta.nanglangeats.domain.image.repository.ImageRepository;
+import com.sparta.nanglangeats.domain.image.service.dto.ImageResponse;
 import com.sparta.nanglangeats.domain.image.util.S3Util;
-import com.sparta.nanglangeats.domain.user.entity.User;
 
 import lombok.RequiredArgsConstructor;
 
@@ -20,10 +20,6 @@ import lombok.RequiredArgsConstructor;
 public class ImageService {
 	private final S3Util s3Util;
 	private final ImageRepository imageRepository;
-
-	public ImageResponse uploadImage(MultipartFile image, String dirName) {
-		return s3Util.uploadFile(image, dirName);
-	}
 
 	@Transactional
 	public void uploadAllImages(List<MultipartFile> images, ImageCategory category, Long contentId) {
@@ -36,14 +32,28 @@ public class ImageService {
 			dirName = "review-images";
 
 		for (MultipartFile image : images) {
-			Image storeImage = new Image(uploadImage(image, dirName), contentId, category);
+			Image storeImage = new Image(s3Util.uploadFile(image, dirName), contentId, category);
 			imageRepository.save(storeImage);
 		}
 	}
 
 	@Transactional
-	public void deleteAllImages(ImageCategory category, Long contentId) {
-		List<Image> images = imageRepository.findAllByImageCategoryAndAndContentId(category, contentId);
-		imageRepository.deleteAll(images);
+	public ImageResponse changeImage(String fileName, String dirName, MultipartFile image) {
+		s3Util.deleteFile(fileName);
+		return uploadImage(image, dirName);
 	}
+
+	@Transactional
+	public void hardDeleteAllImages(ImageCategory category, Long contentId) {
+		List<Image> images = imageRepository.findAllByImageCategoryAndContentId(category, contentId);
+		imageRepository.deleteAll(images);
+		images.forEach(image -> s3Util.deleteFile(image.getFileName()));
+	}
+
+	@Transactional
+	public void softDeleteAllImages(ImageCategory category, Long contentId, String deleteBy) {
+		List<Image> images = imageRepository.findAllByImageCategoryAndContentId(category, contentId);
+		images.forEach(image -> image.delete(deleteBy));
+	}
+
 }
