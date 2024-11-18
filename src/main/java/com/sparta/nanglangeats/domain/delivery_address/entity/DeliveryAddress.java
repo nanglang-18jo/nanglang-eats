@@ -1,6 +1,7 @@
 package com.sparta.nanglangeats.domain.delivery_address.entity;
 
 import com.sparta.nanglangeats.domain.address.entity.CommonAddress;
+import com.sparta.nanglangeats.domain.delivery_address.controller.dto.request.DeliveryAddressUpdateRequest;
 import com.sparta.nanglangeats.domain.user.entity.User;
 import com.sparta.nanglangeats.global.common.entity.Timestamped;
 
@@ -49,6 +50,17 @@ public class DeliveryAddress extends Timestamped {
 		this.commonAddress = commonAddress;
 		this.addressDetail = addressDetail;
 		this.alias = alias;
+		this.isRecentDelivery = isRecentDelivery;
+	}
+
+	public void update(CommonAddress commonAddress, DeliveryAddressUpdateRequest request) {
+		this.commonAddress = commonAddress;
+		this.addressDetail = request.getAddressDetail();
+		this.alias = request.getAlias();
+		this.isRecentDelivery = request.getIsRecentDelivery();
+	}
+
+	public void updateIsRecentDelivery(boolean isRecentDelivery) {
 		this.isRecentDelivery = isRecentDelivery;
 	}
 }

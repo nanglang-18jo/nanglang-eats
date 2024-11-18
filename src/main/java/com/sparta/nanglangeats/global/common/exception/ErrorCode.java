@@ -34,6 +34,9 @@ public enum ErrorCode {
 
     USER_NOT_FOUND(NOT_FOUND, "유저를 찾을 수 없습니다."),
 
+    // DELIVERY ADDRESS
+    DELIVERY_ADDRESS_NOT_FOUND(NOT_FOUND, "해당 배송 주소를 찾을 수 없습니다."),
+
     // Order
 
     // Review
