@@ -12,11 +12,15 @@ import lombok.Getter;
 public enum ErrorCode {
 
     // COMMON
+    COMMON_SYSTEM_ERROR(BAD_REQUEST, "일시적인 오류입니다. 잠시 후 다시 시도해 주세요."),
     COMMON_INVALID_PARAMETER(BAD_REQUEST, "요청한 값이 올바르지 않습니다."),
     INVALID_SORTBY_PARAMETER(BAD_REQUEST, "유효하지 않은 정렬 기준입니다."),
 
     // JWT
+    INVALID_ACCESS_TOKEN(UNAUTHORIZED, "유효하지 않은 액세스 토큰입니다."),
     INVALID_REFRESH_TOKEN(UNAUTHORIZED, "유효하지 않은 리프레시 토큰입니다. 다시 로그인 해주세요."),
+
+    EXPIRED_ACCESS_TOKEN(UNAUTHORIZED, "Expired JWT token, 만료된 JWT token 입니다."),
 
     // User
     INVALID_PASSWORD(BAD_REQUEST, "유효하지 않은 비밀번호입니다"),

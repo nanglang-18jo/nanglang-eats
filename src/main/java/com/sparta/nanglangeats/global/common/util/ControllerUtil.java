@@ -16,6 +16,10 @@ public final class ControllerUtil {
         return getResponseEntity(HttpStatus.OK, response, msg);
     }
 
+    public static ResponseEntity<CommonResponse<?>> getResponseEntity(HttpStatus status, String msg) {
+        return getResponseEntity(status, null, msg);
+    }
+
     public static ResponseEntity<CommonResponse<?>> getResponseEntity(HttpStatus status, Object response, String msg) {
         return ResponseEntity.status(status).body(CommonResponse.builder()
             .statusCode(status.value())

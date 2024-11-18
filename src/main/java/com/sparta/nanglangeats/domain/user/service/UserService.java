@@ -89,14 +89,20 @@ public class UserService {
 	}
 
 	@Transactional(readOnly = true)
+	public User getUserById(Long userId) {
+		return userRepository.findById(userId)
+			.orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+	}
+
+	@Transactional(readOnly = true)
 	public User getUserByUsername(String username) {
 		return userRepository.findByUsername(username)
 			.orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 	}
 
 	@Transactional(readOnly = true)
-	public User getUserById(Long userId) {
-		return userRepository.findById(userId)
+	public User getUserByEmail(String email) {
+		return userRepository.findByEmail(email)
 			.orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 	}
 
