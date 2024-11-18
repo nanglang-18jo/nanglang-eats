@@ -1,4 +1,4 @@
-package com.sparta.nanglangeats.domain.delivery_address.service;
+package com.sparta.nanglangeats.domain.user.service;
 
 import static com.sparta.nanglangeats.global.common.exception.ErrorCode.*;
 
@@ -7,12 +7,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.sparta.nanglangeats.domain.address.entity.CommonAddress;
 import com.sparta.nanglangeats.domain.address.service.CommonAddressService;
-import com.sparta.nanglangeats.domain.delivery_address.controller.dto.request.DeliveryAddressCreateRequest;
-import com.sparta.nanglangeats.domain.delivery_address.controller.dto.request.DeliveryAddressUpdateRequest;
-import com.sparta.nanglangeats.domain.delivery_address.entity.DeliveryAddress;
-import com.sparta.nanglangeats.domain.delivery_address.repository.DeliveryAddressRepository;
+import com.sparta.nanglangeats.domain.user.controller.dto.request.DeliveryAddressCreateRequest;
+import com.sparta.nanglangeats.domain.user.controller.dto.request.DeliveryAddressUpdateRequest;
+import com.sparta.nanglangeats.domain.user.entity.DeliveryAddress;
 import com.sparta.nanglangeats.domain.user.entity.User;
-import com.sparta.nanglangeats.domain.user.service.UserService;
+import com.sparta.nanglangeats.domain.user.repository.DeliveryAddressRepository;
 import com.sparta.nanglangeats.global.common.exception.CustomException;
 
 import lombok.RequiredArgsConstructor;
@@ -28,6 +27,9 @@ public class DeliveryAddressService {
 	@Transactional
 	public Long createDeliveryAddress(User user, DeliveryAddressCreateRequest request) {
 		User findUser = userService.getUserById(user.getId());
+
+		updatePreviousDeliveryStatus(findUser, request.getIsRecentDelivery());
+
 		CommonAddress commonAddress = commonAddressService.findCommonAddressByAddress(request.getAddress());
 
 		return deliveryAddressRepository.save(DeliveryAddress.builder()
@@ -45,6 +47,8 @@ public class DeliveryAddressService {
 		DeliveryAddress deliveryAddress = getDeliveryAddressRepositoryById(deliveryAddressId);
 		validateUser(user.getId(), deliveryAddress.getUser().getId());
 
+		updatePreviousDeliveryStatus(user, request.getIsRecentDelivery());
+
 		CommonAddress commonAddress = commonAddressService.findCommonAddressByAddress(request.getAddress());
 		deliveryAddress.update(commonAddress, request);
 		return deliveryAddress.getId();
@@ -61,6 +65,14 @@ public class DeliveryAddressService {
 	public DeliveryAddress getDeliveryAddressRepositoryById(Long deliveryAddressId) {
 		return deliveryAddressRepository.findById(deliveryAddressId)
 			.orElseThrow(() -> new CustomException(DELIVERY_ADDRESS_NOT_FOUND));
+	}
+
+	@Transactional
+	protected void updatePreviousDeliveryStatus(User user, Boolean isRecentDelivery) {
+		if (isRecentDelivery) {
+			deliveryAddressRepository.findByUserAndIsRecentDeliveryTrue(user)
+				.ifPresent(entity -> entity.updateIsRecentDelivery(false));
+		}
 	}
 
 	private void validateUser(Long userId, Long deliveryAddressUserId) {
