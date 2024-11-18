@@ -30,22 +30,22 @@ public class UserController {
 
 	@PostMapping("/api/users/signup")
 	public ResponseEntity<CommonResponse<?>> createUser(@Valid @RequestBody UserSignupRequest request) {
-		return getResponseEntity(CREATED, userService.createUser(request.toServiceRequest()), "고객 회원 가입 성공");
+		return getResponseEntity(CREATED, userService.createUser(request.toServiceRequest()), "회원 가입 성공");
 	}
 
 	@PreAuthorize("hasRole('MASTER')")
 	@PostMapping("/api/admin/managers")
 	public ResponseEntity<CommonResponse<?>> createManager(@Valid @RequestBody ManagerSignupRequest request) {
-		return getResponseEntity(CREATED, userService.createManager(request.toServiceRequest()), "매니저 회원 가입 성공");
+		return getResponseEntity(CREATED, userService.createManager(request.toServiceRequest()), "매니저 등록 성공");
 	}
 
-	@PutMapping("/api/users")
-	public ResponseEntity<CommonResponse<?>> updateUser(@AuthenticationPrincipal User user, @Valid @RequestBody UserUpdateRequest request) {
-		return getResponseEntity(OK, userService.updateUser(user, request), "유저 회원 정보 수정 성공");
+	@PutMapping("/api/users/me")
+	public ResponseEntity<CommonResponse<?>> updateMyInfo(@AuthenticationPrincipal User user, @Valid @RequestBody UserUpdateRequest request) {
+		return getResponseEntity(OK, userService.updateMyInfo(user, request), "내 정보 수정 성공");
 	}
 	
-	@DeleteMapping("/api/users")
-	public ResponseEntity<CommonResponse<?>> deleteUser(@AuthenticationPrincipal User user) {
-		return getResponseEntity(NO_CONTENT, userService.deleteUser(user), "유저 회원 탈퇴 성공");
+	@DeleteMapping("/api/users/me")
+	public ResponseEntity<CommonResponse<?>> deleteMyAccount(@AuthenticationPrincipal User user) {
+		return getResponseEntity(NO_CONTENT, userService.deleteMyAccount(user), "회원 탈퇴 성공");
 	}
 }

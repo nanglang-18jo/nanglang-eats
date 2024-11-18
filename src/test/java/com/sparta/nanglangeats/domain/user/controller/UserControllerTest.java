@@ -182,10 +182,10 @@ class UserControllerTest {
 	}
 
 	@Test
-	@DisplayName("updateUser(유저변경정보DTO): 변경 정보를 입력받아 유저를 변경한다.")
-	void updateUser() throws Exception {
+	@DisplayName("updateMyInfo(유저변경정보DTO): 변경 정보를 입력받아 유저를 변경한다.")
+	void updateMyInfo() throws Exception {
 		// given
-		final String uri = "/api/users";
+		final String uri = "/api/users/me";
 		final UserUpdateRequest request = new UserUpdateRequest("newPassword", "updateNick", "tester@gmail.com", false);
 
 		// expected
