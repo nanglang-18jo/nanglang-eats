@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.sparta.nanglangeats.domain.order.entity.Order;
@@ -20,6 +21,10 @@ import com.sparta.nanglangeats.domain.user.repository.UserRepository;
 import com.sparta.nanglangeats.global.common.exception.CustomException;
 import com.sparta.nanglangeats.global.common.exception.ErrorCode;
 
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
 public class ReviewService {
 
 	private final ReviewRepository reviewRepository;
@@ -76,7 +81,7 @@ public class ReviewService {
 			.collect(Collectors.toList());
 	}
 
-	// 특정 주문 대한 리뷰 조회
+	// 특정 주문에 대한 리뷰 조회
 	public ReviewResponse getReviewByOrder(UUID orderId) {
 		Order order = orderRepository.findById(orderId)
 			.orElseThrow(() -> new IllegalArgumentException("주문 정보를 찾을 수 없습니다"));
@@ -90,12 +95,12 @@ public class ReviewService {
 	@Transactional
 	public ReviewResponse updateReview(UUID reviewId, ReviewRequest request, User user) {
 		Review review = reviewRepository.findById(reviewId)
-			.orElseThrow(() -> new IllegalArgumentException("Review not found with : " + reviewId));
+			.orElseThrow(() -> new CustomException(ErrorCode.REVIEW_NOT_FOUND));
 
 		if(!review.getUser().equals(user)){
 			throw new SecurityException("해당 리뷰는 수정할 수가 없습니다.");
 		}
-		review.updateReview(request.getContent(), request.getRating());
+		review.updateReview(request.getContent(), request.getImages().toString(), request.getRating());
 		return new ReviewResponse(review);
 	}
 
@@ -108,17 +113,5 @@ public class ReviewService {
 		review.deleteReview(deletedBy);
 
 		reviewRepository.save(review);  // 업데이트된 리뷰 저장
-	}
-
-	/* UTIL */
-	private User validateOwner(Long userId) {
-		User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-		if (!user.getRole().equals(UserRole.OWNER))
-			throw new CustomException(ErrorCode.USER_ROLE_NOT_OWNER);
-		return user;
-	}
-
-	private Review findReviewByUuid(String uuid) {
-		return reviewRepository.findByUuid(uuid).orElseThrow(() -> new CustomException(ErrorCode.REVIEW_NOT_FOUND));
 	}
 }

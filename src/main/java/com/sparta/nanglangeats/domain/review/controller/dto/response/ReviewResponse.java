@@ -15,7 +15,7 @@ public class ReviewResponse {
 	private UUID storeId;
 	private UUID orderId;
 	private String content;
-	private int rating;
+	private float rating;
 
 
 

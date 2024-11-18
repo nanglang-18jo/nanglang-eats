@@ -18,5 +18,5 @@ public class ReviewRequest {
 	private UUID orderId;
 	private String content;
 	private List<MultipartFile> images;
-	private int rating;
+	private float rating;
 }

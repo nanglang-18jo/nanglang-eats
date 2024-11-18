@@ -1,19 +1,13 @@
 package com.sparta.nanglangeats.domain.review.entity;
 
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.UUID;
 
-import com.sparta.nanglangeats.domain.address.entity.CommonAddress;
 import com.sparta.nanglangeats.domain.order.entity.Order;
-import com.sparta.nanglangeats.domain.review.controller.dto.request.ReviewRequest;
-import com.sparta.nanglangeats.domain.store.controller.dto.request.StoreRequest;
-import com.sparta.nanglangeats.domain.store.entity.Category;
 import com.sparta.nanglangeats.domain.store.entity.Store;
 import com.sparta.nanglangeats.domain.user.entity.User;
 import com.sparta.nanglangeats.global.common.entity.Timestamped;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -57,19 +51,19 @@ public class Review extends Timestamped {
 	private Boolean isActive;
 
 	@Builder
-	public Review(Order order, User user, Store store, String content, String image) {
+	public Review(Order order, User user, Store store, String content, String image, float rating) {
 		this.uuid = UUID.randomUUID().toString(); // uuid 자동 생성
 		this.order = order;
 		this.user = user;
 		this.store = store;
 		this.content = content;
 		this.image = image;
-		this.rating = null;
+		setRating(rating);
 		this.isActive = true;
 	}
 
 	public void setRating(float rating) {
-		if (rating < 1 || rating < 5) {
+		if (rating < 1 || rating > 5) {
 			throw new IllegalArgumentException("평점은 1.0점에서 5.0점 사이입니다.");
 		}
 		this.rating = rating;

@@ -7,8 +7,10 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import com.sparta.nanglangeats.domain.order.entity.Order;
 import com.sparta.nanglangeats.domain.review.entity.Review;
 import com.sparta.nanglangeats.domain.store.entity.Store;
+import com.sparta.nanglangeats.domain.user.entity.User;
 
 public interface ReviewRepository  extends JpaRepository<Review, UUID> {
 
