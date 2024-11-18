@@ -38,6 +38,17 @@ public enum ErrorCode {
     DELIVERY_ADDRESS_NOT_FOUND(NOT_FOUND, "해당 배송 주소를 찾을 수 없습니다."),
 
     // Order
+    ORDER_PRODUCT_QUANTITY_INVALID(BAD_REQUEST, "상품 수량은 0보다 커야 합니다."),
+    ORDER_PRODUCT_ID_INVALID(BAD_REQUEST, "상품 아이디가 유효하지 않습니다."),
+    ORDER_STORE_ID_INVALID(BAD_REQUEST, "가게 아이디가 유효하지 않습니다."),
+    STORE_OWNER_NOT_FOUND(BAD_REQUEST, "가게 주인을 찾을 수 없거나 잘못된 유형입니다."),
+    ORDER_NOT_FOUND(NOT_FOUND, "주문 정보를 찾을 수 없습니다."),
+    ORDER_UPDATE_FORBIDDEN(FORBIDDEN, "해당 주문을 수정할 권한이 없습니다."),
+    ORDER_CANCEL_TIME_EXCEEDED(CONFLICT, "주문 취소는 5분 이내에만 가능합니다."),
+    ORDER_STATUS_CHANGE_INVALID(CONFLICT, "주문 상태를 변경할 수 없습니다."),
+    ORDER_NOT_CANCELABLE(CONFLICT, "취소 가능한 주문 상태가 아닙니다."),
+    ORDER_NOT_DELETABLE(CONFLICT, "삭제는 취소된(CANCELED) 주문만 가능합니다."),
+
 
     // Review
 
@@ -61,6 +72,10 @@ public enum ErrorCode {
     // Store
     USER_ROLE_NOT_OWNER(BAD_REQUEST, "OWNER 권한을 가진 사용자만 가게 주인으로 등록할 수 있습니다."),
     STORE_NOT_FOUND(NOT_FOUND, "존재하지 않는 가게입니다."),
+
+    // Product
+    PRODUCT_NOT_FOUND(NOT_FOUND, "존재하지 않는 상품입니다."),
+    PRODUCT_NOT_PUBLIC(FORBIDDEN, "해당 상품에 접근할 수 없습니다."),
 
     ;
     private final HttpStatus httpStatus;

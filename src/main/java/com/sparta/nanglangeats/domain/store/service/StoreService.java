@@ -1,12 +1,8 @@
 package com.sparta.nanglangeats.domain.store.service;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -15,10 +11,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.sparta.nanglangeats.domain.address.entity.CommonAddress;
 import com.sparta.nanglangeats.domain.address.service.CommonAddressService;
-import com.sparta.nanglangeats.domain.image.entity.Image;
 import com.sparta.nanglangeats.domain.image.enums.ImageCategory;
 import com.sparta.nanglangeats.domain.image.repository.ImageRepository;
-import com.sparta.nanglangeats.domain.image.service.dto.ImageService;
+import com.sparta.nanglangeats.domain.image.service.ImageService;
+import com.sparta.nanglangeats.domain.image.service.dto.ImageResponse;
+import com.sparta.nanglangeats.domain.image.util.S3Util;
 import com.sparta.nanglangeats.domain.store.controller.dto.request.StoreRequest;
 import com.sparta.nanglangeats.domain.store.controller.dto.response.StoreDetailResponse;
 import com.sparta.nanglangeats.domain.store.controller.dto.response.StoreListResponse;
@@ -45,12 +42,19 @@ public class StoreService {
 	private final ImageRepository imageRepository;
 	private final CommonAddressService commonAddressService;
 	private final UserRepository userRepository;
+	private final S3Util s3Util;
 
 	@Transactional
 	public StoreResponse createStore(StoreRequest request) {
 		User owner = validateOwner(request.getOwnerId());
 		Category category = findCategoryById(request.getCategoryId());
 		CommonAddress commonAddress = commonAddressService.findCommonAddressByAddress(request.getAddress());
+
+		ImageResponse thumbnailResponse = null;
+
+		if (request.getThumbnail() != null) {
+			thumbnailResponse = s3Util.uploadFile(request.getThumbnail(), "store-thumbnails");
+		}
 
 		Store store = Store.builder()
 			.category(category)
@@ -61,6 +65,8 @@ public class StoreService {
 			.commonAddress(commonAddress)
 			.addressDetail(request.getAddressDetail())
 			.phoneNumber(request.getPhoneNumber())
+			.thumbnailName(thumbnailResponse != null ? thumbnailResponse.getFileName() : null)
+			.thumbnailUrl(thumbnailResponse != null ? thumbnailResponse.getUrl() : null)
 			.build();
 
 		storeRepository.save(store);
@@ -69,7 +75,7 @@ public class StoreService {
 			imageService.uploadAllImages(request.getImages(), ImageCategory.STORE_IMAGE, store.getId());
 		}
 
-		return StoreResponse.builder().storeId(store.getUuid()).build();
+		return StoreResponse.builder().storeUuid(store.getUuid()).build();
 	}
 
 	@Transactional
@@ -81,12 +87,20 @@ public class StoreService {
 
 		Category category = findCategoryById(request.getCategoryId());
 		CommonAddress commonAddress = commonAddressService.findCommonAddressByAddress(request.getAddress());
-		store.update(request, category, commonAddress);
 
-		imageService.deleteAllImages(ImageCategory.STORE_IMAGE, store.getId());
+		ImageResponse thumbnailResponse = null;
+		if (request.getThumbnail() != null) {
+			if (store.getThumbnailName() != null)
+				s3Util.deleteFile(store.getThumbnailName());
+			thumbnailResponse = s3Util.uploadFile(request.getThumbnail(), "store-thumbnails");
+		}
+
+		store.update(request, category, commonAddress, thumbnailResponse);
+
+		imageService.hardDeleteAllImages(ImageCategory.STORE_IMAGE, store.getId());
 		imageService.uploadAllImages(request.getImages(), ImageCategory.STORE_IMAGE, store.getId());
 
-		return StoreResponse.builder().storeId(store.getUuid()).build();
+		return StoreResponse.builder().storeUuid(store.getUuid()).build();
 	}
 
 	@Transactional
@@ -95,13 +109,18 @@ public class StoreService {
 
 		if (user.getRole().equals(UserRole.OWNER) && !store.getOwner().equals(user))
 			throw new CustomException(ErrorCode.ACCESS_DENIED);
-
 		store.delete(user.getUsername());
+
+		imageService.softDeleteAllImages(ImageCategory.STORE_IMAGE, store.getId(), user.getUsername());
 	}
 
-	public StoreDetailResponse getStoreDetail(String uuid){
+	public StoreDetailResponse getStoreDetail(String uuid) {
 		Store store = findStoreByUuid(uuid);
-		return StoreDetailResponse.builder().store(store).build();
+		validateStore(store);
+
+		List<String> imageUrls = imageRepository.findUrlsByImageCategoryAndContentId(ImageCategory.STORE_IMAGE,
+			store.getId());
+		return StoreDetailResponse.builder().store(store).imageUrls(imageUrls).build();
 	}
 
 	public Page<StoreListResponse> getStoresList(Long categoryId, int page, int size, String sortBy, String direction) {
@@ -110,30 +129,7 @@ public class StoreService {
 
 		Page<Store> stores = storeRepository.findAllByCategoryId(categoryId, pageable);
 
-		List<Long> storeIds = stores.stream()
-			.map(Store::getId)
-			.toList();
-
-		List<Image> images = imageRepository.findByContentIdInAndImageCategory(storeIds, ImageCategory.STORE_IMAGE);
-
-		Map<Long, List<String>> imageUrlMap = images.stream()
-			.collect(Collectors.groupingBy(
-				Image::getContentId,
-				Collectors.mapping(Image::getUrl, Collectors.toList())
-			));
-
-		// Store 엔티티와 이미지 리스트 매핑
-		List<StoreListResponse> storeResponses = stores.stream()
-			.map(store -> new StoreListResponse(
-				store.getUuid(),
-				store.getName(),
-				store.getRating(),
-				store.getReviewCount(),
-				imageUrlMap.getOrDefault(store.getId(), Collections.emptyList()) // 해당 Store의 이미지 리스트
-			))
-			.toList();
-
-		return new PageImpl<>(storeResponses, pageable, stores.getTotalElements());
+		return stores.map(store -> StoreListResponse.builder().store(store).build());
 	}
 
 	/* UTIL */
@@ -142,6 +138,11 @@ public class StoreService {
 		if (!user.getRole().equals(UserRole.OWNER))
 			throw new CustomException(ErrorCode.USER_ROLE_NOT_OWNER);
 		return user;
+	}
+
+	private void validateStore(Store store) {
+		if (!store.getIsActive())
+			throw new CustomException(ErrorCode.STORE_NOT_FOUND);
 	}
 
 	private Category findCategoryById(Long id) {

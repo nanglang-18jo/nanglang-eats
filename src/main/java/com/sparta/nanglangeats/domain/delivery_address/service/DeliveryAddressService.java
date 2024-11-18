@@ -49,7 +49,7 @@ public class DeliveryAddressService {
 		deliveryAddress.update(commonAddress, request);
 		return deliveryAddress.getId();
 	}
-
+	
 	@Transactional(readOnly = true)
 	public DeliveryAddress getDeliveryAddressRepositoryById(Long deliveryAddressId) {
 		return deliveryAddressRepository.findById(deliveryAddressId)

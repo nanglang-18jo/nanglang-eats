@@ -1,7 +1,10 @@
 package com.sparta.nanglangeats.domain.product.entity;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
+import com.sparta.nanglangeats.domain.image.service.dto.ImageResponse;
+import com.sparta.nanglangeats.domain.product.controller.dto.request.ProductRequest;
 import com.sparta.nanglangeats.domain.store.entity.Store;
 import com.sparta.nanglangeats.global.common.entity.Timestamped;
 
@@ -44,20 +47,49 @@ public class Product extends Timestamped {
 	@Column(nullable = false)
 	private int price;
 
-	@Column(nullable = false)
-	private boolean isPublic;
+	@Column
+	private String thumbnailUrl;
+
+	@Column
+	private String thumbnailName;
 
 	@Column(nullable = false)
-	private boolean isActive;
+	private Boolean isPublic;
+
+	@Column(nullable = false)
+	private Boolean isActive;
 
 	@Builder
-	public Product(Store store, String name, String description, int price) {
+	public Product(Store store, String name, String description, int price, String thumbnailUrl, String thumbnailName) {
 		this.uuid = UUID.randomUUID().toString();
 		this.store = store;
 		this.name = name;
 		this.description = description;
 		this.price = price;
+		this.thumbnailUrl = thumbnailUrl;
+		this.thumbnailName = thumbnailName;
 		this.isPublic = true;
 		this.isActive = true;
+	}
+
+	public void update(ProductRequest request, ImageResponse imageResponse) {
+		this.name = request.getName();
+		this.description = request.getDescription();
+		this.price = request.getPrice();
+		if(imageResponse != null) {
+			this.thumbnailName = imageResponse.getFileName();
+			this.thumbnailUrl = imageResponse.getUrl();
+		}
+	}
+
+	public void delete(String deletedBy) {
+		this.isPublic = false;
+		this.isActive = false;
+		this.setDeletedAt(LocalDateTime.now());
+		this.setDeletedBy(deletedBy);
+	}
+
+	public void toggleVisibility() {
+		this.isPublic = !this.isPublic;
 	}
 }
