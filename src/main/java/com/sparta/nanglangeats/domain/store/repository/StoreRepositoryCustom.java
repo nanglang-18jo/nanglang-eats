@@ -6,5 +6,5 @@ import org.springframework.data.domain.Pageable;
 import com.sparta.nanglangeats.domain.store.entity.Store;
 
 public interface StoreRepositoryCustom {
-	Page<Store> findByKeyword(String keyword, Pageable pageable);
+	Page<Store> searchStoreByKeyword(String keyword, Pageable pageable);
 }

@@ -1,7 +1,5 @@
 package com.sparta.nanglangeats.domain.store.controller.dto.response;
 
-import java.util.List;
-
 import com.sparta.nanglangeats.domain.store.entity.Store;
 
 import lombok.AllArgsConstructor;

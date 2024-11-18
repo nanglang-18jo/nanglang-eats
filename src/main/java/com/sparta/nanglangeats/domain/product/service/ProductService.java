@@ -1,14 +1,14 @@
 package com.sparta.nanglangeats.domain.product.service;
 
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
-import com.sparta.nanglangeats.domain.image.entity.Image;
 import com.sparta.nanglangeats.domain.image.enums.ImageCategory;
 import com.sparta.nanglangeats.domain.image.repository.ImageRepository;
 import com.sparta.nanglangeats.domain.image.service.ImageService;
@@ -34,6 +34,7 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 public class ProductService {
 
+	private static final int PAGE_SIZE = 10;
 	private final StoreRepository storeRepository;
 	private final ProductRepository productRepository;
 	private final ImageService imageService;
@@ -124,6 +125,15 @@ public class ProductService {
 		product.toggleVisibility();
 
 		return ProductResponse.builder().productUuid(product.getUuid()).build();
+	}
+
+	public Page<ProductListResponse> searchProduct(String keyword, int page){
+		Sort sort = Sort.by(Sort.Direction.ASC, "name");
+		Pageable pageable = PageRequest.of(page, PAGE_SIZE, sort);
+
+		Page<Product> products = productRepository.searchProductByKeyword(keyword, pageable);
+
+		return products.map(product -> ProductListResponse.builder().product(product).build());
 	}
 
 	/* UTIL */

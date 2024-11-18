@@ -20,7 +20,7 @@ public class StoreRepositoryCustomImpl implements StoreRepositoryCustom {
 	private final JPAQueryFactory queryFactory;
 
 	@Override
-	public Page<Store> findByKeyword(String keyword, Pageable pageable) {
+	public Page<Store> searchStoreByKeyword(String keyword, Pageable pageable) {
 		List<Store> stores = queryFactory.selectFrom(store)
 			.where(store.name.containsIgnoreCase(keyword))
 			.offset(pageable.getOffset())

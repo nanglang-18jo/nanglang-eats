@@ -142,7 +142,7 @@ public class StoreService {
 		Sort sort = Sort.by(Sort.Direction.ASC, "name");
 		Pageable pageable = PageRequest.of(page, PAGE_SIZE, sort);
 
-		Page<Store> stores = storeRepository.findByKeyword(keyword, pageable);
+		Page<Store> stores = storeRepository.searchStoreByKeyword(keyword, pageable);
 
 		return stores.map(store -> StoreListResponse.builder().store(store).build());
 	}
