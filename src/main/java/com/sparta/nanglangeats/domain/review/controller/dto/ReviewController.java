@@ -1,27 +1,25 @@
 package com.sparta.nanglangeats.domain.review.controller.dto;
 
+import static com.sparta.nanglangeats.global.common.util.ControllerUtil.*;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import static com.sparta.nanglangeats.global.common.util.ControllerUtil.*;
-
 import com.sparta.nanglangeats.domain.review.controller.dto.request.ReviewRequest;
-import com.sparta.nanglangeats.domain.review.controller.dto.response.ReviewResponse;
 import com.sparta.nanglangeats.domain.review.service.ReviewService;
 import com.sparta.nanglangeats.domain.user.entity.User;
 import com.sparta.nanglangeats.global.common.dto.CommonResponse;
-import com.sparta.nanglangeats.global.config.security.provider.CustomAuthenticationProvider;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -60,34 +58,12 @@ public class ReviewController {
 		reviewService.deleteReview(reviewUuid, user);
 		return getResponseEntity(HttpStatus.NO_CONTENT, null, "리뷰 삭제 완료");
 	}
-	//
-	// // 내 리뷰 목록 조회
-	// @GetMapping("/me")
-	// @PreAuthorize("hasAnyRole('CUSTOMER')")
-	// public ResponseEntity<ReviewResponse> getReviewByOrder(@PathVariable UUID orderId) {
-	// 	return ResponseEntity.ok(reviewService.getReviewByOrder(orderId));
-	// }
-	//
-	// // 특정 사용자에 대한 리뷰 조회
-	// @GetMapping("/user/{userId}")
-	// public ResponseEntity<List<ReviewResponse>> getReviewsByUser(@PathVariable UUID userId) {
-	// 	List<ReviewResponse> reviews = reviewService.getReviewsByUser(userId);
-	// 	return ResponseEntity.ok(reviews);
-	// }
-	//
-	// // 음식점 ID로 해당 음식점의 리뷰 리스트 조회
-	// @GetMapping("/{storeId}")
-	// public ResponseEntity<List<ReviewResponse>> getReviewsByStoreId(@PathVariable UUID storeId) {
-	// 	List<ReviewResponse> reviews = reviewService.getReviewsByStoreId(storeId);
-	// 	return ResponseEntity.status(HttpStatus.OK).body(reviews);
-	// }
-	//
-	
 
-	// 	// 삭제 요청 처리
-	// 	String deletedBy = user.getUser(); // 삭제한 사용자 정보
-	// 	reviewService.deleteReview(reviewId, deletedBy);
-	//
-	// 	return ResponseEntity.status(HttpStatus.OK).body("리뷰 삭제 요청 처리 완료");
-	// }
+	// 가게별 리뷰 목록 조회
+	@GetMapping("/{storeUuid}")
+	public ResponseEntity<CommonResponse<?>> getReviewsList(
+		@PathVariable String storeUuid,
+		@RequestParam(defaultValue = "0") int page) {
+		return getOkResponseEntity(reviewService.getReviewList(storeUuid, page), "가게별 리뷰 목록 조회");
+	}
 }

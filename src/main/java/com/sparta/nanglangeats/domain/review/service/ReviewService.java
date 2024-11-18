@@ -1,26 +1,28 @@
 package com.sparta.nanglangeats.domain.review.service;
 
 import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.sparta.nanglangeats.domain.image.enums.ImageCategory;
+import com.sparta.nanglangeats.domain.image.repository.ImageRepository;
 import com.sparta.nanglangeats.domain.image.service.ImageService;
 import com.sparta.nanglangeats.domain.order.entity.Order;
 import com.sparta.nanglangeats.domain.order.repository.OrderRepository;
 import com.sparta.nanglangeats.domain.review.controller.dto.request.ReviewRequest;
+import com.sparta.nanglangeats.domain.review.controller.dto.response.ReviewListResponse;
 import com.sparta.nanglangeats.domain.review.controller.dto.response.ReviewResponse;
 import com.sparta.nanglangeats.domain.review.entity.Review;
 import com.sparta.nanglangeats.domain.review.repository.ReviewRepository;
-import com.sparta.nanglangeats.domain.store.entity.Category;
 import com.sparta.nanglangeats.domain.store.entity.Store;
 import com.sparta.nanglangeats.domain.store.repository.StoreRepository;
 import com.sparta.nanglangeats.domain.user.entity.User;
 import com.sparta.nanglangeats.domain.user.enums.UserRole;
-import com.sparta.nanglangeats.domain.user.repository.UserRepository;
 import com.sparta.nanglangeats.global.common.exception.CustomException;
 import com.sparta.nanglangeats.global.common.exception.ErrorCode;
 
@@ -31,11 +33,12 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 public class ReviewService {
 
+	private static final int PAGE_SIZE = 10;
 	private final ReviewRepository reviewRepository;
 	private final OrderRepository orderRepository;
 	private final StoreRepository storeRepository;
-	private final UserRepository userRepository;
 	private final ImageService imageService;
+	private final ImageRepository imageRepository;
 
 	//리뷰 생성
 	@Transactional
@@ -102,34 +105,22 @@ public class ReviewService {
 		imageService.softDeleteAllImages(ImageCategory.REVIEW_IMAGE, review.getId(), user.getUsername());
 	}
 
-	//
-	// // 가게 고유 ID로 리뷰 리스트 조회
-	// @Transactional(readOnly = true)
-	// public List<ReviewResponse> getReviewsByStoreId(UUID storeId) {
-	// 	Store store = storeRepository.findById(storeId)
-	// 		.orElseThrow(() -> new IllegalArgumentException("음식점 정보를 찾을 수 없습니다"));
-	//
-	// 	// 삭제되지 않은 리뷰만 조회
-	// 	List<Review> reviews = reviewRepository.findByStoreAndDeletedFalse(store);
-	//
-	// 	return reviews.stream()
-	// 		.map(ReviewResponse::new)
-	// 		.collect(Collectors.toList());
-	// }
-	//
-	// // 다른 사용자 리뷰 목록 조회
-	// public List<ReviewResponse> getReviewsByUser(UUID userId) {
-	// 	User user = userRepository.findById(userId)
-	// 		.orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다"));
-	// 	// 삭제되지 않은 리뷰만 조회
-	// 	List<Review> reviews = reviewRepository.findByUserAndDeletedFalse(user);
-	// 	return reviews.stream()
-	// 		.map(ReviewResponse::new)
-	// 		.collect(Collectors.toList());
-	// }
-	//
+	public Page<ReviewListResponse> getReviewList(String storeUuid, int page){
+		Store store = findStoreByUuid(storeUuid);
 
+		Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
+		Pageable pageable = PageRequest.of(page, PAGE_SIZE, sort);
 
+		Page<Review> reviews = reviewRepository.findAllByStoreIdAndIsActiveTrueOrderByCreatedAtDesc(store.getId(), pageable);
+
+		return reviews.map(review -> {
+			List<String> imagesUrl = imageRepository.findUrlsByImageCategoryAndContentId(ImageCategory.REVIEW_IMAGE, review.getId());
+			return ReviewListResponse.builder()
+				.review(review)
+				.imageUrls(imagesUrl)
+				.build();
+		});
+	}
 
 	/* UTIL */
 
