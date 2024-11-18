@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sparta.nanglangeats.domain.order.controller.dto.request.OrderCreateRequest;
@@ -33,16 +34,6 @@ import lombok.RequiredArgsConstructor;
 public class OrderController {
 
 	private final OrderService orderService;
-
-	// 주문 조회 (단 건)
-	@PreAuthorize("hasAnyRole('CUSTOMER', 'OWNER', 'MANAGER')")
-	@GetMapping("/{orderId}")
-	public ResponseEntity<CommonResponse<?>> getOrder(
-		@PathVariable Long orderId,
-		@AuthenticationPrincipal User user) {
-
-		return ControllerUtil.getResponseEntity(HttpStatus.OK, orderService.getOrder(orderId, user), "주문 조회 성공");
-	}
 
 	// 주문 등록
 	@PreAuthorize("hasAnyRole('CUSTOMER', 'OWNER')")
@@ -100,5 +91,31 @@ public class OrderController {
 
 		orderService.deleteOrder(orderId, user);
 		return ControllerUtil.getResponseEntity(HttpStatus.OK, null, "주문 삭제 완료");
+	}
+
+	// 주문 상세 조회
+	@PreAuthorize("hasAnyRole('CUSTOMER', 'OWNER', 'MANAGER')")
+	@GetMapping("/{orderId}")
+	public ResponseEntity<CommonResponse<?>> getOrderDetail(
+		@PathVariable Long orderId,
+		@AuthenticationPrincipal User user) {
+
+		return ControllerUtil.getResponseEntity(HttpStatus.OK, orderService.getOrderDetail(orderId, user), "주문 조회 성공");
+	}
+
+	// 주문 목록 조회
+	@PreAuthorize("hasAnyRole('CUSTOMER', 'OWNER', 'MANAGER')")
+	@GetMapping
+	public ResponseEntity<CommonResponse<?>> getOrderList(
+		@AuthenticationPrincipal User user,
+		@RequestParam(defaultValue = "0") int page,
+		@RequestParam(defaultValue = "10") int size,
+		@RequestParam(defaultValue = "createdAt") String sortBy,
+		@RequestParam(required = false) String status,
+		@RequestParam(required = false) String search) {
+
+		return ControllerUtil.getResponseEntity(HttpStatus.OK,
+			orderService.getOrderList(user, page, size, sortBy, status, search),
+			"주문 목록 조회 성공");
 	}
 }

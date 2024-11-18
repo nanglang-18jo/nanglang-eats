@@ -5,6 +5,11 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,6 +18,7 @@ import com.sparta.nanglangeats.domain.order.controller.dto.request.OrderUpdateRe
 import com.sparta.nanglangeats.domain.order.controller.dto.request.ProductRequestDto;
 import com.sparta.nanglangeats.domain.order.controller.dto.response.OrderCreateResponse;
 import com.sparta.nanglangeats.domain.order.controller.dto.response.OrderDetailResponse;
+import com.sparta.nanglangeats.domain.order.controller.dto.response.OrderSummaryResponse;
 import com.sparta.nanglangeats.domain.order.controller.dto.response.OrderUpdateResponse;
 import com.sparta.nanglangeats.domain.order.entity.Order;
 import com.sparta.nanglangeats.domain.order.entity.OrderProduct;
@@ -38,31 +44,6 @@ public class OrderService {
 	private final OrderRepository orderRepository;
 	private final OrderProductRepository orderProductRepository;
 	private final StoreService storeService;
-
-	// 주문 조회 (단 건)
-	@Transactional(readOnly = true)
-	public OrderDetailResponse getOrder(Long orderId, User user) {
-		// 주문 조회
-		Order order = orderRepository.findById(orderId)
-			.orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
-
-		switch (user.getRole()) {
-			case CUSTOMER:
-				if (!order.getUserId().equals(user.getId())) {
-					throw new CustomException(ErrorCode.ACCESS_DENIED);
-				}
-				break;
-			case OWNER:
-				validateStoreOwner(order.getStoreId(), user.getId());
-				break;
-			case MANAGER:
-				break; // MANAGER는 모든 주문 조회 가능
-			default:
-				throw new CustomException(ErrorCode.ACCESS_DENIED);
-		}
-
-		return new OrderDetailResponse(order);
-	}
 
 	// 주문 등록
 	@Transactional
@@ -224,7 +205,73 @@ public class OrderService {
 		orderRepository.save(order); // 상태 저장
 	}
 
+	// 주문 상세 조회
+	@Transactional(readOnly = true)
+	public OrderDetailResponse getOrderDetail(Long orderId, User user) {
+		// 주문 조회
+		Order order = orderRepository.findById(orderId)
+			.orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
+
+		switch (user.getRole()) {
+			case CUSTOMER:
+				if (!order.getUserId().equals(user.getId())) {
+					throw new CustomException(ErrorCode.ACCESS_DENIED);
+				}
+				break;
+			case OWNER:
+				validateStoreOwner(order.getStoreId(), user.getId());
+				break;
+			case MANAGER:
+				break; // MANAGER는 모든 주문 조회 가능
+			default:
+				throw new CustomException(ErrorCode.ACCESS_DENIED);
+		}
+
+		return new OrderDetailResponse(order);
+	}
+
+	// 주문 목록 조회
+	@Transactional(readOnly = true)
+	public Object getOrderList(User user, int page, int size, String sortBy, String status, String search) {
+		if (size != 10 && size != 30 && size != 50) {
+			size = 10; // 허용되지 않은 size 값은 기본값으로 설정
+		}
+
+		Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy).descending());
+		Specification<Order> spec = Specification.where(null); // 동적 쿼리
+
+		// 사용자 역할에 따른 필터링
+		switch (user.getRole()) {
+			case CUSTOMER: // 자신이 등록한 주문만 조회
+				spec = spec.and((root, query, cb) -> cb.equal(root.get("userId"), user.getId()));
+				break;
+			case OWNER: // 자신의 가게 주문만 조회
+				// TODO: storeService.getStoreIdsByOwnerId(user.getId()) 구현 필요
+				//List<String> storeIds = storeService.getStoreIdsByOwnerId(user.getId());
+				//spec = spec.and((root, query, cb) -> root.get("storeId").in(storeIds));
+				break;
+			case MANAGER:
+				break; // MANAGER는 모든 주문 조회 가능
+			default:
+				throw new CustomException(ErrorCode.ACCESS_DENIED);
+		}
+
+		// 상태 필터링
+		if (status != null) {
+			spec = spec.and((root, query, cb) -> cb.equal(root.get("status"), OrderStatus.valueOf(status)));
+		}
+
+		// 검색
+		if (search != null && !search.isEmpty()) {
+			spec = spec.and((root, query, cb) -> cb.like(root.get("address"), "%" + search + "%"));
+		}
+
+		Page<Order> orders = orderRepository.findAll(spec, pageable);
+		return orders.map(OrderSummaryResponse::new);
+	}
+
 	// 주문 상품 검증
+
 	private <T extends ProductRequestDto> void validateOrderProducts(List<T> products) {
 		List<CustomFieldError> customFieldErrors = new ArrayList<>();
 		for (T product : products) {
@@ -242,8 +289,8 @@ public class OrderService {
 			throw new ParameterException(ErrorCode.COMMON_INVALID_PARAMETER, customFieldErrors);
 		}
 	}
-
 	// 요청 사용자가 해당 가게의 주인인지 확인
+
 	public void validateStoreOwner(String storeId, Long userId) {
 		// 가게 주인의 ID를 가져오고, 없거나 잘못된 경우 예외 처리
 		// TODO: StoreService에 getStoreOwnerId() 구현 필요
@@ -259,8 +306,8 @@ public class OrderService {
 		}
 		*/
 	}
-
 	// 해당 가게의 오늘 주문 수 조회
+
 	public int getTodayOrderCountByStore(String storeId) {
 		LocalDateTime startOfDay = LocalDate.now().atStartOfDay(); // 오늘 시작 시간
 		LocalDateTime endOfDay = startOfDay.plusDays(1).minusSeconds(1); // 오늘 종료 시간
