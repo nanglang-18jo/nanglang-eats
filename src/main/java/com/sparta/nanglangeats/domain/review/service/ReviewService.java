@@ -15,6 +15,7 @@ import com.sparta.nanglangeats.domain.image.service.ImageService;
 import com.sparta.nanglangeats.domain.order.entity.Order;
 import com.sparta.nanglangeats.domain.order.repository.OrderRepository;
 import com.sparta.nanglangeats.domain.review.controller.dto.request.ReviewRequest;
+import com.sparta.nanglangeats.domain.review.controller.dto.response.MyReviewListResponse;
 import com.sparta.nanglangeats.domain.review.controller.dto.response.ReviewListResponse;
 import com.sparta.nanglangeats.domain.review.controller.dto.response.ReviewResponse;
 import com.sparta.nanglangeats.domain.review.entity.Review;
@@ -34,13 +35,13 @@ import lombok.RequiredArgsConstructor;
 public class ReviewService {
 
 	private static final int PAGE_SIZE = 10;
+
 	private final ReviewRepository reviewRepository;
 	private final OrderRepository orderRepository;
 	private final StoreRepository storeRepository;
 	private final ImageService imageService;
 	private final ImageRepository imageRepository;
 
-	//리뷰 생성
 	@Transactional
 	public ReviewResponse createReview(ReviewRequest request, User user) {
 		Order order = findOrderByUuid(request.getOrderUuid());
@@ -70,7 +71,17 @@ public class ReviewService {
 		return ReviewResponse.builder().review(review).imagesUrl(imagesUrl).build();
 	}
 
-	//리뷰 수정
+	@Transactional(readOnly = true)
+	public List<MyReviewListResponse> getMyReviewList(User user, int page, int size, String sortBy) {
+		PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, sortBy));
+		List<Review> reviews = reviewRepository.findAllMyReviews(user, pageRequest);
+		return reviews.stream()
+			.map(review -> {
+				List<String> imageUrls = imageRepository.findUrlsByImageCategoryAndContentId(ImageCategory.REVIEW_IMAGE, review.getId());
+				return MyReviewListResponse.of(review, imageUrls);
+			}).toList();
+	}
+
 	@Transactional
 	public ReviewResponse updateReview(String reviewUuid, ReviewRequest request, User user) {
 		Review review = findReviewByUuid(reviewUuid);
@@ -123,7 +134,6 @@ public class ReviewService {
 	}
 
 	/* UTIL */
-
 	private void checkDuplicateReview(Long orderId) {
 		if (reviewRepository.existsByOrderOrderIdAndIsActiveTrue(orderId))
 			throw new CustomException(ErrorCode.REVIEW_ALREADY_EXISTS);
