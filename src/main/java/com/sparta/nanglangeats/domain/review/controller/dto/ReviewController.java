@@ -5,7 +5,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,6 +39,17 @@ public class ReviewController {
 		@AuthenticationPrincipal User user) {
 		return getResponseEntity(HttpStatus.CREATED, reviewService.createReview(request, user), "리뷰 등록 완료");
 	}
+
+	// 리뷰 수정
+	@PatchMapping("/{reviewUuid}")
+	@PreAuthorize("hasRole('CUSTOMER')")
+	public ResponseEntity<CommonResponse<?>> updateReview(
+		@PathVariable String reviewUuid,
+		@ModelAttribute @Valid ReviewRequest request,
+		@AuthenticationPrincipal User user) {
+		return getOkResponseEntity(reviewService.updateReview(reviewUuid, request, user), "리뷰 수정 완료");
+	}
+
 	//
 	// // 내 리뷰 목록 조회
 	// @GetMapping("/me")
@@ -58,17 +72,7 @@ public class ReviewController {
 	// 	return ResponseEntity.status(HttpStatus.OK).body(reviews);
 	// }
 	//
-	// // 리뷰 수정
-	// @PutMapping("/{reviewId}")
-	// @PreAuthorize("hasAnyRole('CUSTOMER')")
-	// public ResponseEntity<ReviewResponse> updateReview(
-	// 	@PathVariable UUID reviewId,
-	// 	@RequestBody ReviewRequest request,
-	// 	@AuthenticationPrincipal CustomAuthenticationProvider customAuthenticationProvider) {
-	// 	ReviewResponse responseDto = reviewService.updateReview(reviewId, request, customAuthenticationProvider.getUser());
-	// 	return ResponseEntity.ok(responseDto);
-	// }
-	//
+	
 	// // 리뷰 삭제
 	// @DeleteMapping("/{reviewId}")
 	// @PreAuthorize("hasAnyRole('CUSTOMER','MASTER')")
