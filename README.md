@@ -37,7 +37,7 @@
 ![Github](https://img.shields.io/badge/github-181717?style=for-the-badge&logo=github&logoColor=white)
 ![Notion](https://img.shields.io/badge/Notion-000000?style=for-the-badge&logo=Notion&logoColor=white)
 ![Slack](https://img.shields.io/badge/Slack-4A154B?style=for-the-badge&logo=Slack&logoColor=white)
-
+![Swagger](https://img.shields.io/badge/swagger-85EA2D?style=for-the-badge&logo=swaggeri&logoColor=white)
 
 ### 개발 일정
 
@@ -104,6 +104,8 @@
 ## ERD
 ![18조 ERD 설계서 최종](https://github.com/user-attachments/assets/d1739a04-c064-4100-9723-696089bb815b)
 
+## Swagger
+[18조 Swagger문서](http://43.200.171.152/swagger-ui/index.html)
 
 ## Git Convention
 
