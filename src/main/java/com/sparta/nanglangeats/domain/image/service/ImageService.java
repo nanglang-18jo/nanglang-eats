@@ -21,10 +21,6 @@ public class ImageService {
 	private final S3Util s3Util;
 	private final ImageRepository imageRepository;
 
-	public ImageResponse uploadImage(MultipartFile image, String dirName) {
-		return s3Util.uploadFile(image, dirName);
-	}
-
 	@Transactional
 	public void uploadAllImages(List<MultipartFile> images, ImageCategory category, Long contentId) {
 		String dirName = "";
@@ -36,7 +32,7 @@ public class ImageService {
 			dirName = "review-images";
 
 		for (MultipartFile image : images) {
-			Image storeImage = new Image(uploadImage(image, dirName), contentId, category);
+			Image storeImage = new Image(s3Util.uploadFile(image, dirName), contentId, category);
 			imageRepository.save(storeImage);
 		}
 	}

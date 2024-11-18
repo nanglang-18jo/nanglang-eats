@@ -1,17 +1,14 @@
 package com.sparta.nanglangeats.domain.product.service;
 
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
-import com.sparta.nanglangeats.domain.image.entity.Image;
 import com.sparta.nanglangeats.domain.image.enums.ImageCategory;
 import com.sparta.nanglangeats.domain.image.repository.ImageRepository;
 import com.sparta.nanglangeats.domain.image.service.ImageService;
+import com.sparta.nanglangeats.domain.image.util.S3Util;
 import com.sparta.nanglangeats.domain.image.service.dto.ImageResponse;
 import com.sparta.nanglangeats.domain.product.controller.dto.request.ProductRequest;
 import com.sparta.nanglangeats.domain.product.controller.dto.response.ProductDetailResponse;
@@ -37,6 +34,7 @@ public class ProductService {
 	private final ProductRepository productRepository;
 	private final ImageService imageService;
 	private final ImageRepository imageRepository;
+	private final S3Util s3Util;
 
 	@Transactional
 	public ProductResponse createProduct(ProductRequest request, User user) {
@@ -45,8 +43,8 @@ public class ProductService {
 
 		ImageResponse thumbnailResponse = null;
 
-		if (!request.getThumbnail().isEmpty()) {
-			thumbnailResponse = imageService.uploadImage(request.getThumbnail(), "product-thumbnails");
+		if (request.getThumbnail() != null) {
+			thumbnailResponse = s3Util.uploadFile(request.getThumbnail(), "product-thumbnails");
 		}
 
 		Product product = Product.builder()
@@ -61,12 +59,9 @@ public class ProductService {
 		productRepository.save(product);
 
 		if (!request.getImages().isEmpty()) {
-			for (MultipartFile image : request.getImages()) {
-				Image productImage = new Image(imageService.uploadImage(image, "product-images"), product.getId(),
-					ImageCategory.PRODUCT_IMAGE);
-				imageRepository.save(productImage);
-			}
+			imageService.uploadAllImages(request.getImages(), ImageCategory.PRODUCT_IMAGE, product.getId());
 		}
+
 		return ProductResponse.builder().productUuid(product.getUuid()).build();
 	}
 
@@ -76,10 +71,12 @@ public class ProductService {
 		validateUser(product.getStore(), user);
 
 		ImageResponse thumbnailResponse = null;
-		if (!request.getThumbnail().isEmpty()) {
-			thumbnailResponse = imageService.changeImage(product.getThumbnailName(),
-				"product-thumbnails", request.getThumbnail());
+		if (request.getThumbnail() != null) {
+			if (product.getThumbnailName() != null)
+				s3Util.deleteFile(product.getThumbnailName());
+			thumbnailResponse = s3Util.uploadFile(request.getThumbnail(), "product-thumbnails");
 		}
+
 		product.update(request, thumbnailResponse);
 
 		imageService.hardDeleteAllImages(ImageCategory.PRODUCT_IMAGE, product.getId());

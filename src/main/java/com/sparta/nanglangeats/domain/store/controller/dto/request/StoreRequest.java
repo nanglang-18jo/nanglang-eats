@@ -33,7 +33,10 @@ public class StoreRequest {
 	private String address;
 
 	private String addressDetail;
+	
 	private String phoneNumber;
+
+	private MultipartFile thumbnail;
 
 	private List<MultipartFile> images;
 }
