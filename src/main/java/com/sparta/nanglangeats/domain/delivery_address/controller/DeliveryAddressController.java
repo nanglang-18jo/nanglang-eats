@@ -5,6 +5,7 @@ import static org.springframework.http.HttpStatus.*;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -34,5 +35,11 @@ public class DeliveryAddressController {
 	@PutMapping("/api/delivery-address/{deliveryAddressId}")
 	public ResponseEntity<CommonResponse<?>> updateDeliveryAddress(@AuthenticationPrincipal User user, @PathVariable Long deliveryAddressId, @RequestBody @Valid DeliveryAddressUpdateRequest request) {
 		return getOkResponseEntity(deliveryAddressService.updateDeliveryAddress(user, deliveryAddressId, request), "배송 주소 수정 완료");
+	}
+
+	@DeleteMapping("/api/delivery-address/{deliveryAddressId}")
+	public ResponseEntity<CommonResponse<?>> deleteDeliveryAddress(@AuthenticationPrincipal User user, @PathVariable Long deliveryAddressId) {
+		deliveryAddressService.deleteDeliveryAddress(user, deliveryAddressId);
+		return getResponseEntity(NO_CONTENT, "배송 주소 삭제 완료");
 	}
 }

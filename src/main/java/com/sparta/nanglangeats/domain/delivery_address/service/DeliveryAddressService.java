@@ -50,6 +50,13 @@ public class DeliveryAddressService {
 		return deliveryAddress.getId();
 	}
 
+	@Transactional
+	public void deleteDeliveryAddress(User user, Long deliveryAddressId) {
+		DeliveryAddress deliveryAddress = getDeliveryAddressRepositoryById(deliveryAddressId);
+		validateUser(user.getId(), deliveryAddress.getUser().getId());
+		deliveryAddressRepository.delete(deliveryAddress);
+	}
+
 	@Transactional(readOnly = true)
 	public DeliveryAddress getDeliveryAddressRepositoryById(Long deliveryAddressId) {
 		return deliveryAddressRepository.findById(deliveryAddressId)
