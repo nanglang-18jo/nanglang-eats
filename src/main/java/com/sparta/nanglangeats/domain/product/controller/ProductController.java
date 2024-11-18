@@ -9,6 +9,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -66,5 +67,13 @@ public class ProductController {
 	public ResponseEntity<CommonResponse<?>> getProductsByStoresList(
 		@PathVariable String storeUuid){
 		return getOkResponseEntity(productService.getProductsByStoresList(storeUuid), "상품 목록 조회 완료");
+	}
+
+	@PatchMapping("/products/{productUuid}")
+	@PreAuthorize("hasAnyRole('OWNER')")
+	public ResponseEntity<CommonResponse<?>> updateProductVisibility(
+		@PathVariable String productUuid,
+		@AuthenticationPrincipal User user){
+		return getOkResponseEntity(productService.updateProductVisibility(productUuid, user), "상품 공개/비공개 전환 완료");
 	}
 }

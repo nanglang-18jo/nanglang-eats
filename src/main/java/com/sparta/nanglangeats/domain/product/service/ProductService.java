@@ -107,9 +107,19 @@ public class ProductService {
 	public List<ProductListResponse> getProductsByStoresList(String storeUuid) {
 		Store store = findStoreByUuid(storeUuid);
 
-		List<Product> products = productRepository.findByStoreId(store.getId());
+		List<Product> products = productRepository.findByStoreIdAndIsPublicTrue(store.getId());
 
 		return products.stream().map(product -> ProductListResponse.builder().product(product).build()).toList();
+	}
+
+	@Transactional
+	public ProductResponse updateProductVisibility(String productUuid, User user) {
+		Product product = findProductByUuid(productUuid);
+		validateUser(product.getStore(), user);
+
+		product.toggleVisibility();
+
+		return ProductResponse.builder().productUuid(product.getUuid()).build();
 	}
 
 	/* UTIL */
