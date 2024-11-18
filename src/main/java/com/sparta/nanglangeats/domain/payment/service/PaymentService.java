@@ -1,15 +1,19 @@
 package com.sparta.nanglangeats.domain.payment.service;
 
+import java.util.Optional;
+
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.nanglangeats.domain.order.entity.Order;
 import com.sparta.nanglangeats.domain.order.repository.OrderRepository;
 import com.sparta.nanglangeats.domain.payment.client.TossPaymentClient;
+import com.sparta.nanglangeats.domain.payment.client.TossPaymentSimulator;
 import com.sparta.nanglangeats.domain.payment.controller.request.PaymentApproveRequest;
+import com.sparta.nanglangeats.domain.payment.controller.request.PaymentUpdateRequest;
+import com.sparta.nanglangeats.domain.payment.controller.response.PaymentResponse;
 import com.sparta.nanglangeats.domain.payment.entity.Payment;
 import com.sparta.nanglangeats.domain.payment.enums.PaymentStatus;
 import com.sparta.nanglangeats.domain.payment.enums.PaymentType;
@@ -28,17 +32,19 @@ public class PaymentService {
 	private final PaymentRepository paymentRepository;
 	private final OrderRepository orderRepository;
 	private final TossPaymentClient tossPaymentClient;
+	private final TossPaymentSimulator tossPaymentSimulator;
 
 	// 결제 승인 및 저장
 	@Transactional
-	public Payment approvePayment(@Valid PaymentApproveRequest request, User user) {
+	public PaymentResponse approvePayment(@Valid PaymentApproveRequest request, User user) {
 
 		// Toss API 호출
 		//JsonNode response = tossPaymentClient.approvePayment(request.getPaymentKey(),
 		//	String.valueOf(request.getOrderId()), request.getPaymentAmount());
 
-		// 샘플 데이터를 사용하여 Toss API 응답 시뮬레이션
-		JsonNode response = simulateTossPaymentResponse();
+		// Toss API 응답 시뮬레이션
+		JsonNode response = tossPaymentSimulator.approvePayment(request.getPaymentKey(),
+			String.valueOf(request.getOrderId()), request.getPaymentAmount());
 
 		// 주문 조회
 		Order order = null;
@@ -64,16 +70,53 @@ public class PaymentService {
 			.status(PaymentStatus.valueOf(response.get("status").asText().toUpperCase()))
 			.build();
 
-		return paymentRepository.save(payment);
+		paymentRepository.save(payment);
+		return new PaymentResponse(payment);
 	}
-/*
+
+	// 결제 조회
+	@Transactional(readOnly = true)
+	public PaymentResponse getPaymentByPaymentId(Long paymentId) {
+		Payment payment = paymentRepository.findByPaymentId(paymentId)
+			.orElseThrow(() -> new CustomException(ErrorCode.PAYMENT_NOT_FOUND));
+		return new PaymentResponse(payment);
+	}
+
+	// 결제 수정
+	@Transactional
+	public PaymentResponse updatePayment(Long paymentId, @Valid PaymentUpdateRequest request) {
+		Payment payment = paymentRepository.findByPaymentId(paymentId)
+			.orElseThrow(() -> new CustomException(ErrorCode.PAYMENT_NOT_FOUND));
+
+		// 업데이트 로직
+		if (request.getAmount() != null) {
+			payment.setAmount(request.getAmount());
+		}
+		if (request.getStatus() != null) {
+			payment.updateStatus(PaymentStatus.valueOf(request.getStatus()));
+		}
+		if (request.getType() != null) {
+			payment.setType(request.getType());
+		}
+		paymentRepository.save(payment);
+		return new PaymentResponse(payment);
+	}
+
+	// 결제 삭제
+	@Transactional
+	public void deletePayment(Long paymentId) {
+		Payment payment = paymentRepository.findByPaymentId(paymentId)
+			.orElseThrow(() -> new CustomException(ErrorCode.PAYMENT_NOT_FOUND));
+		paymentRepository.delete(payment);
+	}
+
 	// 결제 조회 (PaymentKey)
 	@Transactional(readOnly = true)
 	public Optional<Payment> getPaymentByPaymentKey(String paymentKey) {
 		return paymentRepository.findByPaymentKey(paymentKey);
 	}
 
-	// 결제 조회 (OrderId)
+	// 결제 조회 (orderId)
 	@Transactional(readOnly = true)
 	public Optional<Payment> getPaymentByOrderId(String orderId) {
 		return paymentRepository.findByOrder_OrderUuid(orderId);
@@ -83,81 +126,18 @@ public class PaymentService {
 	@Transactional
 	public Payment cancelPayment(String paymentKey, String cancelReason) {
 		// Toss API 호출
-		tossPaymentClient.cancelPayment(paymentKey, cancelReason);
+		//tossPaymentClient.cancelPayment(paymentKey, cancelReason);
+
+		// Toss API 시뮬레이터 호출
+		tossPaymentSimulator.cancelPayment(paymentKey, cancelReason);
 
 		// DB에서 결제 조회 및 상태 업데이트
 		Payment payment = paymentRepository.findByPaymentKey(paymentKey)
 			.orElseThrow(() -> new CustomException(ErrorCode.PAYMENT_NOT_FOUND));
 		payment.updateStatus(PaymentStatus.CANCELED);
 
+		// 저장
 		return paymentRepository.save(payment);
 	}
- */
 
-	// Toss 결제 승인 API 응답 샘플 데이터 반환
-	private JsonNode simulateTossPaymentResponse() {
-		ObjectMapper objectMapper = new ObjectMapper();
-		String sampleResponse = """
-			{
-			    "mId": "tosspayments",
-			    "version": "2022-11-16",
-			    "paymentKey": "B1d9edx08u7ic9yQqcTzj",
-			    "status": "DONE",
-			    "lastTransactionKey": "Wgz12DHTz2PaVxm5LUO6i",
-			    "method": "카드",
-			    "orderId": "chdimFOf9tnXV5u8Xqtlo",
-			    "orderName": "토스 티셔츠 외 2건",
-			    "requestedAt": "2022-06-08T15:40:09+09:00",
-			    "approvedAt": "2022-06-08T15:40:49+09:00",
-			    "useEscrow": false,
-			    "cultureExpense": false,
-			    "card": {
-			        "issuerCode": "61",
-			        "acquirerCode": "31",
-			        "number": "12345678****789*",
-			        "installmentPlanMonths": 0,
-			        "isInterestFree": false,
-			        "interestPayer": null,
-			        "approveNo": "00000000",
-			        "useCardPoint": false,
-			        "cardType": "신용",
-			        "ownerType": "개인",
-			        "acquireStatus": "READY",
-			        "amount": 15000
-			    },
-			    "virtualAccount": null,
-			    "transfer": null,
-			    "mobilePhone": null,
-			    "giftCertificate": null,
-			    "cashReceipt": null,
-			    "cashReceipts": null,
-			    "discount": null,
-			    "cancels": null,
-			    "secret": null,
-			    "type": "NORMAL",
-			    "easyPay": null,
-			    "country": "KR",
-			    "failure": null,
-			    "isPartialCancelable": true,
-			    "receipt": {
-			        "url": "https://dashboard.tosspayments.com/sales-slip?transactionId=KAgfjGxIqVVXDxOiSW1wUnRWBS1dszn3DKcuhpm7mQlKP0iOdgPCKmwEdYglIHX&ref=PX"
-			    },
-			    "checkout": {
-			        "url": "https://api.tosspayments.com/v1/payments/B1d9edx08u7ic9yQqcTzj/checkout"
-			    },
-			    "currency": "KRW",
-			    "totalAmount": 15000,
-			    "balanceAmount": 15000,
-			    "suppliedAmount": 13636,
-			    "vat": 1364,
-			    "taxFreeAmount": 0
-			}
-			""";
-
-		try {
-			return objectMapper.readTree(sampleResponse);
-		} catch (Exception ex) {
-			throw new RuntimeException("샘플 데이터를 로드하는 중 오류 발생", ex);
-		}
-	}
 }

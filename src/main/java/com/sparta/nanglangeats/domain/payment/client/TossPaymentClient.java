@@ -12,7 +12,7 @@ import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.databind.JsonNode;
 
 @Component
-public class TossPaymentClient {
+public class TossPaymentClient implements TossPayment {
 
 	private static final String TOSS_BASE_URL = "https://api.tosspayments.com/v1";
 	private static final String TOSS_SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
