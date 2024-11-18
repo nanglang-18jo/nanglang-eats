@@ -2,6 +2,10 @@ package com.sparta.nanglangeats.domain.product.service;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +34,7 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 public class ProductService {
 
+	private static final int PAGE_SIZE = 10;
 	private final StoreRepository storeRepository;
 	private final ProductRepository productRepository;
 	private final ImageService imageService;
@@ -120,6 +125,15 @@ public class ProductService {
 		product.toggleVisibility();
 
 		return ProductResponse.builder().productUuid(product.getUuid()).build();
+	}
+
+	public Page<ProductListResponse> searchProduct(String keyword, int page){
+		Sort sort = Sort.by(Sort.Direction.ASC, "name");
+		Pageable pageable = PageRequest.of(page, PAGE_SIZE, sort);
+
+		Page<Product> products = productRepository.searchProductByKeyword(keyword, pageable);
+
+		return products.map(product -> ProductListResponse.builder().product(product).build());
 	}
 
 	/* UTIL */

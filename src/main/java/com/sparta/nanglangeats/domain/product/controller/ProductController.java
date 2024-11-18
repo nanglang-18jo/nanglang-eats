@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sparta.nanglangeats.domain.product.controller.dto.request.ProductRequest;
@@ -75,5 +76,12 @@ public class ProductController {
 		@PathVariable String productUuid,
 		@AuthenticationPrincipal User user){
 		return getOkResponseEntity(productService.updateProductVisibility(productUuid, user), "상품 공개/비공개 전환 완료");
+	}
+
+	@GetMapping("/products/search")
+	public ResponseEntity<CommonResponse<?>> searchProduct(
+		@RequestParam String keyword,
+		@RequestParam(defaultValue = "0") int page){
+		return getOkResponseEntity(productService.searchProduct(keyword, page), "상품 검색 완료");
 	}
 }
