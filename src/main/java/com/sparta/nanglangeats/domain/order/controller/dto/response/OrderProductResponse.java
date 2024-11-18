@@ -9,12 +9,14 @@ import lombok.Getter;
 @AllArgsConstructor
 public class OrderProductResponse {
 	private Long orderProductId;
+	private String name;
 	private Integer quantity;
 	private Long price;
 	private String productId;
 
 	public OrderProductResponse(OrderProduct orderProduct) {
 		this.orderProductId = orderProduct.getOrderProductId();
+		this.name = orderProduct.getName();
 		this.quantity = orderProduct.getQuantity();
 		this.price = orderProduct.getPrice();
 		this.productId = orderProduct.getProductId();

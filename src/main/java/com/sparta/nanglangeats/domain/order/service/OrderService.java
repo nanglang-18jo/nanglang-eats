@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,7 +27,7 @@ import com.sparta.nanglangeats.domain.order.enums.OrderStatus;
 import com.sparta.nanglangeats.domain.order.enums.OrderType;
 import com.sparta.nanglangeats.domain.order.repository.OrderProductRepository;
 import com.sparta.nanglangeats.domain.order.repository.OrderRepository;
-import com.sparta.nanglangeats.domain.store.service.StoreService;
+import com.sparta.nanglangeats.domain.store.repository.StoreRepository;
 import com.sparta.nanglangeats.domain.user.entity.User;
 import com.sparta.nanglangeats.global.common.exception.CustomException;
 import com.sparta.nanglangeats.global.common.exception.CustomFieldError;
@@ -45,7 +46,7 @@ public class OrderService {
 
 	private final OrderRepository orderRepository;
 	private final OrderProductRepository orderProductRepository;
-	private final StoreService storeService;
+	private final StoreRepository storeRepository;
 
 	// 주문 등록
 	@Transactional
@@ -216,6 +217,7 @@ public class OrderService {
 		Order order = orderRepository.findById(orderId)
 			.orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
 
+		// 권한 검증
 		switch (user.getRole()) {
 			case CUSTOMER:
 				if (!order.getUserId().equals(user.getId())) {
@@ -231,12 +233,18 @@ public class OrderService {
 				throw new CustomException(ErrorCode.ACCESS_DENIED);
 		}
 
-		return new OrderDetailResponse(order);
+		// 가게 이름 조회
+		String storeName = Optional.ofNullable(storeRepository.findNameById(Long.valueOf(order.getStoreId())))
+			.orElseThrow(() -> new CustomException(ErrorCode.STORE_NAME_NOT_FOUND));
+
+		// OrderDetailResponse에 가게 이름과 주문 상품 추가
+		return new OrderDetailResponse(order, storeName);
 	}
 
 	// 주문 목록 조회
 	@Transactional(readOnly = true)
-	public Object getOrderList(User user, int page, int size, String sortBy, String status, String search,
+	public Page<OrderSummaryResponse> getOrderList(User user, int page, int size, String sortBy, String status,
+		String search,
 		LocalDate startDate, LocalDate endDate) {
 		if (size != 10 && size != 30 && size != 50) {
 			size = 10; // 허용되지 않은 size 값은 기본값으로 설정
@@ -251,9 +259,8 @@ public class OrderService {
 				spec = spec.and((root, query, cb) -> cb.equal(root.get("userId"), user.getId()));
 				break;
 			case OWNER: // 자신의 가게 주문만 조회
-				// TODO: storeService.getStoreIdsByOwnerId(user.getId()) 구현 필요
-				//List<String> storeIds = storeService.getStoreIdsByOwnerId(user.getId());
-				//spec = spec.and((root, query, cb) -> root.get("storeId").in(storeIds));
+				List<Long> storeIds = storeRepository.findIdsByOwner(user);
+				spec = spec.and((root, query, cb) -> root.get("storeId").in(storeIds));
 				break;
 			case MANAGER:
 				break; // MANAGER는 모든 주문 조회 가능
@@ -281,11 +288,15 @@ public class OrderService {
 
 		// 페이징 처리된 결과 조회
 		Page<Order> orders = orderRepository.findAll(spec, pageable);
-		return orders.map(OrderSummaryResponse::new);
+		return orders.map(order -> {
+			// 가게 이름 조회
+			String storeName = Optional.ofNullable(storeRepository.findNameById(Long.valueOf(order.getStoreId())))
+				.orElseThrow(() -> new CustomException(ErrorCode.STORE_NAME_NOT_FOUND));
+			return new OrderSummaryResponse(order, storeName);
+		});
 	}
 
 	// 주문 상품 검증
-
 	private <T extends ProductRequestDto> void validateOrderProducts(List<T> products) {
 		List<CustomFieldError> customFieldErrors = new ArrayList<>();
 		for (T product : products) {
@@ -303,25 +314,20 @@ public class OrderService {
 			throw new ParameterException(ErrorCode.COMMON_INVALID_PARAMETER, customFieldErrors);
 		}
 	}
-	// 요청 사용자가 해당 가게의 주인인지 확인
 
+	// 요청 사용자가 해당 가게의 주인인지 확인
 	public void validateStoreOwner(String storeId, Long userId) {
 		// 가게 주인의 ID를 가져오고, 없거나 잘못된 경우 예외 처리
-		// TODO: storeService.getStoreOwnerIdByStoreId(request.getStoreId()) 구현 필요
-		/*
-		String storeOwnerId = Optional.ofNullable(storeService.getStoreOwnerIdByStoreId(request.getStoreId()))
-			.filter(id -> id instanceof String)
-			.map(String.class::cast)
+		User owner = Optional.ofNullable(storeRepository.findOwnerById(Long.valueOf(storeId)))
 			.orElseThrow(() -> new CustomException(ErrorCode.STORE_OWNER_NOT_FOUND));
 
 		// 요청 사용자가 가게 주인이 아닌 경우 예외 처리
-		if (!storeOwnerId.equals(user.getId())) {
+		if (!owner.getId().equals(userId)) {
 			throw new CustomException(ErrorCode.ORDER_UPDATE_FORBIDDEN);
 		}
-		*/
 	}
-	// 해당 가게의 오늘 주문 수 조회
 
+	// 해당 가게의 오늘 주문 수 조회
 	public int getTodayOrderCountByStore(String storeId) {
 		LocalDateTime startOfDay = LocalDate.now().atStartOfDay(); // 오늘 시작 시간
 		LocalDateTime endOfDay = startOfDay.plusDays(1).minusSeconds(1); // 오늘 종료 시간
