@@ -20,7 +20,28 @@
 | [신진우](https://github.com/sjw0851)                                                                                                                            | [김해나](https://github.com/gogohaena)                                                                                                    | [안주환](https://github.com/Hut234)                                                                       | [이민정](https://github.com/M1ngD0ng)                                                                       
 |------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|
 | |
-| • AI 메뉴 설명 생성 <br>• ERD 설계<br>• <br>•   | • ERD 설계<br>• <br>• <br> •   | • ERD 설계<br>• <br>• <br>•                                             |• ERD 설계<br>• <br>• <br>•                                                                                                         |• ERD 설계<br>• <br>• <br>• 
+| • ERD 설계 <br>• AI 메뉴 설명 생성<br>• <br>•   | • ERD 설계<br>• <br>• <br> •   | • ERD 설계<br>• <br>• <br>•                                             |• ERD 설계<br>• <br>• <br>•                                                                                                         |• ERD 설계<br>• <br>• <br>• 
+
+### 개발 기술과 환경
+
+![AMAZONAWS](https://img.shields.io/badge/amazonaws-232F3E?style=for-the-badge&logo=amazonaws&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
+
+
+![JAVA](https://img.shields.io/badge/java-007396?style=for-the-badge&logo=java&logoColor=white)
+![SpringBoot](https://img.shields.io/badge/springboot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)
+![SpringSecurity](https://img.shields.io/badge/springsecurity-6DB33F?style=for-the-badge&logo=springsecurity&logoColor=white)
+![GoogleGemini](https://img.shields.io/badge/googlegemini-8E75B2?style=for-the-badge&logo=googlegemini&logoColor=white)
+
+
+![Github](https://img.shields.io/badge/github-181717?style=for-the-badge&logo=github&logoColor=white)
+![Notion](https://img.shields.io/badge/Notion-000000?style=for-the-badge&logo=Notion&logoColor=white)
+![Slack](https://img.shields.io/badge/Slack-4A154B?style=for-the-badge&logo=Slack&logoColor=white)
+
+
+### 개발 일정
+
+2024년 11월 06일 ~ 2024년 11월 18일
 
 ## Dependency
 
