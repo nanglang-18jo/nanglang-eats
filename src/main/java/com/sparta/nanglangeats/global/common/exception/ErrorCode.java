@@ -33,6 +33,7 @@ public enum ErrorCode {
     // Order
 
     // Review
+    REVIEW_NOT_FOUND(NOT_FOUND, "해당 리뷰를 찾을 수 없습니다."),
 
     // Address
     ADDRESS_NOT_FOUND(NOT_FOUND, "해당 주소를 찾을 수 없습니다."),
