@@ -91,8 +91,8 @@ public class JwtTokenProvider {
 		response.addCookie(cookie);
 	}
 
-	public String getRefreshToken(HttpServletRequest req) {
-		Cookie[] cookies = req.getCookies();
+	public String getRefreshToken(HttpServletRequest request) {
+		Cookie[] cookies = request.getCookies();
 		if (cookies != null) {
 			for (Cookie cookie : cookies) {
 				if (cookie.getName().equals(REFRESH_TOKEN_COOKIE)) {
