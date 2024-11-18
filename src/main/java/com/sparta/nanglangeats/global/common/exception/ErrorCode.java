@@ -42,6 +42,7 @@ public enum ErrorCode {
     ORDER_PRODUCT_ID_INVALID(BAD_REQUEST, "상품 아이디가 유효하지 않습니다."),
     ORDER_STORE_ID_INVALID(BAD_REQUEST, "가게 아이디가 유효하지 않습니다."),
     STORE_OWNER_NOT_FOUND(BAD_REQUEST, "가게 주인을 찾을 수 없거나 잘못된 유형입니다."),
+    STORE_NAME_NOT_FOUND(NOT_FOUND, "가게 이름을 찾을 수 없습니다."),
     ORDER_NOT_FOUND(NOT_FOUND, "주문 정보를 찾을 수 없습니다."),
     ORDER_UPDATE_FORBIDDEN(FORBIDDEN, "해당 주문을 수정할 권한이 없습니다."),
     ORDER_CANCEL_TIME_EXCEEDED(CONFLICT, "주문 취소는 5분 이내에만 가능합니다."),

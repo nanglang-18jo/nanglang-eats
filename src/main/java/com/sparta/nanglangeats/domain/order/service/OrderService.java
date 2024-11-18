@@ -4,7 +4,13 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,6 +18,8 @@ import com.sparta.nanglangeats.domain.order.controller.dto.request.OrderCreateRe
 import com.sparta.nanglangeats.domain.order.controller.dto.request.OrderUpdateRequest;
 import com.sparta.nanglangeats.domain.order.controller.dto.request.ProductRequestDto;
 import com.sparta.nanglangeats.domain.order.controller.dto.response.OrderCreateResponse;
+import com.sparta.nanglangeats.domain.order.controller.dto.response.OrderDetailResponse;
+import com.sparta.nanglangeats.domain.order.controller.dto.response.OrderSummaryResponse;
 import com.sparta.nanglangeats.domain.order.controller.dto.response.OrderUpdateResponse;
 import com.sparta.nanglangeats.domain.order.entity.Order;
 import com.sparta.nanglangeats.domain.order.entity.OrderProduct;
@@ -19,13 +27,15 @@ import com.sparta.nanglangeats.domain.order.enums.OrderStatus;
 import com.sparta.nanglangeats.domain.order.enums.OrderType;
 import com.sparta.nanglangeats.domain.order.repository.OrderProductRepository;
 import com.sparta.nanglangeats.domain.order.repository.OrderRepository;
-import com.sparta.nanglangeats.domain.store.service.StoreService;
+import com.sparta.nanglangeats.domain.store.repository.StoreRepository;
 import com.sparta.nanglangeats.domain.user.entity.User;
 import com.sparta.nanglangeats.global.common.exception.CustomException;
 import com.sparta.nanglangeats.global.common.exception.CustomFieldError;
 import com.sparta.nanglangeats.global.common.exception.ErrorCode;
 import com.sparta.nanglangeats.global.common.exception.ParameterException;
 
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -36,7 +46,7 @@ public class OrderService {
 
 	private final OrderRepository orderRepository;
 	private final OrderProductRepository orderProductRepository;
-	private final StoreService storeService;
+	private final StoreRepository storeRepository;
 
 	// 주문 등록
 	@Transactional
@@ -72,7 +82,9 @@ public class OrderService {
 			OrderProduct orderProduct = OrderProduct.builder()
 				.order(order)
 				.productId(productDto.getProductId())
+				.name(productDto.getName())
 				.quantity(productDto.getQuantity())
+				.price(productDto.getPrice())
 				.build();
 			orderProductRepository.save(orderProduct);
 		});
@@ -109,6 +121,7 @@ public class OrderService {
 			OrderProduct orderProduct = OrderProduct.builder()
 				.order(order)
 				.productId(productDto.getProductId())
+				.name(productDto.getName())
 				.quantity(productDto.getQuantity())
 				.build();
 			orderProductRepository.save(orderProduct);
@@ -197,6 +210,92 @@ public class OrderService {
 		orderRepository.save(order); // 상태 저장
 	}
 
+	// 주문 상세 조회
+	@Transactional(readOnly = true)
+	public OrderDetailResponse getOrderDetail(Long orderId, User user) {
+		// 주문 조회
+		Order order = orderRepository.findById(orderId)
+			.orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
+
+		// 권한 검증
+		switch (user.getRole()) {
+			case CUSTOMER:
+				if (!order.getUserId().equals(user.getId())) {
+					throw new CustomException(ErrorCode.ACCESS_DENIED);
+				}
+				break;
+			case OWNER:
+				validateStoreOwner(order.getStoreId(), user.getId());
+				break;
+			case MANAGER:
+				break; // MANAGER는 모든 주문 조회 가능
+			default:
+				throw new CustomException(ErrorCode.ACCESS_DENIED);
+		}
+
+		// 가게 이름 조회
+		String storeName = Optional.ofNullable(storeRepository.findNameById(Long.valueOf(order.getStoreId())))
+			.orElseThrow(() -> new CustomException(ErrorCode.STORE_NAME_NOT_FOUND));
+
+		// OrderDetailResponse에 가게 이름과 주문 상품 추가
+		return new OrderDetailResponse(order, storeName);
+	}
+
+	// 주문 목록 조회
+	@Transactional(readOnly = true)
+	public Page<OrderSummaryResponse> getOrderList(User user, int page, int size, String sortBy, String status,
+		String search,
+		LocalDate startDate, LocalDate endDate) {
+		if (size != 10 && size != 30 && size != 50) {
+			size = 10; // 허용되지 않은 size 값은 기본값으로 설정
+		}
+
+		Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy).descending());
+		Specification<Order> spec = Specification.where(null); // 동적 쿼리
+
+		// 사용자 역할에 따른 필터링
+		switch (user.getRole()) {
+			case CUSTOMER: // 자신이 등록한 주문만 조회
+				spec = spec.and((root, query, cb) -> cb.equal(root.get("userId"), user.getId()));
+				break;
+			case OWNER: // 자신의 가게 주문만 조회
+				List<Long> storeIds = storeRepository.findIdsByOwner(user);
+				spec = spec.and((root, query, cb) -> root.get("storeId").in(storeIds));
+				break;
+			case MANAGER:
+				break; // MANAGER는 모든 주문 조회 가능
+			default:
+				throw new CustomException(ErrorCode.ACCESS_DENIED);
+		}
+
+		// 상태 필터링
+		if (status != null) {
+			spec = spec.and((root, query, cb) -> cb.equal(root.get("status"), OrderStatus.valueOf(status)));
+		}
+
+		// 날짜 조건 추가
+		if (startDate != null && endDate != null) {
+			spec = spec.and((root, query, cb) -> cb.between(root.get("createdAt"), startDate, endDate));
+		}
+
+		// 주문 상품명 검색
+		if (search != null && !search.isEmpty()) {
+			spec = spec.and((root, query, cb) -> {
+				Join<Order, OrderProduct> productsJoin = root.join("orderProducts", JoinType.LEFT);
+				return cb.like(productsJoin.get("name"), "%" + search + "%");
+			});
+		}
+
+		// 페이징 처리된 결과 조회
+		Page<Order> orders = orderRepository.findAll(spec, pageable);
+		return orders.map(order -> {
+			// 가게 이름 조회
+			String storeName = Optional.ofNullable(storeRepository.findNameById(Long.valueOf(order.getStoreId())))
+				.orElseThrow(() -> new CustomException(ErrorCode.STORE_NAME_NOT_FOUND));
+			return new OrderSummaryResponse(order, storeName);
+		});
+	}
+
 	// 주문 상품 검증
 	private <T extends ProductRequestDto> void validateOrderProducts(List<T> products) {
 		List<CustomFieldError> customFieldErrors = new ArrayList<>();
@@ -219,18 +318,13 @@ public class OrderService {
 	// 요청 사용자가 해당 가게의 주인인지 확인
 	public void validateStoreOwner(String storeId, Long userId) {
 		// 가게 주인의 ID를 가져오고, 없거나 잘못된 경우 예외 처리
-		// TODO: StoreService에 getStoreOwnerId() 구현 필요
-		/*
-		String storeOwnerId = Optional.ofNullable(storeService.getStoreOwnerId(request.getStoreId()))
-			.filter(id -> id instanceof String)
-			.map(String.class::cast)
+		User owner = Optional.ofNullable(storeRepository.findOwnerById(Long.valueOf(storeId)))
 			.orElseThrow(() -> new CustomException(ErrorCode.STORE_OWNER_NOT_FOUND));
 
 		// 요청 사용자가 가게 주인이 아닌 경우 예외 처리
-		if (!storeOwnerId.equals(user.getId())) {
+		if (!owner.getId().equals(userId)) {
 			throw new CustomException(ErrorCode.ORDER_UPDATE_FORBIDDEN);
 		}
-		*/
 	}
 
 	// 해당 가게의 오늘 주문 수 조회
