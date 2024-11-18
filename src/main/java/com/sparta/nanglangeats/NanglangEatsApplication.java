@@ -8,6 +8,8 @@ public class NanglangEatsApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(NanglangEatsApplication.class, args);
+        System.out.println("Environment Variable: " + System.getenv("AWS_ACCESS_KEY"));
     }
+
 
 }

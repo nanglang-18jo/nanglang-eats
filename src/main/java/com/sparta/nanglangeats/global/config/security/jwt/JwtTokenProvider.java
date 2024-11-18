@@ -31,7 +31,7 @@ public class JwtTokenProvider {
 	private static final String AUTHORIZATION_TYPE = "Bearer ";
 	private static final String AUTHORITIES_KEY = "authorities";
 
-	@Value("${jwt.secret.key}")
+	@Value("${jwt.secret.key:7Iqk7YyM66W07YOA7L2U65Sp7YG065+9U3ByaW5n6rCV7J2Y7Yqc7YSw7LWc7JuQ67mI7J6F64uI64ukLg==}")
 	private String secret;
 	private Key key;
 

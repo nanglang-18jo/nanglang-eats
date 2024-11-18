@@ -27,7 +27,7 @@ import lombok.extern.log4j.Log4j2;
 @Service
 public class GeocodingService {
 
-	@Value("${GOOGLE_GEOCODING_API_KEY}")
+	@Value("${GOOGLE_GEOCODING_API_KEY:AIzaSyCJjy-QhuCK-9dXek11p7fWgVbFguqB6m8}")
 	private String apiKey;
 
 	public CommonAddress getCoordinates(String address) {
