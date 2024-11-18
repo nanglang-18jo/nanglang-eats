@@ -16,7 +16,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.sparta.nanglangeats.domain.refresh_token.repository.RefreshTokenRepository;
+import com.sparta.nanglangeats.domain.auth.repository.RefreshTokenRepository;
 import com.sparta.nanglangeats.domain.user.service.UserService;
 import com.sparta.nanglangeats.global.config.security.entrypoint.CustomAuthenticationEntryPoint;
 import com.sparta.nanglangeats.global.config.security.filter.CustomAuthenticationFilter;
