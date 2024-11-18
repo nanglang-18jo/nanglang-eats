@@ -1,4 +1,4 @@
-package com.sparta.nanglangeats.domain.delivery_address.controller.dto.request;
+package com.sparta.nanglangeats.domain.user.controller.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
