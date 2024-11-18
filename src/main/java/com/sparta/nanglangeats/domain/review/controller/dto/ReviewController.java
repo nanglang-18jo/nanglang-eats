@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -50,6 +51,15 @@ public class ReviewController {
 		return getOkResponseEntity(reviewService.updateReview(reviewUuid, request, user), "리뷰 수정 완료");
 	}
 
+	// 리뷰 삭제
+	@DeleteMapping("/{reviewUuid}")
+	@PreAuthorize("hasAnyRole('CUSTOMER','MASTER','MANAGER')")
+	public ResponseEntity<CommonResponse<?>> deleteReview(
+		@PathVariable String reviewUuid,
+		@AuthenticationPrincipal User user) {
+		reviewService.deleteReview(reviewUuid, user);
+		return getResponseEntity(HttpStatus.NO_CONTENT, null, "리뷰 삭제 완료");
+	}
 	//
 	// // 내 리뷰 목록 조회
 	// @GetMapping("/me")
@@ -73,15 +83,7 @@ public class ReviewController {
 	// }
 	//
 	
-	// // 리뷰 삭제
-	// @DeleteMapping("/{reviewId}")
-	// @PreAuthorize("hasAnyRole('CUSTOMER','MASTER')")
-	// public ResponseEntity<String> deleteReview(@PathVariable UUID reviewId, @AuthenticationPrincipal User user) {
-	// 	// 인증된 사용자 확인
-	// 	if (user == null) {
-	// 		return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized: User not logged in");
-	// 	}
-	//
+
 	// 	// 삭제 요청 처리
 	// 	String deletedBy = user.getUser(); // 삭제한 사용자 정보
 	// 	reviewService.deleteReview(reviewId, deletedBy);

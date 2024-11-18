@@ -127,15 +127,24 @@ public class Store extends Timestamped {
 		else {
 			this.rating = (this.rating * this.reviewCount + rating) / (this.reviewCount + 1);
 		}
-		increaseReviewCount();
+		this.increaseReviewCount();
 	}
 
-	public void calculateEditRating(int rating) {
-		this.rating = (this.rating * this.reviewCount - this.rating + rating) / this.reviewCount;
+	public void calculateUpdateRating(int lastRating, int rating) {
+		this.rating = (this.rating * this.reviewCount - lastRating + rating) / this.reviewCount;
+	}
+
+	public void calculateDeleteRating(int lastRating) {
+		this.rating = (this.rating * this.reviewCount - lastRating) / (this.reviewCount - 1);
+		this.decreaseReviewCount();
 	}
 
 	private void increaseReviewCount() {
 		this.reviewCount++;
+	}
+
+	private void decreaseReviewCount() {
+		this.reviewCount--;
 	}
 
 }
