@@ -1,4 +1,4 @@
-package com.sparta.nanglangeats.domain.refresh_token.service;
+package com.sparta.nanglangeats.domain.auth.service;
 
 import static com.sparta.nanglangeats.global.common.exception.ErrorCode.*;
 import static com.sparta.nanglangeats.global.config.security.jwt.JwtTokenProvider.*;
@@ -6,8 +6,8 @@ import static com.sparta.nanglangeats.global.config.security.jwt.JwtTokenProvide
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.sparta.nanglangeats.domain.refresh_token.entity.RefreshToken;
-import com.sparta.nanglangeats.domain.refresh_token.repository.RefreshTokenRepository;
+import com.sparta.nanglangeats.domain.auth.entity.RefreshToken;
+import com.sparta.nanglangeats.domain.auth.repository.RefreshTokenRepository;
 import com.sparta.nanglangeats.global.common.exception.CustomException;
 import com.sparta.nanglangeats.global.config.security.jwt.JwtTokenProvider;
 

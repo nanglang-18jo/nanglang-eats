@@ -1,4 +1,4 @@
-package com.sparta.nanglangeats.domain.refresh_token.entity;
+package com.sparta.nanglangeats.domain.auth.entity;
 
 import com.sparta.nanglangeats.domain.user.enums.UserRole;
 

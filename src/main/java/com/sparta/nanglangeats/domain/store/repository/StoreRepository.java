@@ -12,7 +12,7 @@ import org.springframework.data.repository.query.Param;
 import com.sparta.nanglangeats.domain.store.entity.Store;
 import com.sparta.nanglangeats.domain.user.entity.User;
 
-public interface StoreRepository extends JpaRepository<Store, Long> {
+public interface StoreRepository extends JpaRepository<Store, Long>, StoreRepositoryCustom {
 	Optional<Store> findByUuid(String uuid);
 
 	Page<Store> findAllByCategoryId(Long categoryId, Pageable pageable);
