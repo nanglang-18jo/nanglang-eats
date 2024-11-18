@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.sparta.nanglangeats.domain.refresh_token.service.RefreshTokenService;
+import com.sparta.nanglangeats.domain.auth.service.RefreshTokenService;
 import com.sparta.nanglangeats.global.common.dto.CommonResponse;
 
 import jakarta.servlet.http.HttpServletRequest;

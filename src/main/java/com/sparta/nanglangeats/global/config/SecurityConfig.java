@@ -16,7 +16,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.sparta.nanglangeats.domain.refresh_token.repository.RefreshTokenRepository;
+import com.sparta.nanglangeats.domain.auth.repository.RefreshTokenRepository;
 import com.sparta.nanglangeats.domain.user.service.UserService;
 import com.sparta.nanglangeats.global.config.security.entrypoint.CustomAuthenticationEntryPoint;
 import com.sparta.nanglangeats.global.config.security.filter.CustomAuthenticationFilter;
@@ -49,9 +49,10 @@ public class SecurityConfig {
 			.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
 			.authorizeHttpRequests(requests -> requests
+				.requestMatchers(GET, "/api/users/me").authenticated()
+				.requestMatchers(GET, "/api/users/delivery-address/**").authenticated()
 				.requestMatchers("/api/auth/**").permitAll()
 				.requestMatchers("/api/users/signup").permitAll()
-				.requestMatchers(GET, "/api/users/me").authenticated()
 				.requestMatchers(GET, "/api/users/**").permitAll()
 				.anyRequest().authenticated())
 
