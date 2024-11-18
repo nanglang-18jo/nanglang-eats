@@ -1,12 +1,8 @@
 package com.sparta.nanglangeats.domain.store.service;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -15,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.sparta.nanglangeats.domain.address.entity.CommonAddress;
 import com.sparta.nanglangeats.domain.address.service.CommonAddressService;
-import com.sparta.nanglangeats.domain.image.entity.Image;
 import com.sparta.nanglangeats.domain.image.enums.ImageCategory;
 import com.sparta.nanglangeats.domain.image.repository.ImageRepository;
 import com.sparta.nanglangeats.domain.image.service.ImageService;

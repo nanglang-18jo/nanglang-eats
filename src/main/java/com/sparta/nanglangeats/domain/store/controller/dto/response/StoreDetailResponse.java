@@ -1,9 +1,7 @@
 package com.sparta.nanglangeats.domain.store.controller.dto.response;
 
-import java.time.LocalTime;
 import java.util.List;
 
-import com.sparta.nanglangeats.domain.store.entity.Category;
 import com.sparta.nanglangeats.domain.store.entity.Store;
 
 import lombok.Builder;

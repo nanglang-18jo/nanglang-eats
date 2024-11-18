@@ -1,19 +1,15 @@
 package com.sparta.nanglangeats.domain.product.service;
 
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
-import com.sparta.nanglangeats.domain.image.entity.Image;
 import com.sparta.nanglangeats.domain.image.enums.ImageCategory;
 import com.sparta.nanglangeats.domain.image.repository.ImageRepository;
 import com.sparta.nanglangeats.domain.image.service.ImageService;
-import com.sparta.nanglangeats.domain.image.service.dto.ImageResponse;
 import com.sparta.nanglangeats.domain.image.util.S3Util;
+import com.sparta.nanglangeats.domain.image.service.dto.ImageResponse;
 import com.sparta.nanglangeats.domain.product.controller.dto.request.ProductRequest;
 import com.sparta.nanglangeats.domain.product.controller.dto.response.ProductDetailResponse;
 import com.sparta.nanglangeats.domain.product.controller.dto.response.ProductListResponse;

@@ -31,6 +31,17 @@ public enum ErrorCode {
     USER_NOT_FOUND(NOT_FOUND, "유저를 찾을 수 없습니다."),
 
     // Order
+    ORDER_PRODUCT_QUANTITY_INVALID(BAD_REQUEST, "상품 수량은 0보다 커야 합니다."),
+    ORDER_PRODUCT_ID_INVALID(BAD_REQUEST, "상품 아이디가 유효하지 않습니다."),
+    ORDER_STORE_ID_INVALID(BAD_REQUEST, "가게 아이디가 유효하지 않습니다."),
+    STORE_OWNER_NOT_FOUND(BAD_REQUEST, "가게 주인을 찾을 수 없거나 잘못된 유형입니다."),
+    ORDER_NOT_FOUND(NOT_FOUND, "주문 정보를 찾을 수 없습니다."),
+    ORDER_UPDATE_FORBIDDEN(FORBIDDEN, "해당 주문을 수정할 권한이 없습니다."),
+    ORDER_CANCEL_TIME_EXCEEDED(CONFLICT, "주문 취소는 5분 이내에만 가능합니다."),
+    ORDER_STATUS_CHANGE_INVALID(CONFLICT, "주문 상태를 변경할 수 없습니다."),
+    ORDER_NOT_CANCELABLE(CONFLICT, "취소 가능한 주문 상태가 아닙니다."),
+    ORDER_NOT_DELETABLE(CONFLICT, "삭제는 취소된(CANCELED) 주문만 가능합니다."),
+
 
     // Review
 

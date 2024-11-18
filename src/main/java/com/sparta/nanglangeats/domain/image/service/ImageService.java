@@ -38,6 +38,12 @@ public class ImageService {
 	}
 
 	@Transactional
+	public ImageResponse changeImage(String fileName, String dirName, MultipartFile image) {
+		s3Util.deleteFile(fileName);
+		return uploadImage(image, dirName);
+	}
+
+	@Transactional
 	public void hardDeleteAllImages(ImageCategory category, Long contentId) {
 		List<Image> images = imageRepository.findAllByImageCategoryAndContentId(category, contentId);
 		imageRepository.deleteAll(images);
