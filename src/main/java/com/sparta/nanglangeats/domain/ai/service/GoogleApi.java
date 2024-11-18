@@ -2,6 +2,7 @@ package com.sparta.nanglangeats.domain.ai.service;
 
 import java.net.URI;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,9 @@ public class GoogleApi {
 
 	private RestTemplate restTemplate;
 
+	@Value("${google.ai.api-key}")
+	private String apiKey;
+
 	public GoogleApi(RestTemplateBuilder builder) {
 		this.restTemplate = builder.build();
 	}
@@ -25,7 +29,7 @@ public class GoogleApi {
 	public String generateText(String prompt) {
 		URI uri = UriComponentsBuilder.fromUriString("https://generativelanguage.googleapis.com")
 			.path("/v1beta/models/gemini-1.5-flash:generateContent")
-			.queryParam("key", "AIzaSyAgCQRDYoNKiwTNMrSNq1ylxqYnS9rujmo").encode().build().toUri();
+			.queryParam("key", apiKey).encode().build().toUri();
 
 		String test1 = String.format("{\"contents\" : [{\"parts\" : [{\"text\" : \"%s\"}]}]}",prompt);
 
