@@ -50,6 +50,8 @@ public enum ErrorCode {
     ORDER_NOT_CANCELABLE(CONFLICT, "취소 가능한 주문 상태가 아닙니다."),
     ORDER_NOT_DELETABLE(CONFLICT, "삭제는 취소된(CANCELED) 주문만 가능합니다."),
 
+    // Payment
+    PAYMENT_NOT_FOUND(NOT_FOUND, "결제 정보를 찾을 수 없습니다."),
 
     // Review
     REVIEW_NOT_FOUND(NOT_FOUND, "해당 리뷰를 찾을 수 없습니다."),

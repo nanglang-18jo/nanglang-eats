@@ -13,6 +13,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public class OrderDetailResponse {
 	private Long orderId;
+	private String orderUuid;
 	private String storeId;
 	private Long userId;
 	private String status;
@@ -22,6 +23,7 @@ public class OrderDetailResponse {
 
 	public OrderDetailResponse(Order order, String storeName) {
 		this.orderId = order.getOrderId();
+		this.orderUuid = order.getOrderUuid();
 		this.storeId = order.getStoreId();
 		this.userId = order.getUserId();
 		this.status = order.getStatus().name();

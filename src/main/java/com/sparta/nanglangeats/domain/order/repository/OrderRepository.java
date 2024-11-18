@@ -13,5 +13,6 @@ import com.sparta.nanglangeats.domain.order.entity.Order;
 public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecificationExecutor<Order> {
 	// 오늘 주문 수 조회
 	int countByStoreIdAndCreatedAtBetween(String storeId, LocalDateTime startOfDay, LocalDateTime endOfDay);
-	Optional<Order> findByOrderUuid(String orderUuid);
+
+	Optional<Order> findByOrderUuid(@NotNull(message = "주문 ID는 필수 값입니다.") String orderUuId);
 }

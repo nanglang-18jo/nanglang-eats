@@ -13,6 +13,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public class OrderSummaryResponse {
 	private Long orderId;
+	private String orderUuid;
 	private String status;
 	private LocalDateTime createdAt;
 	private Long totalPrice;
@@ -21,6 +22,7 @@ public class OrderSummaryResponse {
 
 	public OrderSummaryResponse(Order order, String storeName) {
 		this.orderId = order.getOrderId();
+		this.orderUuid = order.getOrderUuid();
 		this.status = order.getStatus().name();
 		this.createdAt = order.getCreatedAt();
 		this.totalPrice = order.getTotalPrice();
