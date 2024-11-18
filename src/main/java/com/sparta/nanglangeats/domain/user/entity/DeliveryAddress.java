@@ -1,8 +1,7 @@
-package com.sparta.nanglangeats.domain.delivery_address.entity;
+package com.sparta.nanglangeats.domain.user.entity;
 
 import com.sparta.nanglangeats.domain.address.entity.CommonAddress;
-import com.sparta.nanglangeats.domain.delivery_address.controller.dto.request.DeliveryAddressUpdateRequest;
-import com.sparta.nanglangeats.domain.user.entity.User;
+import com.sparta.nanglangeats.domain.user.controller.dto.request.DeliveryAddressUpdateRequest;
 import com.sparta.nanglangeats.global.common.entity.Timestamped;
 
 import jakarta.persistence.CascadeType;

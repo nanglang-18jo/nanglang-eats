@@ -99,7 +99,8 @@ public class StoreService {
 		store.update(request, category, commonAddress, thumbnailResponse);
 
 		imageService.hardDeleteAllImages(ImageCategory.STORE_IMAGE, store.getId());
-		imageService.uploadAllImages(request.getImages(), ImageCategory.STORE_IMAGE, store.getId());
+		if (request.getImages() != null)
+			imageService.uploadAllImages(request.getImages(), ImageCategory.STORE_IMAGE, store.getId());
 
 		return StoreResponse.builder().storeUuid(store.getUuid()).build();
 	}
@@ -133,7 +134,7 @@ public class StoreService {
 		return stores.map(store -> StoreListResponse.builder().store(store).build());
 	}
 
-	public Page<StoreListResponse> searchStore(String keyword, int page){
+	public Page<StoreListResponse> searchStore(String keyword, int page) {
 		Sort sort = Sort.by(Sort.Direction.ASC, "name");
 		Pageable pageable = PageRequest.of(page, PAGE_SIZE, sort);
 

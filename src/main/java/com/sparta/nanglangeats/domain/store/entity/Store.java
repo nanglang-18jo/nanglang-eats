@@ -82,7 +82,8 @@ public class Store extends Timestamped {
 
 	@Builder
 	public Store(Category category, User owner, String name, LocalTime openTime, LocalTime closeTime,
-		CommonAddress commonAddress, String addressDetail, String phoneNumber, String thumbnailUrl, String thumbnailName) {
+		CommonAddress commonAddress, String addressDetail, String phoneNumber, String thumbnailUrl,
+		String thumbnailName) {
 		this.uuid = UUID.randomUUID().toString(); // uuid 자동 생성
 		this.category = category;
 		this.owner = owner;
@@ -99,7 +100,8 @@ public class Store extends Timestamped {
 		this.thumbnailName = thumbnailName;
 	}
 
-	public void update(StoreRequest request, Category category, CommonAddress commonAddress, ImageResponse imageResponse) {
+	public void update(StoreRequest request, Category category, CommonAddress commonAddress,
+		ImageResponse imageResponse) {
 		this.category = category;
 		this.commonAddress = commonAddress;
 		this.name = request.getName();
@@ -107,15 +109,33 @@ public class Store extends Timestamped {
 		this.closeTime = request.getCloseTime();
 		this.addressDetail = request.getAddressDetail();
 		this.phoneNumber = request.getPhoneNumber();
-		if(imageResponse != null) {
+		if (imageResponse != null) {
 			this.thumbnailName = imageResponse.getFileName();
 			this.thumbnailUrl = imageResponse.getUrl();
 		}
 	}
 
-	public void delete(String deletedBy){
-		this.isActive=false;
+	public void delete(String deletedBy) {
+		this.isActive = false;
 		this.setDeletedAt(LocalDateTime.now());
 		this.setDeletedBy(deletedBy);
 	}
+
+	public void calculateNewRating(int rating) {
+		if (this.reviewCount == 0)
+			this.rating = (float)rating;
+		else {
+			this.rating = (this.rating * this.reviewCount + rating) / (this.reviewCount + 1);
+		}
+		increaseReviewCount();
+	}
+
+	public void calculateEditRating(int rating) {
+		this.rating = (this.rating * this.reviewCount - this.rating + rating) / this.reviewCount;
+	}
+
+	private void increaseReviewCount() {
+		this.reviewCount++;
+	}
+
 }

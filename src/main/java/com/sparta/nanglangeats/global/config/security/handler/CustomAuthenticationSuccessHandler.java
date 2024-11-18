@@ -8,8 +8,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sparta.nanglangeats.domain.refresh_token.entity.RefreshToken;
-import com.sparta.nanglangeats.domain.refresh_token.repository.RefreshTokenRepository;
+import com.sparta.nanglangeats.domain.auth.entity.RefreshToken;
+import com.sparta.nanglangeats.domain.auth.repository.RefreshTokenRepository;
 import com.sparta.nanglangeats.domain.user.entity.User;
 import com.sparta.nanglangeats.domain.user.enums.UserRole;
 import com.sparta.nanglangeats.global.common.util.ControllerUtil;

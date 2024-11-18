@@ -12,20 +12,24 @@ import com.sparta.nanglangeats.domain.review.entity.Review;
 import com.sparta.nanglangeats.domain.store.entity.Store;
 import com.sparta.nanglangeats.domain.user.entity.User;
 
-public interface ReviewRepository  extends JpaRepository<Review, UUID> {
+public interface ReviewRepository  extends JpaRepository<Review, Long> {
 
-	// 삭제되지 않은 특정 음식점의 리뷰 리스트 조회
-	List<Review> findByStoreAndDeletedFalse(Store store);
+	boolean existsByOrderOrderId(Long orderId);
 
-	// 삭제되지 않은 특정 사용자의 리뷰 리스트 조회
-	List<Review> findByUserAndDeletedFalse(User user);
+	Optional<Review> findByUuid(String reviewUuid);
 
-	// 삭제되지 않은 특정 주문의 리뷰 조회
-	Review findByOrderAndDeletedFalse(Order order);
-	@Query("SELECT AVG(r.rating) FROM Review r WHERE r.store.storeId = :storeId")
-	Optional<Double> findAverageRatingByStoreId(UUID storeId);
-
-	List<Review> findByStore(Store store);
+	// // 삭제되지 않은 특정 음식점의 리뷰 리스트 조회
+	// List<Review> findByStoreAndDeletedFalse(Store store);
+	//
+	// // 삭제되지 않은 특정 사용자의 리뷰 리스트 조회
+	// List<Review> findByUserAndDeletedFalse(User user);
+	//
+	// // 삭제되지 않은 특정 주문의 리뷰 조회
+	// Review findByOrderAndDeletedFalse(Order order);
+	// @Query("SELECT AVG(r.rating) FROM Review r WHERE r.store.storeId = :storeId")
+	// Optional<Double> findAverageRatingByStoreId(UUID storeId);
+	//
+	// List<Review> findByStore(Store store);
 
 
 }
