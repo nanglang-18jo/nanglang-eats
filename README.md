@@ -1,19 +1,6 @@
 # nanglang-eats
 
-프로젝트 소개글 작성
-
-```
-- 반드시 포함해야 할 것
-  - 팀원 역할분담
-  - 기술 스택
-  - 서비스 구성 및 실행방법
-  - 프로젝트 목적/상세
-  - ERD
-  - (선택)API docs
-```
-
-<details>
-<summary>to be updated...</summary>
+스파르타 내일배움캠프 Spring 심화 2기 낭랑 18조의 음식 주문 앱 **낭랑이츠(Nang lang Eats)** 프로젝트입니다.
 
 ## R&R
 
@@ -186,13 +173,12 @@ $ git commit -m "this is Subject
 
 - 클래스명 : Pascal Case 사용 `ex) UserService.java`
 - 메소드명 : Camel Case 사용 `ex) getUser()`
-- DB스키마명 : Snake Case & Upper Case 사용 `ex) USER_PERMITION`
 
 **메소드**
 
 - getXxxList : 목록 조회
 - getXxxDetail : 단건, 상세 조회
-- insertXxx : 등록
+- createXxx : 등록
 - updateXxx : 수정
 - deleteXxx : 삭제
 
@@ -203,5 +189,3 @@ $ git commit -m "this is Subject
 ## Test
 
 테스트 매뉴얼 작성
-
-</details>
