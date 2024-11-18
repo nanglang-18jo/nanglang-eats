@@ -1,5 +1,7 @@
 package com.sparta.nanglangeats.domain.image.entity;
 
+import java.time.LocalDateTime;
+
 import com.sparta.nanglangeats.domain.image.enums.ImageCategory;
 import com.sparta.nanglangeats.domain.image.service.dto.ImageResponse;
 import com.sparta.nanglangeats.global.common.entity.Timestamped;
@@ -39,11 +41,21 @@ public class Image extends Timestamped {
 	@Enumerated(EnumType.STRING)
 	private ImageCategory imageCategory;
 
+	@Column(nullable = false)
+	private boolean isActive;
+
 	@Builder
 	public Image(ImageResponse response, Long contentId, ImageCategory imageCategory) {
 		this.fileName = response.getFileName();
 		this.url = response.getUrl();
 		this.contentId = contentId;
 		this.imageCategory = imageCategory;
+		this.isActive = true;
+	}
+
+	public void delete(String deletedBy){
+		this.isActive = false;
+		this.setDeletedAt(LocalDateTime.now());
+		this.setDeletedBy(deletedBy);
 	}
 }

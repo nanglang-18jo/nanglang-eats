@@ -7,7 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.sparta.nanglangeats.domain.image.entity.Image;
 import com.sparta.nanglangeats.domain.image.enums.ImageCategory;
 import com.sparta.nanglangeats.domain.image.repository.ImageRepository;
-import com.sparta.nanglangeats.domain.image.service.dto.ImageService;
+import com.sparta.nanglangeats.domain.image.service.ImageService;
 import com.sparta.nanglangeats.domain.product.controller.dto.request.ProductRequest;
 import com.sparta.nanglangeats.domain.product.controller.dto.response.ProductResponse;
 import com.sparta.nanglangeats.domain.product.entity.Product;
@@ -62,10 +62,20 @@ public class ProductService {
 
 		product.update(request);
 
-		imageService.deleteAllImages(ImageCategory.PRODUCT_IMAGE, product.getId());
+		imageService.hardDeleteAllImages(ImageCategory.PRODUCT_IMAGE, product.getId());
 		imageService.uploadAllImages(request.getImages(), ImageCategory.PRODUCT_IMAGE, product.getId());
 
 		return ProductResponse.builder().productUuid(product.getUuid()).build();
+	}
+
+	@Transactional
+	public void deleteProduct(String uuid, User user) {
+		Product product = findProductByUuid(uuid);
+		validateUser(product.getStore(), user);
+
+		product.delete(user.getUsername());
+
+		imageService.softDeleteAllImages(ImageCategory.PRODUCT_IMAGE, product.getId(), user.getUsername());
 	}
 
 	/* UTIL */
