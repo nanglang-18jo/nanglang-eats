@@ -1,6 +1,5 @@
 package com.sparta.nanglangeats.domain.store.controller.dto.request;
 
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -13,7 +12,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class StoreCreateRequest {
+public class StoreRequest {
 
 	@NotNull(message = "카테고리 정보를 입력해주세요.")
 	private Long categoryId;
@@ -34,7 +33,10 @@ public class StoreCreateRequest {
 	private String address;
 
 	private String addressDetail;
+	
 	private String phoneNumber;
+
+	private MultipartFile thumbnail;
 
 	private List<MultipartFile> images;
 }

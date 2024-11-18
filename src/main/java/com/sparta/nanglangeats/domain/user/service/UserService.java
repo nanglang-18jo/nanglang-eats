@@ -9,8 +9,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.sparta.nanglangeats.domain.user.controller.dto.request.UserUpdateRequest;
+import com.sparta.nanglangeats.domain.user.controller.dto.response.MyInfoResponse;
+import com.sparta.nanglangeats.domain.user.controller.dto.response.UserDetailResponse;
 import com.sparta.nanglangeats.domain.user.entity.User;
 import com.sparta.nanglangeats.domain.user.repository.UserRepository;
+import com.sparta.nanglangeats.domain.user.service.dto.request.ManagerSignupServiceRequest;
 import com.sparta.nanglangeats.domain.user.service.dto.request.UserSignupServiceRequest;
 import com.sparta.nanglangeats.global.common.exception.CustomException;
 import com.sparta.nanglangeats.global.common.exception.CustomFieldError;
@@ -38,9 +42,49 @@ public class UserService {
 			.build()).getId();
 	}
 
+	@Transactional
+	public Long createManager(ManagerSignupServiceRequest request) {
+		validateUserInfo(request.getUsername(), request.getNickname(), request.getEmail());
+
+		return userRepository.save(User.builder()
+			.username(request.getUsername())
+			.password(passwordEncoder.encode(request.getPassword()))
+			.nickname(request.getNickname())
+			.email(request.getEmail())
+			.role(request.getRole())
+			.build()).getId();
+	}
+
 	@Transactional(readOnly = true)
-	public User getUserByUsername(String username) {
-		return userRepository.findByUsername(username)
+	public MyInfoResponse getMyInfo(User user) {
+		User findUser = getUserById(user.getId());
+		return MyInfoResponse.from(findUser);
+	}
+
+	@Transactional(readOnly = true)
+	public UserDetailResponse getUserDetailByNickname(String nickname) {
+		User findUser = getUserByNickname(nickname);
+		return UserDetailResponse.from(findUser);
+	}
+
+	@Transactional
+	public Long updateMyInfo(User user, UserUpdateRequest request) {
+		validateUpdateUserInfo(user, request);
+		User findUser = getUserById(user.getId());
+		findUser.updateUserInfo(passwordEncoder.encode(request.getPassword()), request.getNickname(), request.getEmail(), request.getIsActive());
+		return findUser.getId();
+	}
+
+	@Transactional
+	public Long deleteMyAccount(User user) {
+		User findUser = getUserById(user.getId());
+		findUser.delete(findUser.getUsername());
+		return findUser.getId();
+	}
+
+	@Transactional(readOnly = true)
+	public User getUserByNickname(String nickname) {
+		return userRepository.findByNickname(nickname)
 			.orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 	}
 
@@ -48,6 +92,24 @@ public class UserService {
 	public User getUserById(Long userId) {
 		return userRepository.findById(userId)
 			.orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+	}
+
+	@Transactional(readOnly = true)
+	public User getUserByUsername(String username) {
+		return userRepository.findByUsername(username)
+			.orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+	}
+
+	@Transactional(readOnly = true)
+	public User getUserByEmail(String email) {
+		return userRepository.findByEmail(email)
+			.orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+	}
+
+	private void validateUpdateUserInfo(User user, UserUpdateRequest request) {
+		String nickname = user.getNickname().equals(request.getNickname()) ? null : request.getNickname();
+		String email = user.getEmail().equals(request.getEmail()) ? null : request.getEmail();
+		validateUserInfo(null, nickname, email);
 	}
 
 	private void validateUserInfo(String username, String nickname, String email) {

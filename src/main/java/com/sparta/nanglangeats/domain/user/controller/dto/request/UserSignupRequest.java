@@ -24,11 +24,11 @@ public class UserSignupRequest {
 	private String username;
 	@Password
 	private String password;
-	@NotBlank
+	@NotBlank(message = "최소 1자 이상의 닉네임을 반드시 입력해 주세요.")
 	private String nickname;
 	@Email
 	private String email;
-	@NotNull
+	@NotNull(message = "유저의 권한을 선택해 주세요.")
 	private UserRole role;
 
 	public UserSignupServiceRequest toServiceRequest() {
