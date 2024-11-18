@@ -1,7 +1,21 @@
 package com.sparta.nanglangeats.domain.ai.service;
 
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.RequestEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.sparta.nanglangeats.domain.ai.dto.request.AiRequest;
 import com.sparta.nanglangeats.domain.ai.dto.response.AiResponse;
@@ -13,8 +27,8 @@ import com.sparta.nanglangeats.domain.user.repository.UserRepository;
 import com.sparta.nanglangeats.global.common.dto.CommonResponse;
 import com.sparta.nanglangeats.global.common.exception.CustomException;
 import com.sparta.nanglangeats.global.common.exception.ErrorCode;
-import com.sparta.nanglangeats.global.config.ai.TextGenerationServiceClient;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -23,51 +37,35 @@ public class AiService {
 
 	private final AiRepository aiDataRepository;
 	private final UserRepository userRepository;
-	private final TextGenerationServiceClient textGenerationServiceClient;
+	private final GoogleAiClient googleAiClient; // Inject Google AI client
 
 	@Transactional
 	public CommonResponse<AiResponse> createMenuDescription(AiRequest request, User user) {
-		// 권한 확인
-		if (!(user.getRole() == UserRole.OWNER)) {
+		// Authorization check
+		if (!(user.getRole() == UserRole.OWNER))
 			throw new CustomException(ErrorCode.ACCESS_DENIED);
-		}
 
-		// Google AI API 호출하여 응답을 받는 로직
-		String question = request.getQuestion();
-		String aiAnswer = callGoogleAiApi(question);
+		// Generate prompt
+		String prompt = "설명이 필요한 음식을 작성해주세요: " + request.getProductName();
 
-		// DB 저장
-		AiData aiData = new AiData(request.getUser(), request.getProductName(), aiAnswer);
+		// Call Google AI API
+		String aiResponse = googleAiClient.generateText(prompt);
+
+		// Persist data
+		AiData aiData = AiData.builder()
+			.user(user)
+			.question(prompt)
+			.answer(aiResponse)
+			.build();
 		aiDataRepository.save(aiData);
 
-		// 응답 생성
-		AiResponse response = AiResponse.builder()
-			.statusCode("success")
-			.msg("메뉴 설명 생성 완료")
-			.data(aiAnswer)
-			.build();
-
+		// Return response
 		return CommonResponse.<AiResponse>builder()
-			.statusCode(200)
-			.msg("OK")
-			.data(response)
+			.statusCode(HttpStatus.CREATED.value())
+			.msg("메뉴 설명 생성 완료")
+			.data(AiResponse.builder()
+				.data(aiResponse)
+				.build())
 			.build();
-	}
-
-	private String callGoogleAiApi(String question) {
-		// 1. Google AI API 호출 요청 설정
-		TextGenerationRequest request = TextGenerationRequest.newBuilder()
-			.setModel("text-davinci-003") // 사용할 Google AI 모델 (예: text-davinci-003)
-			.setPrompt(question) // 질문을 프롬프트로 설정
-			.setMaxTokens(100) // 응답 최대 토큰 수 (조정 가능)
-			.setTemperature(0.7) // 생성 결과의 창의성 수준 (0~1 사이, 0에 가까울수록 덜 창의적)
-			.build();
-
-		// 2. Google AI API 호출
-		TextGenerationResponse response = textGenerationServiceClient.generateText(request);
-
-		// 3. 응답 처리
-		String aiAnswer = response.getGeneratedText();
-		return aiAnswer;
 	}
 }
