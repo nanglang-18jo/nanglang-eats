@@ -7,9 +7,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sparta.nanglangeats.domain.user.controller.dto.request.ManagerSignupRequest;
@@ -41,11 +43,21 @@ public class UserController {
 
 	@PutMapping("/api/users/me")
 	public ResponseEntity<CommonResponse<?>> updateMyInfo(@AuthenticationPrincipal User user, @Valid @RequestBody UserUpdateRequest request) {
-		return getResponseEntity(OK, userService.updateMyInfo(user, request), "내 정보 수정 성공");
+		return getOkResponseEntity(userService.updateMyInfo(user, request), "내 정보 수정 성공");
 	}
 	
 	@DeleteMapping("/api/users/me")
 	public ResponseEntity<CommonResponse<?>> deleteMyAccount(@AuthenticationPrincipal User user) {
 		return getResponseEntity(NO_CONTENT, userService.deleteMyAccount(user), "회원 탈퇴 성공");
+	}
+
+	@GetMapping("/api/users/me")
+	public ResponseEntity<CommonResponse<?>> getMyInfo(@AuthenticationPrincipal User user) {
+		return getOkResponseEntity(userService.getMyInfo(user), "내 정보 조회 성공");
+	}
+
+	@GetMapping("/api/users")
+	public ResponseEntity<CommonResponse<?>> getUserDetailByNickname(@RequestParam String nickname) {
+		return getOkResponseEntity(userService.getUserDetailByNickname(nickname), "유저 상세 정보 조회 성공");
 	}
 }

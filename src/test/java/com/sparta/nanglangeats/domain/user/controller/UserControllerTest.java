@@ -182,6 +182,31 @@ class UserControllerTest {
 	}
 
 	@Test
+	@DisplayName("getMyInfo(AuthenticationPrincipal): 내 정보를 조회한다.")
+	void getMyInfo() throws Exception {
+		// given
+		final String uri = "/api/users/me";
+
+		// expected
+		mockMvc.perform(get(uri))
+			.andDo(print())
+			.andExpect(status().isOk());
+	}
+
+	@Test
+	@DisplayName("getUserDetailByNickname(닉네임): 닉네임을 받아 유저 상세 정보를 조회한다.")
+	void getUserDetailByNickname() throws Exception {
+		// given
+		final String uri = "/api/users";
+		final String nickname = "tester123";
+
+		// expected
+		mockMvc.perform(get(uri).queryParam("nickname", nickname))
+			.andDo(print())
+			.andExpect(status().isOk());
+}
+
+	@Test
 	@DisplayName("updateMyInfo(유저변경정보DTO): 변경 정보를 입력받아 유저를 변경한다.")
 	void updateMyInfo() throws Exception {
 		// given

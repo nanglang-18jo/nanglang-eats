@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.sparta.nanglangeats.domain.user.controller.dto.request.UserUpdateRequest;
+import com.sparta.nanglangeats.domain.user.controller.dto.response.MyInfoResponse;
+import com.sparta.nanglangeats.domain.user.controller.dto.response.UserDetailResponse;
 import com.sparta.nanglangeats.domain.user.entity.User;
 import com.sparta.nanglangeats.domain.user.repository.UserRepository;
 import com.sparta.nanglangeats.domain.user.service.dto.request.ManagerSignupServiceRequest;
@@ -53,6 +55,18 @@ public class UserService {
 			.build()).getId();
 	}
 
+	@Transactional(readOnly = true)
+	public MyInfoResponse getMyInfo(User user) {
+		User findUser = getUserById(user.getId());
+		return MyInfoResponse.from(findUser);
+	}
+
+	@Transactional(readOnly = true)
+	public UserDetailResponse getUserDetailByNickname(String nickname) {
+		User findUser = getUserByNickname(nickname);
+		return UserDetailResponse.from(findUser);
+	}
+
 	@Transactional
 	public Long updateMyInfo(User user, UserUpdateRequest request) {
 		validateUpdateUserInfo(user, request);
@@ -66,6 +80,12 @@ public class UserService {
 		User findUser = getUserById(user.getId());
 		findUser.delete(findUser.getUsername());
 		return findUser.getId();
+	}
+
+	@Transactional(readOnly = true)
+	public User getUserByNickname(String nickname) {
+		return userRepository.findByNickname(nickname)
+			.orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 	}
 
 	@Transactional(readOnly = true)
