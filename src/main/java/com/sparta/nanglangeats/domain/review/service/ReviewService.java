@@ -56,7 +56,7 @@ public class ReviewService {
 		return new ReviewResponse(review);
 	}
 
-	// 음식점 고유 ID로 리뷰 리스트 조회
+	// 가게 고유 ID로 리뷰 리스트 조회
 	@Transactional(readOnly = true)
 	public List<ReviewResponse> getReviewsByStoreId(UUID storeId) {
 		Store store = storeRepository.findById(storeId)
@@ -70,7 +70,7 @@ public class ReviewService {
 			.collect(Collectors.toList());
 	}
 
-	// 특정 사용자 대한 리뷰 조회
+	// 다른 사용자 리뷰 목록 조회
 	public List<ReviewResponse> getReviewsByUser(UUID userId) {
 		User user = userRepository.findById(userId)
 			.orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다"));
@@ -79,16 +79,6 @@ public class ReviewService {
 		return reviews.stream()
 			.map(ReviewResponse::new)
 			.collect(Collectors.toList());
-	}
-
-	// 특정 주문에 대한 리뷰 조회
-	public ReviewResponse getReviewByOrder(UUID orderId) {
-		Order order = orderRepository.findById(orderId)
-			.orElseThrow(() -> new IllegalArgumentException("주문 정보를 찾을 수 없습니다"));
-
-		// 삭제되지 않은 리뷰만 조회
-		Review review = reviewRepository.findByOrderAndDeletedFalse(order);
-		return new ReviewResponse(review);
 	}
 
 	//리뷰 수정
