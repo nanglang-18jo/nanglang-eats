@@ -11,6 +11,10 @@ import com.sparta.nanglangeats.domain.user.entity.User;
 
 public interface DeliveryAddressRepository extends JpaRepository<DeliveryAddress, Long> {
 	@Query("SELECT da FROM DeliveryAddress da JOIN FETCH da.commonAddress WHERE da.user = :user")
-	List<DeliveryAddress> findByUser(User user);
+	List<DeliveryAddress> findAllByUser(User user);
+
+	@Query("SELECT da FROM DeliveryAddress da JOIN FETCH da.commonAddress WHERE da.id = :id")
+	Optional<DeliveryAddress> findByUserWithCommonAddress(Long id);
+
 	Optional<DeliveryAddress> findByUserAndIsRecentDeliveryTrue(User user);
 }
