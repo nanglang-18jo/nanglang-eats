@@ -49,6 +49,7 @@ public class SecurityConfig {
 			.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
 			.authorizeHttpRequests(requests -> requests
+				.requestMatchers("/v3/**", "/swagger-ui/**").permitAll()
 				.requestMatchers("/api/auth/**").permitAll()
 				.requestMatchers("/api/users/signup").permitAll()
 				.requestMatchers(GET, "/api/users/me").authenticated()
@@ -77,7 +78,6 @@ public class SecurityConfig {
 			"ROLE_MANAGER > ROLE_OWNER\n" +
 			"ROLE_MASTER > ROLE_MANAGER");
 	}
-
 
 	private CustomAuthenticationFilter customAuthenticationFilter(AuthenticationManager authenticationManager) {
 		CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter();
