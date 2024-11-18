@@ -5,37 +5,37 @@
 
 ## R&R
 
-| [신진우](https://github.com/sjw0851)                                                                                                                            | [김해나](https://github.com/gogohaena)                                                                                                    | [안주환](https://github.com/Hut234)                                                                       | [이민정](https://github.com/M1ngD0ng)                                                                       
-|------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|
-| |
-| • ERD 설계 <br>• AI 메뉴 설명 생성<br>• 리뷰 관리 기능 <br>   | • ERD 설계<br>•주문 관리 기능 <br>•결제 관리 기능   | • ERD 설계<br>•인증 · 인가 기능 구현 <br>•유저(고객, 관리자, 매니저, 마스터) 기능 구현 <br>•리뷰 조회 기능 구현 <br>• AWS 배포                                            |• ERD 설계<br>•가게 관리 기능 구현 <br>•상품 관리 기능 구현 <br>•리뷰 관리 기능 구현                                                                                                          |
-### 개발 기술과 환경
+| [신진우](https://github.com/sjw0851)                   | [김해나](https://github.com/gogohaena)        | [안주환](https://github.com/Hut234)                                                                      | [이민정](https://github.com/M1ngD0ng)                                  | 
+|-----------------------------------------------------|--------------------------------------------|-------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------|
+| • ERD 설계 <br/> • AI 메뉴 설명 생성 <br/> • 리뷰 관리 기능 <br/> | • ERD 설계 <br/> • 주문 관리 기능 <br/> • 결제 관리 기능 | • ERD 설계 <br/> • 인증 · 인가 기능 구현 <br/> • 유저(고객, 관리자, 매니저, 마스터) 기능 구현 <br/> • 리뷰 조회 기능 구현 <br/> • AWS 배포 | • ERD 설계<br/> • 가게 관리 기능 구현 <br/> • 상품 관리 기능 구현 <br/> • 리뷰 관리 기능 구현 |
+
+## 개발 기술과 환경
 
 ![AMAZONAWS](https://img.shields.io/badge/amazonaws-232F3E?style=for-the-badge&logo=amazonaws&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
-
 
 ![JAVA](https://img.shields.io/badge/java-007396?style=for-the-badge&logo=java&logoColor=white)
 ![SpringBoot](https://img.shields.io/badge/springboot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)
 ![SpringSecurity](https://img.shields.io/badge/springsecurity-6DB33F?style=for-the-badge&logo=springsecurity&logoColor=white)
 ![GoogleGemini](https://img.shields.io/badge/googlegemini-8E75B2?style=for-the-badge&logo=googlegemini&logoColor=white)
 
-
 ![Github](https://img.shields.io/badge/github-181717?style=for-the-badge&logo=github&logoColor=white)
 ![Notion](https://img.shields.io/badge/Notion-000000?style=for-the-badge&logo=Notion&logoColor=white)
 ![Slack](https://img.shields.io/badge/Slack-4A154B?style=for-the-badge&logo=Slack&logoColor=white)
 ![Swagger](https://img.shields.io/badge/swagger-85EA2D?style=for-the-badge&logo=swaggeri&logoColor=white)
 
-### 개발 일정
+## 개발 일정
 
 2024년 11월 06일 ~ 2024년 11월 18일
 
 ## 서비스 구성 및 실행 방법
 
-
+- 구성도
+- 배포 URL
 
 ## 프로젝트 목적/상세
+
 - **프로젝트 개요**
     - **주제:** 배달 및 포장 음식 주문 관리 플랫폼 개발
     - **목표:** 광화문 근처에서 운영될 음식점들의 배달 및 포장 주문 관리, 결제, 그리고 주문 내역 관리 기능을 제공하는 플랫폼 개발
@@ -76,6 +76,7 @@
 - **AI API 연동**
     - **상품 설명 자동 생성:** AI API를 연동하여 가게 사장님이 상품 설명을 쉽게 작성할 수 있도록 지원
     - **AI 요청 기록:** AI API 요청 질문과 대답은 모두 데이터베이스에 저장
+
 ## Dependency
 
 - Java SDK 17
@@ -90,9 +91,11 @@
 - aws
 
 ## ERD
+
 ![18조 ERD 설계서 최종](https://github.com/user-attachments/assets/d1739a04-c064-4100-9723-696089bb815b)
 
 ## Swagger
+
 [nanglang-eats Swagger문서](http://43.200.171.152/swagger-ui/index.html)
 
 ## Git Convention
@@ -182,11 +185,3 @@ $ git commit -m "this is Subject
 - createXxx : 등록
 - updateXxx : 수정
 - deleteXxx : 삭제
-
-## Deploy
-
-배포 매뉴얼 작성
-
-## Test
-
-테스트 매뉴얼 작성
