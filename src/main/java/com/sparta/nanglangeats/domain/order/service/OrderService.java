@@ -33,6 +33,8 @@ import com.sparta.nanglangeats.global.common.exception.CustomFieldError;
 import com.sparta.nanglangeats.global.common.exception.ErrorCode;
 import com.sparta.nanglangeats.global.common.exception.ParameterException;
 
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -79,6 +81,7 @@ public class OrderService {
 			OrderProduct orderProduct = OrderProduct.builder()
 				.order(order)
 				.productId(productDto.getProductId())
+				.name(productDto.getName())
 				.quantity(productDto.getQuantity())
 				.price(productDto.getPrice())
 				.build();
@@ -117,6 +120,7 @@ public class OrderService {
 			OrderProduct orderProduct = OrderProduct.builder()
 				.order(order)
 				.productId(productDto.getProductId())
+				.name(productDto.getName())
 				.quantity(productDto.getQuantity())
 				.build();
 			orderProductRepository.save(orderProduct);
@@ -232,7 +236,8 @@ public class OrderService {
 
 	// 주문 목록 조회
 	@Transactional(readOnly = true)
-	public Object getOrderList(User user, int page, int size, String sortBy, String status, String search) {
+	public Object getOrderList(User user, int page, int size, String sortBy, String status, String search,
+		LocalDate startDate, LocalDate endDate) {
 		if (size != 10 && size != 30 && size != 50) {
 			size = 10; // 허용되지 않은 size 값은 기본값으로 설정
 		}
@@ -261,11 +266,20 @@ public class OrderService {
 			spec = spec.and((root, query, cb) -> cb.equal(root.get("status"), OrderStatus.valueOf(status)));
 		}
 
-		// 검색
-		if (search != null && !search.isEmpty()) {
-			spec = spec.and((root, query, cb) -> cb.like(root.get("address"), "%" + search + "%"));
+		// 날짜 조건 추가
+		if (startDate != null && endDate != null) {
+			spec = spec.and((root, query, cb) -> cb.between(root.get("createdAt"), startDate, endDate));
 		}
 
+		// 주문 상품명 검색
+		if (search != null && !search.isEmpty()) {
+			spec = spec.and((root, query, cb) -> {
+				Join<Order, OrderProduct> productsJoin = root.join("orderProducts", JoinType.LEFT);
+				return cb.like(productsJoin.get("name"), "%" + search + "%");
+			});
+		}
+
+		// 페이징 처리된 결과 조회
 		Page<Order> orders = orderRepository.findAll(spec, pageable);
 		return orders.map(OrderSummaryResponse::new);
 	}
@@ -293,9 +307,9 @@ public class OrderService {
 
 	public void validateStoreOwner(String storeId, Long userId) {
 		// 가게 주인의 ID를 가져오고, 없거나 잘못된 경우 예외 처리
-		// TODO: StoreService에 getStoreOwnerId() 구현 필요
+		// TODO: storeService.getStoreOwnerIdByStoreId(request.getStoreId()) 구현 필요
 		/*
-		String storeOwnerId = Optional.ofNullable(storeService.getStoreOwnerId(request.getStoreId()))
+		String storeOwnerId = Optional.ofNullable(storeService.getStoreOwnerIdByStoreId(request.getStoreId()))
 			.filter(id -> id instanceof String)
 			.map(String.class::cast)
 			.orElseThrow(() -> new CustomException(ErrorCode.STORE_OWNER_NOT_FOUND));

@@ -1,6 +1,7 @@
 package com.sparta.nanglangeats.domain.order.entity;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -67,7 +68,7 @@ public class Order extends Timestamped {
 	private boolean isActive;
 
 	@OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-	private List<OrderProduct> orderProducts;
+	private List<OrderProduct> orderProducts = new ArrayList<>();
 
 	@Builder
 	public Order(Long userId, String storeId, String orderUuid, Integer orderNumber, String address,

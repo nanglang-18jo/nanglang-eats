@@ -1,5 +1,8 @@
 package com.sparta.nanglangeats.domain.order.controller;
 
+import java.time.LocalDate;
+
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -112,10 +115,12 @@ public class OrderController {
 		@RequestParam(defaultValue = "10") int size,
 		@RequestParam(defaultValue = "createdAt") String sortBy,
 		@RequestParam(required = false) String status,
-		@RequestParam(required = false) String search) {
+		@RequestParam(required = false) String search,
+		@RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+		@RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate) {
 
 		return ControllerUtil.getResponseEntity(HttpStatus.OK,
-			orderService.getOrderList(user, page, size, sortBy, status, search),
+			orderService.getOrderList(user, page, size, sortBy, status, search, startDate, endDate),
 			"주문 목록 조회 성공");
 	}
 }

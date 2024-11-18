@@ -44,6 +44,9 @@ public class OrderCreateRequest {
 		@NotBlank(message = "productId는 필수 항목입니다.")
 		private String productId;
 
+		@NotBlank(message = "상품명(name)은 필수 항목입니다.")
+		private String name;
+
 		@NotNull(message = "상품 개수(quantity)는 필수 항목입니다.")
 		@Min(value = 1, message = "상품 개수(quantity)는 1 이상이어야 합니다.")
 		private Integer quantity;
