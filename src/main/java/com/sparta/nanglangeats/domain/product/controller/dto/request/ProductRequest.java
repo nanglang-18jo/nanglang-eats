@@ -11,9 +11,9 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class ProductCreateRequest {
+public class ProductRequest {
 	@NotNull(message = "가게 ID를 입력해주세요.")
-	private Long storeId;
+	private String storeUuid;
 
 	@NotBlank(message = "상품명을 입력해주세요.")
 	private String name;

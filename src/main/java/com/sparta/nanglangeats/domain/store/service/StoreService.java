@@ -18,7 +18,7 @@ import com.sparta.nanglangeats.domain.address.service.CommonAddressService;
 import com.sparta.nanglangeats.domain.image.entity.Image;
 import com.sparta.nanglangeats.domain.image.enums.ImageCategory;
 import com.sparta.nanglangeats.domain.image.repository.ImageRepository;
-import com.sparta.nanglangeats.domain.image.service.dto.ImageService;
+import com.sparta.nanglangeats.domain.image.service.ImageService;
 import com.sparta.nanglangeats.domain.store.controller.dto.request.StoreRequest;
 import com.sparta.nanglangeats.domain.store.controller.dto.response.StoreDetailResponse;
 import com.sparta.nanglangeats.domain.store.controller.dto.response.StoreListResponse;
@@ -69,7 +69,7 @@ public class StoreService {
 			imageService.uploadAllImages(request.getImages(), ImageCategory.STORE_IMAGE, store.getId());
 		}
 
-		return StoreResponse.builder().storeId(store.getUuid()).build();
+		return StoreResponse.builder().storeUuid(store.getUuid()).build();
 	}
 
 	@Transactional
@@ -83,10 +83,10 @@ public class StoreService {
 		CommonAddress commonAddress = commonAddressService.findCommonAddressByAddress(request.getAddress());
 		store.update(request, category, commonAddress);
 
-		imageService.deleteAllImages(ImageCategory.STORE_IMAGE, store.getId());
+		imageService.hardDeleteAllImages(ImageCategory.STORE_IMAGE, store.getId());
 		imageService.uploadAllImages(request.getImages(), ImageCategory.STORE_IMAGE, store.getId());
 
-		return StoreResponse.builder().storeId(store.getUuid()).build();
+		return StoreResponse.builder().storeUuid(store.getUuid()).build();
 	}
 
 	@Transactional
@@ -95,8 +95,9 @@ public class StoreService {
 
 		if (user.getRole().equals(UserRole.OWNER) && !store.getOwner().equals(user))
 			throw new CustomException(ErrorCode.ACCESS_DENIED);
-
 		store.delete(user.getUsername());
+
+		imageService.softDeleteAllImages(ImageCategory.STORE_IMAGE, store.getId(), user.getUsername());
 	}
 
 	public StoreDetailResponse getStoreDetail(String uuid){
