@@ -72,9 +72,9 @@ public class Review extends Timestamped {
 		this.rating = request.getRating();
 	}
 
-	// public void deleteReview(String deleteBy){
-	// 	this.isActive = false;
-	// 	this.setDeletedAt(LocalDateTime.now());
-	// 	this.setDeletedBy(deleteBy);
-	// }
+	public void delete(String deleteBy) {
+		this.isActive = false;
+		this.setDeletedAt(LocalDateTime.now());
+		this.setDeletedBy(deleteBy);
+	}
 }

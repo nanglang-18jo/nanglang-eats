@@ -74,6 +74,7 @@ public class ReviewService {
 
 		validateReviewOwner(review.getUser().getId(), user.getId());
 
+		review.getStore().calculateUpdateRating(review.getRating(), request.getRating());
 		review.update(request);
 
 		imageService.hardDeleteAllImages(ImageCategory.REVIEW_IMAGE, review.getId());
@@ -83,9 +84,22 @@ public class ReviewService {
 			imagesUrl = imageService.uploadAllImages(request.getImages(), ImageCategory.REVIEW_IMAGE, review.getId());
 		}
 
-		review.getStore().calculateEditRating(request.getRating());
 
 		return ReviewResponse.builder().review(review).imagesUrl(imagesUrl).build();
+	}
+
+	@Transactional
+	public void deleteReview(String reviewUuid, User user) {
+		Review review = findReviewByUuid(reviewUuid);
+
+		if (user.getRole().equals(UserRole.CUSTOMER))
+			validateReviewOwner(review.getUser().getId(), user.getId());
+
+		review.getStore().calculateDeleteRating(review.getRating());
+
+		review.delete(user.getUsername());
+
+		imageService.softDeleteAllImages(ImageCategory.REVIEW_IMAGE, review.getId(), user.getUsername());
 	}
 
 	//
@@ -115,21 +129,12 @@ public class ReviewService {
 	// }
 	//
 
-	// @Transactional
-	// public void deleteReview(UUID reviewId, String deletedBy) {
-	//
-	// 	Review review = reviewRepository.findById(reviewId)
-	// 		.orElseThrow(() -> new IllegalArgumentException("해당 리뷰는 삭제되었습니다 : " + reviewId));
-	//
-	// 	review.deleteReview(deletedBy);
-	//
-	// 	reviewRepository.save(review);  // 업데이트된 리뷰 저장
-	// }
+
 
 	/* UTIL */
 
 	private void checkDuplicateReview(Long orderId) {
-		if (reviewRepository.existsByOrderOrderId(orderId))
+		if (reviewRepository.existsByOrderOrderIdAndIsActiveTrue(orderId))
 			throw new CustomException(ErrorCode.REVIEW_ALREADY_EXISTS);
 	}
 
@@ -144,7 +149,7 @@ public class ReviewService {
 	}
 
 	private Review findReviewByUuid(String reviewUuid) {
-		return reviewRepository.findByUuid(reviewUuid)
+		return reviewRepository.findByUuidAndIsActiveTrue(reviewUuid)
 			.orElseThrow(() -> new CustomException(ErrorCode.REVIEW_NOT_FOUND));
 	}
 

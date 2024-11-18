@@ -14,9 +14,9 @@ import com.sparta.nanglangeats.domain.user.entity.User;
 
 public interface ReviewRepository  extends JpaRepository<Review, Long> {
 
-	boolean existsByOrderOrderId(Long orderId);
+	boolean existsByOrderOrderIdAndIsActiveTrue(Long orderId);
 
-	Optional<Review> findByUuid(String reviewUuid);
+	Optional<Review> findByUuidAndIsActiveTrue(String reviewUuid);
 
 	// // 삭제되지 않은 특정 음식점의 리뷰 리스트 조회
 	// List<Review> findByStoreAndDeletedFalse(Store store);
