@@ -29,7 +29,7 @@ public class ReviewController {
 	private final ReviewService reviewService;
 
 	@PreAuthorize("hasRole('CUSTOMER')")
-	@PostMapping(("/api/customers/reviews"))
+	@PostMapping(("/api/reviews"))
 	public ResponseEntity<CommonResponse<?>> createReview(
 		@ModelAttribute @Valid ReviewRequest request,
 		@AuthenticationPrincipal User user) {
@@ -47,7 +47,7 @@ public class ReviewController {
 	}
 
 	@PreAuthorize("hasRole('CUSTOMER')")
-	@PatchMapping("/api/customers/reviews/{reviewUuid}")
+	@PatchMapping("/api/reviews/{reviewUuid}")
 	public ResponseEntity<CommonResponse<?>> updateReview(
 		@PathVariable String reviewUuid,
 		@ModelAttribute @Valid ReviewRequest request,
@@ -56,7 +56,7 @@ public class ReviewController {
 	}
 
 	@PreAuthorize("hasAnyRole('CUSTOMER')")
-	@DeleteMapping("/api/customers/reviews/{reviewUuid}")
+	@DeleteMapping("/api/reviews/{reviewUuid}")
 	public ResponseEntity<CommonResponse<?>> deleteReview(
 		@PathVariable String reviewUuid,
 		@AuthenticationPrincipal User user) {
