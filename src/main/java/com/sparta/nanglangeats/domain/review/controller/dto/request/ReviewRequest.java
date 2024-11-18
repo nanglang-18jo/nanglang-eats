@@ -5,18 +5,23 @@ import java.util.UUID;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor
 @AllArgsConstructor
 public class ReviewRequest {
-	private UUID userId;
-	private UUID storeId;
-	private UUID orderId;
+
+	@NotBlank(message = "리뷰를 등록할 주문의 UUID를 입력해주세요.")
+	private String orderUuid;
+
 	private String content;
+
 	private List<MultipartFile> images;
-	private float rating;
+
+	@NotNull(message = "별점은 필수 항목입니다.")
+	private Integer rating;
 }

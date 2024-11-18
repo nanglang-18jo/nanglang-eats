@@ -70,7 +70,6 @@ public class StoreController {
 	public ResponseEntity<CommonResponse<?>> getStoresList(
 		@RequestParam Long categoryId,
 		@RequestParam(defaultValue = "0") int page,
-		@RequestParam(defaultValue = "10") int size,
 		@RequestParam(defaultValue = "name") String sortBy) {
 		List<String> validSortByFields = Arrays.asList("name", "reviewCount", "rating");
 		if (!validSortByFields.contains(sortBy))
@@ -80,7 +79,14 @@ public class StoreController {
 		if (sortBy.equals("name"))
 			direction = "asc";
 
-		return getOkResponseEntity(storeService.getStoresList(categoryId, page, size, sortBy, direction),
+		return getOkResponseEntity(storeService.getStoresList(categoryId, page, sortBy, direction),
 			"가게 목록 조회 완료");
+	}
+
+	@GetMapping("/search")
+	public ResponseEntity<CommonResponse<?>> searchStore(
+		@RequestParam String keyword,
+		@RequestParam(defaultValue = "0") int page){
+		return getOkResponseEntity(storeService.searchStore(keyword, page), "가게 검색 완료");
 	}
 }

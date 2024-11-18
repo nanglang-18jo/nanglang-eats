@@ -9,14 +9,23 @@ import com.sparta.nanglangeats.domain.user.entity.User;
 import com.sparta.nanglangeats.global.common.entity.Timestamped;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@Entity
+@Getter
+@Table(name = "p_review")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Review extends Timestamped {
 
 	@Id
@@ -39,45 +48,33 @@ public class Review extends Timestamped {
 	private Store store;
 
 	@Column
-	private float rating;
+	private int rating;
 
-	@Column(nullable = false)
 	private String content;
-
-	@Column(nullable = false)
-	private String image;
 
 	@Column(nullable = false)
 	private Boolean isActive;
 
 	@Builder
-	public Review(Order order, User user, Store store, String content, String image, float rating) {
-		this.uuid = UUID.randomUUID().toString(); // uuid 자동 생성
+	public Review(Order order, User user, Store store, int rating, String content) {
+		this.uuid = UUID.randomUUID().toString();
 		this.order = order;
 		this.user = user;
 		this.store = store;
+		this.rating = rating;
 		this.content = content;
-		this.image = image;
-		setRating(rating);
 		this.isActive = true;
 	}
-
-	public void setRating(float rating) {
-		if (rating < 1 || rating > 5) {
-			throw new IllegalArgumentException("평점은 1.0점에서 5.0점 사이입니다.");
-		}
-		this.rating = rating;
-	}
-
-	public void updateReview(String content, String image, float rating) {
-		this.content = content;
-		this.image = image;
-		this.rating = rating;
-	}
-
-	public void deleteReview(String deleteBy){
-		this.isActive = false;
-		this.setDeletedAt(LocalDateTime.now());
-		this.setDeletedBy(deleteBy);
-	}
+	//
+	// public void updateReview(String content, String image, float rating) {
+	// 	this.content = content;
+	// 	this.image = image;
+	// 	this.rating = rating;
+	// }
+	//
+	// public void deleteReview(String deleteBy){
+	// 	this.isActive = false;
+	// 	this.setDeletedAt(LocalDateTime.now());
+	// 	this.setDeletedBy(deleteBy);
+	// }
 }

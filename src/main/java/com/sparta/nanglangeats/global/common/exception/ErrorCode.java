@@ -52,6 +52,7 @@ public enum ErrorCode {
 
     // Review
     REVIEW_NOT_FOUND(NOT_FOUND, "해당 리뷰를 찾을 수 없습니다."),
+    REVIEW_ALREADY_EXISTS(BAD_REQUEST, "각 주문에는 리뷰를 1번만 등록할 수 있습니다."),
 
     // Address
     ADDRESS_NOT_FOUND(NOT_FOUND, "해당 주소를 찾을 수 없습니다."),

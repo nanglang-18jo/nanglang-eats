@@ -7,7 +7,10 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.sparta.nanglangeats.domain.image.enums.ImageCategory;
+import com.sparta.nanglangeats.domain.image.service.ImageService;
 import com.sparta.nanglangeats.domain.order.entity.Order;
+import com.sparta.nanglangeats.domain.order.repository.OrderRepository;
 import com.sparta.nanglangeats.domain.review.controller.dto.request.ReviewRequest;
 import com.sparta.nanglangeats.domain.review.controller.dto.response.ReviewResponse;
 import com.sparta.nanglangeats.domain.review.entity.Review;
@@ -25,83 +28,108 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ReviewService {
 
 	private final ReviewRepository reviewRepository;
 	private final OrderRepository orderRepository;
 	private final StoreRepository storeRepository;
 	private final UserRepository userRepository;
+	private final ImageService imageService;
 
 	//리뷰 생성
 	@Transactional
 	public ReviewResponse createReview(ReviewRequest request, User user) {
-		Order order = orderRepository.findById(request.getUserId())
-			.orElseThrow(() -> new IllegalArgumentException("Invalid User ID"));
-		if(!order.getUser().equals(user)){
-			throw new IllegalArgumentException("이 주문은 해당 사용자에게 속하지 않습니다.");
-		}
-		Store store = storeRepository.findById(request.getReviewId())
-			.orElseThrow(() -> new IllegalArgumentException("Invalid Store ID"));
+		Order order = findOrderByUuid(request.getOrderUuid());
+
+		checkDuplicateReview(order.getOrderId());
+
+		Store store = findStoreByUuid(order.getStoreId());
+
+		validateOrderOwner(order.getUserId(), user.getId());
 
 		Review review = Review.builder()
+			.order(order)
 			.user(user)
 			.store(store)
-			.order(order)
-			.content(request.getContent())
 			.rating(request.getRating())
+			.content(request.getContent())
 			.build();
 
 		reviewRepository.save(review);
 
-		return new ReviewResponse(review);
-	}
-
-	// 가게 고유 ID로 리뷰 리스트 조회
-	@Transactional(readOnly = true)
-	public List<ReviewResponse> getReviewsByStoreId(UUID storeId) {
-		Store store = storeRepository.findById(storeId)
-			.orElseThrow(() -> new IllegalArgumentException("음식점 정보를 찾을 수 없습니다"));
-
-		// 삭제되지 않은 리뷰만 조회
-		List<Review> reviews = reviewRepository.findByStoreAndDeletedFalse(store);
-
-		return reviews.stream()
-			.map(ReviewResponse::new)
-			.collect(Collectors.toList());
-	}
-
-	// 다른 사용자 리뷰 목록 조회
-	public List<ReviewResponse> getReviewsByUser(UUID userId) {
-		User user = userRepository.findById(userId)
-			.orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다"));
-		// 삭제되지 않은 리뷰만 조회
-		List<Review> reviews = reviewRepository.findByUserAndDeletedFalse(user);
-		return reviews.stream()
-			.map(ReviewResponse::new)
-			.collect(Collectors.toList());
-	}
-
-	//리뷰 수정
-	@Transactional
-	public ReviewResponse updateReview(UUID reviewId, ReviewRequest request, User user) {
-		Review review = reviewRepository.findById(reviewId)
-			.orElseThrow(() -> new CustomException(ErrorCode.REVIEW_NOT_FOUND));
-
-		if(!review.getUser().equals(user)){
-			throw new SecurityException("해당 리뷰는 수정할 수가 없습니다.");
+		List<String> imagesUrl = null;
+		if (!request.getImages().isEmpty()) {
+			imagesUrl = imageService.uploadAllImages(request.getImages(), ImageCategory.REVIEW_IMAGE, review.getId());
 		}
-		review.updateReview(request.getContent(), request.getImages().toString(), request.getRating());
-		return new ReviewResponse(review);
+
+		store.updateRating(request.getRating());
+		return ReviewResponse.builder().review(review).imagesUrl(imagesUrl).build();
+	}
+	//
+	// // 가게 고유 ID로 리뷰 리스트 조회
+	// @Transactional(readOnly = true)
+	// public List<ReviewResponse> getReviewsByStoreId(UUID storeId) {
+	// 	Store store = storeRepository.findById(storeId)
+	// 		.orElseThrow(() -> new IllegalArgumentException("음식점 정보를 찾을 수 없습니다"));
+	//
+	// 	// 삭제되지 않은 리뷰만 조회
+	// 	List<Review> reviews = reviewRepository.findByStoreAndDeletedFalse(store);
+	//
+	// 	return reviews.stream()
+	// 		.map(ReviewResponse::new)
+	// 		.collect(Collectors.toList());
+	// }
+	//
+	// // 다른 사용자 리뷰 목록 조회
+	// public List<ReviewResponse> getReviewsByUser(UUID userId) {
+	// 	User user = userRepository.findById(userId)
+	// 		.orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다"));
+	// 	// 삭제되지 않은 리뷰만 조회
+	// 	List<Review> reviews = reviewRepository.findByUserAndDeletedFalse(user);
+	// 	return reviews.stream()
+	// 		.map(ReviewResponse::new)
+	// 		.collect(Collectors.toList());
+	// }
+	//
+	// //리뷰 수정
+	// @Transactional
+	// public ReviewResponse updateReview(UUID reviewId, ReviewRequest request, User user) {
+	// 	Review review = reviewRepository.findById(reviewId)
+	// 		.orElseThrow(() -> new CustomException(ErrorCode.REVIEW_NOT_FOUND));
+	//
+	// 	if(!review.getUser().equals(user)){
+	// 		throw new SecurityException("해당 리뷰는 수정할 수가 없습니다.");
+	// 	}
+	// 	review.updateReview(request.getContent(), request.getImages().toString(), request.getRating());
+	// 	return new ReviewResponse(review);
+	// }
+	//
+	// @Transactional
+	// public void deleteReview(UUID reviewId, String deletedBy) {
+	//
+	// 	Review review = reviewRepository.findById(reviewId)
+	// 		.orElseThrow(() -> new IllegalArgumentException("해당 리뷰는 삭제되었습니다 : " + reviewId));
+	//
+	// 	review.deleteReview(deletedBy);
+	//
+	// 	reviewRepository.save(review);  // 업데이트된 리뷰 저장
+	// }
+
+	/* UTIL */
+	private Order findOrderByUuid(String uuid) {
+		return orderRepository.findByOrderUuid(uuid).orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
 	}
 
-	@Transactional
-	public void deleteReview(UUID reviewId, String deletedBy) {
+	private void checkDuplicateReview(Long orderId){
+		if(reviewRepository.existsByOrderOrderId(orderId)) throw new CustomException(ErrorCode.REVIEW_ALREADY_EXISTS);
+	}
+	private void validateOrderOwner(Long orderOwnerId, Long requestUserId) {
+		if (!orderOwnerId.equals(requestUserId))
+			throw new CustomException(ErrorCode.ACCESS_DENIED);
+	}
 
-		Review review = reviewRepository.findById(reviewId)
-			.orElseThrow(() -> new IllegalArgumentException("해당 리뷰는 삭제되었습니다 : " + reviewId));
-
-		review.deleteReview(deletedBy);
-
-		reviewRepository.save(review);  // 업데이트된 리뷰 저장
+	private Store findStoreByUuid(String storeUuid) {
+		return storeRepository.findByUuid(storeUuid).orElseThrow(() -> new CustomException(ErrorCode.STORE_NOT_FOUND));
 	}
 }

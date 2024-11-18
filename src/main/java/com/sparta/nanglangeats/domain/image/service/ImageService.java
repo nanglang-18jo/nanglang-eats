@@ -1,5 +1,6 @@
 package com.sparta.nanglangeats.domain.image.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -22,7 +23,7 @@ public class ImageService {
 	private final ImageRepository imageRepository;
 
 	@Transactional
-	public void uploadAllImages(List<MultipartFile> images, ImageCategory category, Long contentId) {
+	public List<String> uploadAllImages(List<MultipartFile> images, ImageCategory category, Long contentId) {
 		String dirName = "";
 		if (category == ImageCategory.STORE_IMAGE)
 			dirName = "store-images";
@@ -31,16 +32,15 @@ public class ImageService {
 		else if (category == ImageCategory.REVIEW_IMAGE)
 			dirName = "review-images";
 
-		for (MultipartFile image : images) {
-			Image storeImage = new Image(s3Util.uploadFile(image, dirName), contentId, category);
-			imageRepository.save(storeImage);
-		}
-	}
+		List<String> imageUrls = new ArrayList<>();
 
-	@Transactional
-	public ImageResponse changeImage(String fileName, String dirName, MultipartFile image) {
-		s3Util.deleteFile(fileName);
-		return uploadImage(image, dirName);
+		for (MultipartFile image : images) {
+			ImageResponse imageResponse = s3Util.uploadFile(image, dirName);
+			Image storeImage = new Image(imageResponse, contentId, category);
+			imageRepository.save(storeImage);
+			imageUrls.add(imageResponse.getUrl());
+		}
+		return imageUrls;
 	}
 
 	@Transactional
