@@ -34,6 +34,9 @@ public enum ErrorCode {
 
     USER_NOT_FOUND(NOT_FOUND, "유저를 찾을 수 없습니다."),
 
+    // DELIVERY ADDRESS
+    DELIVERY_ADDRESS_NOT_FOUND(NOT_FOUND, "해당 배송 주소를 찾을 수 없습니다."),
+
     // Order
     ORDER_PRODUCT_QUANTITY_INVALID(BAD_REQUEST, "상품 수량은 0보다 커야 합니다."),
     ORDER_PRODUCT_ID_INVALID(BAD_REQUEST, "상품 아이디가 유효하지 않습니다."),
